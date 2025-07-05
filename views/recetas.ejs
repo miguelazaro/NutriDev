@@ -1,0 +1,48 @@
+<div class="flex justify-between items-center px-6 py-4 bg-white shadow-sm">
+    <h1 class="text-2xl font-bold text-gray-800">Listado de Recetas</h1>
+    <a href="/recetas/nueva"
+        class="group inline-flex items-center gap-2 bg-gradient-to-br from-emerald-500 to-emerald-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:from-emerald-600 hover:to-emerald-700 transition-transform transform hover:scale-105">
+        <i class="fas fa-plus group-hover:animate-pulse"></i> Agregar nueva
+    </a>
+</div>
+
+<main class="max-w-7xl mx-auto p-6 space-y-6">
+    <div class="text-sm text-gray-500">
+        <a href="/" class="hover:underline text-emerald-600">Inicio</a> / Recetas
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <% recetas.forEach(receta=> { %>
+            <div class="bg-white rounded-xl shadow hover:shadow-md transition overflow-hidden">
+                <% if (receta.imagen) { %>
+                    <img src="/uploads/<%= receta.imagen %>" alt="Imagen receta" class="w-full h-48 object-cover" />
+                <% } else { %>
+                    <div class="w-full h-48 flex items-center justify-center bg-gray-200 text-gray-500 italic">
+                        Sin imagen
+                    </div>
+                <% } %>
+
+                <div class="p-4">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-1"><%= receta.titulo %></h3>
+                    <p class="text-sm text-gray-600"><span class="font-medium text-gray-700">Calorías:</span> <%= receta.calorias %></p>
+                    <p class="text-sm text-gray-600"><span class="font-medium text-gray-700">Ingredientes:</span> <%= receta.ingredientes.slice(0, 60) %>...</p>
+                    <p class="text-sm text-gray-600"><span class="font-medium text-gray-700">Categoría:</span> <%= receta.categoria || 'Sin categoría' %></p>
+
+                    <div class="flex items-center gap-3 mt-4">
+                        <a href="/recetas/editar/<%= receta.id %>"
+                            class="group relative inline-flex items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 px-4 py-2 text-sm font-bold text-white shadow-lg hover:from-blue-600 hover:to-indigo-700 transition-transform transform hover:scale-105">
+                            <i class="fas fa-pen mr-2 group-hover:animate-pulse"></i> Editar
+                        </a>
+
+                        <form action="/recetas/eliminar/<%= receta.id %>" method="POST" onsubmit="return confirm('¿Eliminar esta receta?')">
+                            <button type="submit"
+                                class="group relative inline-flex items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-red-500 to-pink-500 px-4 py-2 text-sm font-bold text-white shadow-lg hover:from-red-600 hover:to-pink-600 transition-transform transform hover:scale-105">
+                                <i class="fas fa-trash-alt mr-2 group-hover:animate-bounce"></i> Eliminar
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        <% }) %>
+    </div>
+</main>

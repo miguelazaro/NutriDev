@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+        <%= receta ? 'Editar' : 'Nueva' %> Receta | NutriDev
+    </title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50 text-gray-800 font-inter">
+
+    <div class="max-w-4xl mx-auto p-6">
+        <!-- Breadcrumb -->
+        <div class="text-sm text-gray-500 mb-4 text-right">
+            <a href="/" class="hover:underline text-emerald-600">Inicio</a> /
+            <a href="/recetas" class="hover:underline text-emerald-600">Recetas</a> /
+            <%= receta ? 'Editar' : 'Nueva' %>
+        </div>
+
+        <!-- Título -->
+        <h1 class="text-3xl font-bold mb-6 text-gray-800">
+            <%= receta ? 'Editar' : 'Nueva' %> Receta
+        </h1>
+
+        <!-- Formulario -->
+        <form method="POST" action="<%= receta ? '/recetas/actualizar/' + receta.id : '/recetas/guardar' %>"
+            enctype="multipart/form-data" class="bg-white p-6 rounded-lg shadow-md space-y-5">
+
+            <div>
+                <label for="titulo" class="block font-semibold mb-1">Título:</label>
+                <input type="text" id="titulo" name="titulo" value="<%= receta ? receta.titulo : '' %>" required
+                    class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+            </div>
+
+            <div>
+                <label for="descripcion" class="block font-semibold mb-1">Descripción:</label>
+                <textarea id="descripcion" name="descripcion" rows="3"
+                    class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"><%= receta ? receta.descripcion : '' %></textarea>
+            </div>
+
+            <div>
+                <label for="ingredientes" class="block font-semibold mb-1">Ingredientes:</label>
+                <textarea id="ingredientes" name="ingredientes" rows="3"
+                    class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"><%= receta ? receta.ingredientes : '' %></textarea>
+            </div>
+
+            <div>
+                <label for="calorias" class="block font-semibold mb-1">Calorías:</label>
+                <input type="number" id="calorias" name="calorias" value="<%= receta ? receta.calorias : '' %>"
+                    class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+            </div>
+
+            <div>
+                <label for="categoria" class="block font-semibold mb-1">Categoría:</label>
+                <input type="text" id="categoria" name="categoria" value="<%= receta ? receta.categoria : '' %>"
+                    class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" />
+            </div>
+
+            <div>
+                <label for="preparacion" class="block font-semibold mb-1">Preparación:</label>
+                <textarea id="preparacion" name="preparacion" rows="4"
+                    class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"><%= receta ? receta.preparacion : '' %></textarea>
+            </div>
+
+            <div>
+                <label for="imagen" class="block font-semibold mb-1">Imagen:</label>
+                <input type="file" id="imagen" name="imagen" accept="image/*"
+                    class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100" />
+
+                <% if (receta && receta.imagen) { %>
+                    <p class="mt-4 text-sm text-gray-700 font-medium">Imagen actual:</p>
+                    <img src="/uploads/<%= receta.imagen %>" alt="Imagen actual"
+                        class="mt-2 rounded-md max-w-xs border border-gray-200 shadow-sm" />
+                    <% } %>
+            </div>
+
+            <button type="submit"
+                class="w-full bg-gradient-to-br from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold py-3 rounded-lg shadow-lg transition-transform transform hover:scale-105">
+                <%= receta ? 'Actualizar Receta' : 'Guardar Receta' %>
+            </button>
+
+        </form>
+    </div>
+
+</body>
+
+</html>

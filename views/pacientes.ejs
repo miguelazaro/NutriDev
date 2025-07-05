@@ -1,0 +1,45 @@
+<div class="flex justify-between items-center px-6 py-4 bg-white shadow-sm">
+    <h1 class="text-2xl font-bold text-gray-800">Listado de Pacientes</h1>
+    <a href="/pacientes/nuevo"
+        class="group inline-flex items-center gap-2 bg-gradient-to-br from-emerald-500 to-emerald-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:from-emerald-600 hover:to-emerald-700 transition-transform transform hover:scale-105">
+        <i class="fas fa-plus group-hover:animate-pulse"></i> Agregar nuevo
+    </a>
+</div>
+
+<main class="px-6 py-4 space-y-4">
+    <% if (pacientes.length===0) { %>
+        <div class="bg-white p-4 rounded shadow text-gray-600 text-center">
+            No hay pacientes registrados.
+        </div>
+    <% } else { %>
+        <% pacientes.forEach(p=> { %>
+            <div class="bg-white shadow rounded-lg p-6 flex flex-col md:flex-row justify-between gap-6 items-start">
+                <div class="flex items-center gap-4 flex-1">
+                    <div class="w-14 h-14 bg-gray-200 text-gray-600 rounded-full flex items-center justify-center text-xl">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="text-sm text-gray-800">
+                        <p><span class="font-semibold">Paciente:</span> <%= p.nombre %></p>
+                        <p><span class="font-semibold">Edad:</span> <%= p.edad %> años</p>
+                        <p><span class="font-semibold">Historial médico:</span> <%= p.historial %></p>
+                        <p class="text-xs text-gray-400 mt-1">Registrado el <%= new Date(p.createdAt).toLocaleDateString('es-MX') %></p>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 mt-4 md:mt-0 self-end">
+                    <a href="/pacientes/editar/<%= p.id %>"
+                        class="group relative inline-flex items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 px-4 py-2 text-sm font-bold text-white shadow-lg hover:from-blue-600 hover:to-indigo-700 transition-transform transform hover:scale-105">
+                        <i class="fas fa-pen mr-2 group-hover:animate-pulse"></i> Editar
+                    </a>
+
+                    <form action="/pacientes/eliminar/<%= p.id %>" method="POST" onsubmit="return confirm('¿Eliminar este paciente?')">
+                        <button type="submit"
+                            class="group relative inline-flex items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-red-500 to-pink-500 px-4 py-2 text-sm font-bold text-white shadow-lg hover:from-red-600 hover:to-pink-600 transition-transform transform hover:scale-105">
+                            <i class="fas fa-trash-alt mr-2 group-hover:animate-bounce"></i> Eliminar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        <% }) %>
+    <% } %>
+</main>

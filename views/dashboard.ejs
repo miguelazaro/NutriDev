@@ -1,0 +1,37 @@
+<main class="p-6">
+    <h1 class="text-2xl font-bold text-gray-800 mb-6">Dashboard del Nutriólogo</h1>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+        <!-- Pacientes activos -->
+        <div class="bg-white p-5 rounded-xl shadow-md text-center hover:shadow-lg transition">
+            <i class="fas fa-user-injured text-3xl text-emerald-500 mb-2"></i>
+            <p class="text-gray-600 text-sm">Pacientes activos</p>
+            <h2 class="text-2xl font-bold text-gray-800 mt-1">
+                <%= pacientesActivos %>
+            </h2>
+        </div>
+
+        <!-- Menús creados -->
+        <div class="bg-white p-5 rounded-xl shadow-md text-center hover:shadow-lg transition">
+            <i class="fas fa-clipboard-list text-3xl text-indigo-500 mb-2"></i>
+            <p class="text-gray-600 text-sm">Menús creados</p>
+            <span class="text-2xl font-bold text-gray-800 mt-1">120</span>
+        </div>
+
+        <!-- Progresos registrados -->
+        <div class="bg-white p-5 rounded-xl shadow-md text-center hover:shadow-lg transition">
+            <i class="fas fa-chart-bar text-3xl text-blue-500 mb-2"></i>
+            <p class="text-gray-600 text-sm">Progresos registrados</p>
+            <span class="text-2xl font-bold text-gray-800 mt-1">36</span>
+        </div>
+
+        <!-- Último ingreso -->
+        <div class="bg-white p-5 rounded-xl shadow-md text-center hover:shadow-lg transition">
+            <i class="fas fa-wallet text-3xl text-yellow-500 mb-2"></i>
+            <p class="text-gray-600 text-sm">Último ingreso</p>
+            <span class="text-2xl font-bold text-gray-800 mt-1">$899 MXN</span>
+        </div>
+
+    </div>
+</main>
