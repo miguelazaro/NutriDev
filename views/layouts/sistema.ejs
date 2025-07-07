@@ -14,6 +14,23 @@
 
   <!-- ✅ Íconos FontAwesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const profileMenu = document.getElementById('profile-menu');
+      const dropdown = document.getElementById('profile-dropdown');
+      
+      profileMenu.addEventListener('click', function(e) {
+        e.stopPropagation();
+        dropdown.classList.toggle('hidden');
+      });
+      
+      // Cerrar el menú al hacer clic en cualquier otro lugar
+      document.addEventListener('click', function() {
+        dropdown.classList.add('hidden');
+      });
+    });
+  </script>
 </head>
 
 <body class="bg-gray-50 text-gray-800 font-sans">
@@ -27,8 +44,6 @@
         </div>
       </div>
       
-      
-
       <nav class="flex-1 px-4 py-6 space-y-1">
         <a href="/dashboard" class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200
             <%= active === 'dashboard' 
@@ -67,10 +82,51 @@
       </nav>
     </aside>
 
-    <!-- Contenido -->
-    <main class="flex-1 p-6">
-      <%- body %>
-    </main>
+    <!-- Contenido principal con header y contenido -->
+    <div class="flex-1 flex flex-col">
+      <header class="bg-white shadow-sm py-4 px-6 flex justify-between items-center">
+        <div class="text-lg font-medium text-gray-800">
+          <h1 class="hidden sm:block">Dashboard del Nutriólogo</h1>
+        </div>
+        
+        <% if (user) { %>
+        <div class="relative" id="profile-menu">
+          <button class="flex items-center space-x-3 cursor-pointer focus:outline-none group">
+            <div class="text-right">
+              <p class="text-sm font-medium text-gray-800 group-hover:text-emerald-600 transition-colors">
+                <%= user.nombre %>
+              </p>
+              <p class="text-xs text-gray-500">Nutriólogo</p>
+            </div>
+            <div class="relative flex items-center">
+              <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center group-hover:bg-emerald-200 transition-colors">
+                <i class="fas fa-user text-emerald-600"></i>
+              </div>
+              <!-- Flecha indicadora -->
+              <i class="fas fa-chevron-down text-xs ml-1 text-gray-500"></i>
+            </div>
+          </button>
+          
+          <!-- Menú desplegable (inicialmente oculto) -->
+          <div id="profile-dropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden z-10 border border-gray-200">
+            <!--
+            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-emerald-600">
+              <i class="fas fa-user-circle mr-2"></i> Mi perfil
+            </a>
+            -->
+            <a href="/logout" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-emerald-600">
+              <i class="fas fa-sign-out-alt mr-2"></i> Cerrar sesión
+            </a>
+          </div>
+        </div>
+        <% } %>
+      </header>
+
+      <!-- Contenido de la vista -->
+      <main class="flex-1 p-6">
+        <%- body %>
+      </main>
+    </div>
   </div>
 </body>
 

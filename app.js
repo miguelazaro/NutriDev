@@ -7,9 +7,6 @@ const flash = require('connect-flash');
 const app = express();
 const sequelize = require('./config/db');
 
-// Controladores
-const dashboardController = require('./controllers/dashboardController'); // <<--- IMPORTADO AQUÍ
-
 // Middlewares
 app.use(session({
     secret: 'nutridevSecret',
@@ -21,61 +18,85 @@ app.use(express.urlencoded({ extended: true }));
 
 // EJS y layouts
 app.use(expressLayouts);
-app.set('layout', 'layouts/sistema');
+app.set('layout', 'layouts/sistema'); // Layout por defecto
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
+// Archivos estáticos
+app.use(express.static(path.join(__dirname, 'public')));
 app.use('/assets', express.static(path.join(__dirname, 'public/assets')));
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 app.use('/css', express.static(path.join(__dirname, 'public/css')));
 
-
+// Middleware de protección y usuario
+const { requireAuth, redirectIfAuthenticated } = require('./middlewares/auth');
+const userMiddleware = require('./middlewares/user'); 
+app.use(userMiddleware);
 
 // Rutas de autenticación
-const authRoutes = require('./routes/authRoutes');
-app.use('/', authRoutes);
+const authController = require('./controllers/authController');
 
-// Redirección base
-app.get('/', (req, res) => {
-    res.redirect('/dashboard');
+app.get('/login', redirectIfAuthenticated, (req, res) => {
+    res.render('login', {
+        layout: 'layouts/auth',
+        title: 'Iniciar sesión',
+        error: req.flash('error')
+    });
 });
 
-// Dashboard con contador de pacientes
-app.get('/dashboard', (req, res, next) => {
+app.get('/register', redirectIfAuthenticated, (req, res) => {
+    res.render('register', {
+        layout: 'layouts/auth',
+        title: 'Registro',
+        error: req.flash('error')
+    });
+});
+
+app.post('/login', authController.loginUser);
+app.post('/register', authController.registerUser);
+app.get('/logout', authController.logout);
+
+// Ruta base redirige a login
+app.get('/', (req, res) => {
+    res.redirect('/login');
+});
+
+// Dashboard protegido
+const dashboardController = require('./controllers/dashboardController');
+app.get('/dashboard', requireAuth, (req, res, next) => {
     res.locals.active = 'dashboard';
     next();
 }, dashboardController.renderDashboard);
 
-// Rutas de vistas estáticas con variable de menú activo
-
-app.get('/progreso', (req, res) => {
+// Vistas estáticas con clase activa
+app.get('/progreso', requireAuth, (req, res) => {
     res.render('progreso', { active: 'progreso' });
 });
-app.get('/cobros', (req, res) => {
+
+app.get('/cobros', requireAuth, (req, res) => {
     res.render('cobros', { active: 'cobros' });
 });
 
-// Ruta de pacientes (con clase activa)
+// Rutas de pacientes
 const pacientesRouter = require('./routes/pacientes');
-app.use('/pacientes', (req, res, next) => {
+app.use('/pacientes', requireAuth, (req, res, next) => {
     res.locals.active = 'pacientes';
     next();
 }, pacientesRouter);
 
-// Rutas de recetas (con controlador)
-// Rutas de recetas (con clase activa)
+// Rutas de recetas
 const recetasRouter = require('./routes/recetas');
-app.use('/recetas', (req, res, next) => {
+app.use('/recetas', requireAuth, (req, res, next) => {
     res.locals.active = 'recetas';
     next();
 }, recetasRouter);
 
-
 // Conexión a la base de datos
 sequelize.sync({ alter: true })
-    .then(() => console.log('Bd conectada '))
+    .then(() => console.log('Bd conectada'))
     .catch(err => console.error('Error al conectar con la BD:', err));
 
+// Iniciar servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en http://localhost:${PORT}`);
