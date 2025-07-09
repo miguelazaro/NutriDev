@@ -1,45 +1,163 @@
-<div class="flex justify-between items-center px-6 py-4 bg-white shadow-sm">
-    <h1 class="text-2xl font-bold text-gray-800">Listado de Pacientes</h1>
+<div class="flex flex-col gap-6">
+  <!-- Encabezado con título y botón de agregar -->
+  <div class="flex justify-between items-center">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-800">Tus pacientes</h1>
+      <p class="text-gray-600">Consulta información sobre tus pacientes</p>
+    </div>
     <a href="/pacientes/nuevo"
-        class="group inline-flex items-center gap-2 bg-gradient-to-br from-emerald-500 to-emerald-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:from-emerald-600 hover:to-emerald-700 transition-transform transform hover:scale-105">
-        <i class="fas fa-plus group-hover:animate-pulse"></i> Agregar nuevo
+      class="group inline-flex items-center gap-2 bg-gradient-to-br from-emerald-500 to-emerald-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:from-emerald-600 hover:to-emerald-700 transition-all duration-300">
+      <i class="fas fa-plus-circle group-hover:animate-pulse text-xl"></i>
+      Agregar nuevo paciente
     </a>
-</div>
+  </div>
 
-<main class="px-6 py-4 space-y-4">
-    <% if (pacientes.length===0) { %>
-        <div class="bg-white p-4 rounded shadow text-gray-600 text-center">
-            No hay pacientes registrados.
-        </div>
-    <% } else { %>
-        <% pacientes.forEach(p=> { %>
-            <div class="bg-white shadow rounded-lg p-6 flex flex-col md:flex-row justify-between gap-6 items-start">
-                <div class="flex items-center gap-4 flex-1">
-                    <div class="w-14 h-14 bg-gray-200 text-gray-600 rounded-full flex items-center justify-center text-xl">
-                        <i class="fas fa-user"></i>
-                    </div>
-                    <div class="text-sm text-gray-800">
-                        <p><span class="font-semibold">Paciente:</span> <%= p.nombre %></p>
-                        <p><span class="font-semibold">Edad:</span> <%= p.edad %> años</p>
-                        <p><span class="font-semibold">Historial médico:</span> <%= p.historial %></p>
-                        <p class="text-xs text-gray-400 mt-1">Registrado el <%= new Date(p.createdAt).toLocaleDateString('es-MX') %></p>
-                    </div>
-                </div>
-
-                <div class="flex gap-3 mt-4 md:mt-0 self-end">
-                    <a href="/pacientes/editar/<%= p.id %>"
-                        class="group relative inline-flex items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 px-4 py-2 text-sm font-bold text-white shadow-lg hover:from-blue-600 hover:to-indigo-700 transition-transform transform hover:scale-105">
-                        <i class="fas fa-pen mr-2 group-hover:animate-pulse"></i> Editar
-                    </a>
-
-                    <form action="/pacientes/eliminar/<%= p.id %>" method="POST" onsubmit="return confirm('¿Eliminar este paciente?')">
-                        <button type="submit"
-                            class="group relative inline-flex items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-red-500 to-pink-500 px-4 py-2 text-sm font-bold text-white shadow-lg hover:from-red-600 hover:to-pink-600 transition-transform transform hover:scale-105">
-                            <i class="fas fa-trash-alt mr-2 group-hover:animate-bounce"></i> Eliminar
-                        </button>
-                    </form>
-                </div>
+  <!-- Contenido principal en dos columnas -->
+  <div class="flex flex-col lg:flex-row gap-6">
+    <!-- Columna principal: Lista de pacientes -->
+    <div class="w-full lg:w-2/3">
+      <!-- Barra de búsqueda -->
+      <div class="bg-white shadow rounded-lg p-4 mb-6">
+        <div class="flex items-center gap-3">
+          <div class="flex-1">
+            <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Buscar pacientes</label>
+            <div class="relative">
+              <input type="text" id="search" name="search" placeholder="Busca por nombre, edad, identificación..."
+                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+              <button class="absolute right-3 top-3 text-gray-400 hover:text-emerald-600">
+                <i class="fas fa-search"></i>
+              </button>
             </div>
-        <% }) %>
-    <% } %>
-</main>
+          </div>
+          <div>
+            <label for="filter" class="block text-sm font-medium text-gray-700 mb-1">Filtrar</label>
+            <select id="filter" name="filter"
+              class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+              <option>Todos los pacientes</option>
+              <option>Activos</option>
+              <option>Inactivos</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lista de pacientes -->
+      <div class="space-y-4">
+        <% if (pacientes.length===0) { %>
+          <div class="bg-white p-8 rounded-lg shadow text-center">
+            <i class="fas fa-user-injured text-4xl text-gray-300 mb-4"></i>
+            <h3 class="text-xl font-medium text-gray-700 mb-2">No hay pacientes registrados</h3>
+            <p class="text-gray-500 mb-4">Comienza agregando tu primer paciente</p>
+            <a href="/pacientes/nuevo"
+              class="inline-flex items-center gap-2 bg-gradient-to-br from-emerald-500 to-emerald-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:from-emerald-600 hover:to-emerald-700 transition-all duration-300">
+              <i class="fas fa-plus"></i> Agregar paciente
+            </a>
+          </div>
+          <% } else { %>
+            <% pacientes.forEach(p=> { 
+                // Calcular la edad a partir de la fecha de nacimiento
+                let edadTexto = '';
+                if (p.fecha_nacimiento) {
+                  const hoy = new Date();
+                  const nacimiento = new Date(p.fecha_nacimiento);
+                  let edad = hoy.getFullYear() - nacimiento.getFullYear();
+                  const mes = hoy.getMonth() - nacimiento.getMonth();
+                  if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
+                    edad--;
+                  }
+                  edadTexto = edad + ' años';
+                }
+                
+                // Formatear fecha de registro
+                let fechaRegistro = 'No registrado';
+                if (p.fecha_registro) {
+                  const fecha = new Date(p.fecha_registro);
+                  fechaRegistro = fecha.toLocaleDateString('es-MX');
+                }
+              %>
+              <div class="bg-white shadow rounded-lg overflow-hidden">
+                <div class="p-5 flex flex-col md:flex-row gap-6">
+                  <!-- Avatar e información principal -->
+                  <div class="flex items-center gap-4 flex-1">
+                    <div
+                      class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-xl">
+                      <i class="fas fa-user"></i>
+                    </div>
+                    <div>
+                      <h3 class="font-bold text-gray-800 text-lg">
+                        <%= p.nombre %>
+                      </h3>
+                      <p class="text-sm text-gray-600"><span class="font-medium">Edad:</span>
+                        <%= edadTexto || 'No especificada' %>
+                      </p>
+                      <p class="text-xs text-gray-400 mt-1">Registrado el <%= fechaRegistro %></p>
+                    </div>
+                  </div>
+
+                  <!-- Información secundaria -->
+                  <div class="flex-1">
+                    <p class="text-sm text-gray-700"><span class="font-medium">Historial médico:</span>
+                      <%= p.historial || 'Sin historial registrado' %>
+                    </p>
+                    <p class="text-sm text-gray-700 mt-1"><span class="font-medium">Contacto:</span>
+                      <%= p.telefono || 'Sin teléfono' %> | <%= p.email || 'Sin email' %>
+                    </p>
+                  </div>
+
+                  <!-- Acciones -->
+                  <div class="flex gap-2 self-center">
+                    <a href="/pacientes/editar/<%= p.id %>"
+                      class="w-10 h-10 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors">
+                      <i class="fas fa-pen"></i>
+                    </a>
+                    <form action="/pacientes/eliminar/<%= p.id %>" method="POST"
+                      onsubmit="return confirm('¿Eliminar este paciente?')">
+                      <button type="submit"
+                        class="w-10 h-10 flex items-center justify-center rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition-colors">
+                        <i class="fas fa-trash-alt"></i>
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              <% }) %>
+                <% } %>
+      </div>
+    </div>
+
+    <!-- Columna lateral: Estadísticas -->
+    <div class="w-full lg:w-1/3">
+      <div class="bg-white shadow rounded-lg p-6">
+        <h2 class="text-lg font-bold text-gray-800 mb-4">Informaciones Generales</h2>
+
+        <div class="grid grid-cols-2 gap-4 mb-6">
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <p class="text-sm text-gray-600">Total de pacientes</p>
+            <p class="text-2xl font-bold text-gray-800">
+              <%= pacientes.length %>
+            </p>
+          </div>
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <p class="text-sm text-gray-600">Nuevos este mes</p>
+            <p class="text-2xl font-bold text-gray-800">0</p>
+          </div>
+        </div>
+
+        <div class="mb-6">
+          <h3 class="font-medium text-gray-800 mb-2">Nuevos pacientes</h3>
+          <div class="bg-gray-200 rounded-full h-2">
+            <div class="bg-emerald-500 h-2 rounded-full" style="width: 25%"></div>
+          </div>
+          <p class="text-xs text-gray-500 mt-2">En las últimas 6 semanas</p>
+        </div>
+
+        <div>
+          <h3 class="font-medium text-gray-800 mb-2">Distribución por edad</h3>
+          <div class="h-40 bg-gray-100 rounded-lg flex items-center justify-center">
+            <p class="text-gray-500">Gráfico de distribución</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

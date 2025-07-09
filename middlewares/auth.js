@@ -4,8 +4,7 @@ exports.requireAuth = (req, res, next) => {
     req.flash('error', 'Por favor inicia sesión para acceder');
     return res.redirect('/login');
   }
-  
-  // Guardar datos de usuario en res.locals para acceso en vistas
+
   res.locals.user = {
     id: req.session.userId,
     nombre: req.session.nombreUsuario,

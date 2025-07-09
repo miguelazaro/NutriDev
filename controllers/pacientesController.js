@@ -13,8 +13,38 @@ exports.form = (req, res) => {
 
 // Guardar paciente nuevo
 exports.guardar = async (req, res) => {
-    const { nombre, edad, historial } = req.body;
-    await Paciente.create({ nombre, edad, historial });
+    // Recoger todos los campos del formulario
+    const { 
+        nombre, 
+        genero, 
+        fecha_nacimiento, 
+        pais_residencia, 
+        telefono, 
+        enviar_cuestionario, 
+        lugar_consulta, 
+        ocupacion, 
+        codigo_postal, 
+        email, 
+        historial 
+    } = req.body;
+    
+    // Convertir email vacío a null
+    const cleanedEmail = (email && email.trim() === '') ? null : email;
+    
+    await Paciente.create({ 
+        nombre, 
+        genero, 
+        fecha_nacimiento, 
+        pais_residencia, 
+        telefono, 
+        enviar_cuestionario: enviar_cuestionario === 'on',
+        lugar_consulta, 
+        ocupacion, 
+        codigo_postal, 
+        email: cleanedEmail, 
+        historial 
+    });
+    
     res.redirect('/pacientes');
 };
 
@@ -26,10 +56,40 @@ exports.editar = async (req, res) => {
 
 // Actualizar paciente
 exports.actualizar = async (req, res) => {
-    const { nombre, edad, historial } = req.body;
-    await Paciente.update({ nombre, edad, historial }, {
+    // Recoger todos los campos del formulario
+    const { 
+        nombre, 
+        genero, 
+        fecha_nacimiento, 
+        pais_residencia, 
+        telefono, 
+        enviar_cuestionario, 
+        lugar_consulta, 
+        ocupacion, 
+        codigo_postal, 
+        email, 
+        historial 
+    } = req.body;
+    
+    // Convertir email vacío a null
+    const cleanedEmail = (email && email.trim() === '') ? null : email;
+    
+    await Paciente.update({ 
+        nombre, 
+        genero, 
+        fecha_nacimiento, 
+        pais_residencia, 
+        telefono, 
+        enviar_cuestionario: enviar_cuestionario === 'on',
+        lugar_consulta, 
+        ocupacion, 
+        codigo_postal, 
+        email: cleanedEmail, 
+        historial 
+    }, {
         where: { id: req.params.id }
     });
+    
     res.redirect('/pacientes');
 };
 
