@@ -19,16 +19,16 @@ const diccionarioBusqueda = {
 
 exports.obtenerDesdeAPI = async (req, res) => {
   try {
-    // Obtener la búsqueda original y traducirla si está en español
+  
     let query = req.query.q?.toLowerCase() || 'chicken';
     const originalQuery = query;
     query = diccionarioBusqueda[query] || query;
 
-    // Llamar a la API
+    
     const response = await axios.get(`https://www.themealdb.com/api/json/v1/1/search.php?s=${query}`);
     const recetas = response.data.meals || [];
 
-    // Traducir cada receta (título, categoría y origen)
+  
     const recetasTraducidas = await Promise.all(
       recetas.map(async (receta) => {
         try {
