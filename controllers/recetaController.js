@@ -3,7 +3,7 @@ const { Op } = require('sequelize');
 const Receta = require('../models/Receta');
 const { translate } = require('@vitalets/google-translate-api');
 
-// Función para traducir texto
+
 async function traducir(texto) {
     try {
         if (!texto || typeof texto !== 'string') return '';
@@ -61,7 +61,7 @@ const index = async (req, res) => {
     }
 };
 
-// Ver detalle de receta 
+
 const detalleApi = async (req, res) => {
     const id = req.params.idMeal;
     try {

@@ -13,21 +13,7 @@
             border: 1px solid #e5e7eb;
         }
     </style>
-    <script>
-        function calcularEdad() {
-            const fechaNacimiento = document.getElementById('fecha_nacimiento').value;
-            if (fechaNacimiento) {
-                const nacimiento = new Date(fechaNacimiento);
-                const hoy = new Date();
-                let edad = hoy.getFullYear() - nacimiento.getFullYear();
-                const mes = hoy.getMonth() - nacimiento.getMonth();
-                if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
-                    edad--;
-                }
-                document.getElementById('edad_mostrada').innerText = edad + ' años';
-            }
-        }
-    </script>
+    
 </head>
 <body class="bg-gray-50 min-h-screen font-sans text-gray-800">
 
@@ -186,5 +172,21 @@
             </div>
         </form>
     </main>
+
+    <script>
+        function calcularEdad() {
+            const fechaNacimiento = document.getElementById('fecha_nacimiento').value;
+            if (fechaNacimiento) {
+                const nacimiento = new Date(fechaNacimiento);
+                const hoy = new Date();
+                let edad = hoy.getFullYear() - nacimiento.getFullYear();
+                const mes = hoy.getMonth() - nacimiento.getMonth();
+                if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
+                    edad--;
+                }
+                document.getElementById('edad_mostrada').innerText = edad + ' años';
+            }
+        }
+    </script>
 </body>
 </html>
