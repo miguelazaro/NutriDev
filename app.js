@@ -16,7 +16,6 @@ app.use(session({
 app.use(flash());
 app.use(express.urlencoded({ extended: true }));
 
-
 app.use(expressLayouts);
 app.set('layout', 'layouts/sistema'); 
 app.set('view engine', 'ejs');
@@ -28,9 +27,11 @@ app.use('/assets', express.static(path.join(__dirname, 'public/assets')));
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 app.use('/css', express.static(path.join(__dirname, 'public/css')));
 
+
 const { requireAuth, redirectIfAuthenticated } = require('./middlewares/auth');
 const userMiddleware = require('./middlewares/user'); 
 app.use(userMiddleware);
+
 
 const authController = require('./controllers/authController');
 
@@ -54,16 +55,18 @@ app.post('/login', authController.loginUser);
 app.post('/register', authController.registerUser);
 app.get('/logout', authController.logout);
 
+// Página principa
 app.get('/', (req, res) => {
     res.redirect('/login');
 });
 
-// Dashboard protegido
+
 const dashboardController = require('./controllers/dashboardController');
 app.get('/dashboard', requireAuth, (req, res, next) => {
     res.locals.active = 'dashboard';
     next();
 }, dashboardController.renderDashboard);
+
 
 app.get('/progreso', requireAuth, (req, res) => {
     res.render('progreso', { active: 'progreso' });
@@ -73,21 +76,22 @@ app.get('/cobros', requireAuth, (req, res) => {
     res.render('cobros', { active: 'cobros' });
 });
 
+
 const pacientesRouter = require('./routes/pacientes');
 app.use('/pacientes', requireAuth, (req, res, next) => {
     res.locals.active = 'pacientes';
     next();
 }, pacientesRouter);
 
-
+// Rutas protegidas de recetas
 const recetasRouter = require('./routes/recetas');
 app.use('/recetas', requireAuth, (req, res, next) => {
     res.locals.active = 'recetas';
     next();
 }, recetasRouter);
 
-// Conexión a la base de datos
-sequelize.sync({ alter: true })
+
+sequelize.sync({ force: false })
     .then(() => console.log('Bd conectada'))
     .catch(err => console.error('Error al conectar con la BD:', err));
 

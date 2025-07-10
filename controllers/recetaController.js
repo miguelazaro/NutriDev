@@ -2,33 +2,29 @@ const axios = require('axios');
 const { Op } = require('sequelize');
 const Receta = require('../models/Receta');
 
-// Mostrar recetas personalizadas + API externa)
+// Mostrar recetas personalizadas + API externa
 const index = async (req, res) => {
     const busqueda = req.query.q || '';
 
     try {
-        
         const recetasLocales = await Receta.findAll({
             where: {
                 titulo: { [Op.like]: `%${busqueda}%` }
             }
         });
 
-        
         const respuesta = await axios.get(`https://www.themealdb.com/api/json/v1/1/search.php?s=${busqueda}`);
         const recetasAPI = respuesta.data.meals || [];
 
-        
         const recetasLocalesFormateadas = recetasLocales.map(r => ({
-            strMeal: r.titulo,
-            strCategory: r.categoria || 'Personalizada',
-            strArea: 'Usuario',
-            strMealThumb: r.imagen ? `/uploads/${r.imagen}` : '/img/default.png',
-            strSource: null,
-            strYoutube: null
+            id: r.id,
+            titulo: r.titulo,
+            categoria: r.categoria || 'Personalizada',
+            origen: 'Usuario',
+            imagen: r.imagen ? `/uploads/${r.imagen}` : '/img/default.png',
+            usuarioId: r.usuario_id
         }));
 
-        
         const recetasAPIFormateadas = recetasAPI.map(r => ({
             strMeal: r.strMeal,
             strCategory: r.strCategory,
@@ -42,8 +38,9 @@ const index = async (req, res) => {
 
         res.render('recetas', {
             recetas,
+            busqueda,
             active: 'recetas',
-            busqueda
+            usuario: req.user // 👈 PASAR usuario actual
         });
 
     } catch (error) {
@@ -52,11 +49,9 @@ const index = async (req, res) => {
     }
 };
 
-
 const nueva = (req, res) => {
     res.render('recetas_form', { receta: null, active: 'recetas' });
 };
-
 
 const guardar = async (req, res) => {
     try {
@@ -71,7 +66,7 @@ const guardar = async (req, res) => {
             categoria,
             preparacion,
             imagen,
-            usuario_id: req.session.userId 
+            usuario_id: req.session.userId // 👈 ID del usuario logueado
         });
 
         res.redirect('/recetas');
@@ -81,13 +76,11 @@ const guardar = async (req, res) => {
     }
 };
 
-
 const editar = async (req, res) => {
     const receta = await Receta.findByPk(req.params.id);
     if (!receta) return res.status(404).send('Receta no encontrada');
     res.render('recetas_form', { receta, active: 'recetas' });
 };
-
 
 const actualizar = async (req, res) => {
     try {
@@ -113,7 +106,6 @@ const actualizar = async (req, res) => {
         res.status(500).send('Error del servidor');
     }
 };
-
 
 const eliminar = async (req, res) => {
     try {
