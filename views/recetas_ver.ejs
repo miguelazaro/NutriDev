@@ -1,0 +1,146 @@
+<div class="px-6 py-4 bg-white rounded-lg shadow-md max-w-3xl mx-auto mt-6">
+  <!-- Encabezado -->
+  <div class="flex justify-between items-start mb-4">
+    <div>
+      <h2 class="text-2xl font-bold text-gray-800"><%= receta.titulo %></h2>
+      <p class="text-sm text-gray-500">Categoría: <%= receta.categoria %></p>
+    </div>
+    <span class="bg-<%= origen === 'local' ? 'emerald' : 'blue' %>-100 text-<%= origen === 'local' ? 'emerald' : 'blue' %>-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
+      <%= origen === 'local' ? 'Tu receta' : 'De Edamam' %>
+    </span>
+  </div>
+
+  <!-- Imagen -->
+  <% if (receta.imagen) { %>
+    <div class="mb-6 text-center">
+      <img src="<%= receta.imagen %>" alt="<%= receta.titulo %>" class="max-h-80 mx-auto rounded-lg shadow-sm">
+    </div>
+  <% } %>
+
+  <!-- Descripción -->
+  <% if (receta.descripcion) { %>
+    <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+      <p class="text-gray-700 italic"><%= receta.descripcion %></p>
+    </div>
+  <% } %>
+
+  <!-- Contenido principal -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+    <!-- Columna izquierda - Ingredientes -->
+    <div>
+      <h3 class="text-lg font-semibold mb-3 text-gray-700 border-b pb-2">Ingredientes</h3>
+      <div class="prose max-w-none">
+        <% if (origen === 'local') { %>
+          <%= receta.ingredientes.replace(/\n/g, '<br>') %>
+        <% } else { %>
+          <ul class="list-disc ml-6">
+            <% receta.ingredientesTraducidos.forEach(i => { %>
+              <li><%= i %></li>
+            <% }) %>
+          </ul>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- Columna derecha - Preparación -->
+    <div>
+      <h3 class="text-lg font-semibold mb-3 text-gray-700 border-b pb-2">Preparación</h3>
+      <div class="prose max-w-none">
+        <% if (origen === 'local') { %>
+          <%= receta.preparacion.replace(/\n/g, '<br>') %>
+        <% } else { %>
+          <p><%= receta.preparacion %></p>
+          <% if (receta.urlOriginal) { %>
+            <a href="<%= receta.urlOriginal %>" target="_blank" class="text-blue-600 hover:underline mt-2 inline-block">
+              Ver receta original
+            </a>
+          <% } %>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Información nutricional -->
+  <div class="mt-8 bg-gray-50 p-4 rounded-lg">
+    <h3 class="text-lg font-semibold mb-4 text-gray-700">Información nutricional</h3>
+    
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+      <div class="bg-white p-3 rounded shadow-sm">
+        <p class="text-sm text-gray-500">Calorías</p>
+        <p class="font-medium"><%= receta.calorias || 'N/A' %></p>
+      </div>
+      
+      <div class="bg-white p-3 rounded shadow-sm">
+        <p class="text-sm text-gray-500">Porciones</p>
+        <p class="font-medium"><%= receta.porciones || 'N/A' %></p>
+      </div>
+      
+      <div class="bg-white p-3 rounded shadow-sm">
+        <p class="text-sm text-gray-500">Tiempo preparación</p>
+        <p class="font-medium"><%= receta.tiempo || 'N/A' %></p>
+      </div>
+      
+      <div class="bg-white p-3 rounded shadow-sm">
+        <p class="text-sm text-gray-500">Dificultad</p>
+        <p class="font-medium"><%= receta.dificultad || 'N/A' %></p>
+      </div>
+      
+      <div class="bg-white p-3 rounded shadow-sm">
+        <p class="text-sm text-gray-500">Tamaño porción</p>
+        <p class="font-medium"><%= receta.tamanoPorcion || 'N/A' %></p>
+      </div>
+      
+      <div class="bg-white p-3 rounded shadow-sm">
+        <p class="text-sm text-gray-500">Etiquetas</p>
+        <p class="font-medium"><%= receta.etiquetas || 'Ninguna' %></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botones -->
+  <div class="mt-8 flex justify-between">
+    <a href="/recetas" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg inline-flex items-center">
+      <i class="fas fa-arrow-left mr-2"></i> Regresar
+    </a>
+    
+    <% if (origen === 'local') { %>
+      <a href="/recetas/editar/<%= receta.id %>" class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg inline-flex items-center">
+        <i class="fas fa-edit mr-2"></i> Editar receta
+      </a>
+    <% } else { %>
+      <form action="/recetas/importar-api" method="POST">
+        <input type="hidden" name="titulo" value="<%= receta.titulo %>">
+        <input type="hidden" name="categoria" value="<%= receta.categoria %>">
+        <input type="hidden" name="dataAPI" value='<%= receta.dataAPI %>'>
+        <button type="submit" class="bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-2 px-4 rounded-lg inline-flex items-center">
+          <i class="fas fa-download mr-2"></i> Importar receta
+        </button>
+      </form>
+    <% } %>
+  </div>
+</div>
+
+<!-- Estilos adicionales -->
+<style>
+  .prose {
+    line-height: 1.6;
+    color: #374151;
+  }
+  
+  .prose br {
+    content: "";
+    display: block;
+    margin-bottom: 0.75em;
+  }
+  
+  .shadow-sm {
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  }
+
+  /* Estilo para términos en inglés */
+  .termino-ingles {
+    font-style: italic;
+    color: #6b7280;
+    font-size: 0.9em;
+  }
+</style>

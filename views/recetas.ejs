@@ -1,87 +1,219 @@
-<div class="flex flex-col sm:flex-row justify-between items-center gap-4 px-4 sm:px-6 py-4 bg-white shadow-sm">
-  <h1 class="text-xl sm:text-2xl font-bold text-gray-800">Recetas disponibles</h1>
+<div class="flex justify-between items-center px-4 sm:px-6 py-4 bg-white shadow-sm">
+  <h1 class="text-xl sm:text-2xl font-bold text-gray-800">Recetario</h1>
   <a href="/recetas/nueva"
-    class="group inline-flex items-center gap-2 bg-gradient-to-br from-emerald-500 to-emerald-600 text-white text-sm sm:text-base font-semibold py-2 px-3 sm:py-2.5 sm:px-4 rounded-lg shadow-md hover:from-emerald-600 hover:to-emerald-700 transition-transform transform hover:scale-[1.03]">
-    <i class="fas fa-plus group-hover:animate-pulse"></i>
-    <span class="hidden sm:inline">Crear receta personalizada</span>
-    <span class="sm:hidden">Nueva receta</span>
+    class="group inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base font-semibold py-2 px-3 sm:py-2.5 sm:px-4 rounded-lg shadow transition-all hover:scale-105">
+    <i class="fas fa-plus"></i>
+    <span class="hidden sm:inline">Crear Receta</span>
   </a>
 </div>
 
 <main class="max-w-7xl mx-auto p-4 sm:p-6 space-y-6">
-  <form class="mb-6 flex flex-col sm:flex-row gap-2" method="GET" action="/recetas">
-    <input type="text" name="q" value="<%= busqueda %>" placeholder="Buscar receta (Ej: pollo, res, pasta)"
-      class="w-full px-4 py-2 border border-gray-300 rounded-lg sm:rounded-r-none focus:ring-2 focus:ring-emerald-500">
-    <button class="bg-emerald-600 text-white px-4 py-2 rounded-lg sm:rounded-l-none">
-      Buscar
+
+  <% if (messages.error && messages.error.length > 0) { %>
+    <div id="errorMessage" class="fixed bottom-4 right-4 w-80 bg-red-50 border-l-4 border-red-500 p-4 shadow-lg transform transition-all duration-300 ease-in-out">
+      <div class="flex items-start">
+        <div class="flex-shrink-0">
+          <i class="fas fa-exclamation-circle text-red-500"></i>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm font-medium text-red-800"><%= messages.error %></p>
+        </div>
+        <button onclick="dismissError()" class="ml-auto text-red-500 hover:text-red-700">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+  <% } %>
+  
+  <% if (messages.success && messages.success.length > 0) { %>
+    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+      <strong class="font-bold">Éxito:</strong>
+      <span class="block sm:inline"><%= messages.success %></span>
+    </div>
+  <% } %>
+
+  <form id="searchForm" method="GET" action="/recetas" class="flex flex-col sm:flex-row gap-3 mb-4">
+    <input
+      type="text"
+      name="q"
+      id="searchInput"
+      value="<%= busqueda || '' %>"
+      placeholder="Buscar en mis recetas y en la web..."
+      class="w-full sm:w-1/3 px-4 py-2 border border-gray-300 rounded focus:ring-emerald-500 focus:ring-2"
+      autocomplete="off"
+    />
+    <button type="submit"
+      class="bg-emerald-600 text-white px-4 py-2 rounded hover:bg-emerald-700 transition-all">
+      <i class="fas fa-search"></i> Buscar
     </button>
   </form>
 
-  <% if (recetas.length===0) { %>
-    <p class="text-center text-gray-500 py-8">No se encontraron recetas.</p>
-    <% } %>
+  <% if (recetas.length === 0 && busqueda) { %>
+    <p class="text-center text-gray-500 py-8">No se encontraron recetas para "<%= busqueda %>".</p>
+  <% } else if (recetas.length === 0) { %>
+    <p class="text-center text-gray-500 py-8">No se encontraron recetas. ¡Crea una nueva o busca en la web!</p>
+  <% } else { %>
+    <div id="resultsContainer">
+      <div class="overflow-x-auto bg-white border rounded shadow-sm">
+        <table class="min-w-full table-auto text-sm text-gray-700">
+          <thead class="bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase">
+            <tr>
+              <th class="px-6 py-3">Categoría</th>
+              <th class="px-6 py-3">Nombre</th>
+              <th class="px-6 py-3">Imagen</th>
+              <th class="px-6 py-3 text-right">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% recetas.forEach(r => { %>
+              <tr class="border-b hover:bg-gray-50">
+                <td class="px-6 py-4 font-medium">
+                  <span class="<%= r.origen === 'api' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800' %> text-xs px-2 py-1 rounded-full">
+                    <%= r.categoria || (r.origen === 'api' ? 'Recomendada' : 'Personalizada') %>
+                  </span>
+                </td>
+                <td class="px-6 py-4">
+                  <%= r.titulo %>
+                  <% if (r.origen === 'api' && r.esRecomendacion) { %>
+                    <span class="text-xs text-blue-600 ml-1">(Recomendación)</span>
+                  <% } %>
+                </td>
+                <td class="px-6 py-4">
+                  <% if (r.imagen) { %>
+                    <img src="<%= r.imagen %>" alt="Imagen" class="w-12 h-12 object-cover rounded shadow">
+                  <% } else { %>
+                    <span class="text-gray-400">Sin imagen</span>
+                  <% } %>
+                </td>
+                <td class="px-6 py-4 text-right">
+                  <div class="inline-flex items-center gap-2 justify-end">
+                    <!-- Botón Ver -->
+                    <a href="/recetas/ver/<%= r.origen %>/<%= encodeURIComponent(r.id) %>"
+                      class="text-emerald-600 hover:text-emerald-800" title="Ver Detalles">
+                      <i class="fas fa-eye"></i>
+                    </a>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-        <% recetas.forEach(r=> { %>
-          <div class="bg-white rounded-xl border shadow hover:shadow-md transition overflow-hidden">
-            
-            <% if (r.strMealThumb || r.imagen) { %>
-              <img src="<%= r.strMealThumb || r.imagen %>" alt="<%= r.strMeal || r.titulo %>"
-                class="w-full h-40 sm:h-48 object-cover">
-              <% } else { %>
-                <div class="w-full h-40 sm:h-48 bg-gray-200 flex items-center justify-center">
-                  <span class="text-gray-500">Sin imagen</span>
-                </div>
-                <% } %>
-
-                  <div class="p-3 sm:p-4">
-                    <h3 class="text-base sm:text-lg font-semibold text-gray-800 mb-1">
-                      <%= r.strMeal || r.titulo %>
-                    </h3>
-
-                    <p class="text-xs sm:text-sm text-gray-600">
-                      <span class="font-medium">Categoría:</span>
-                      <%= r.strCategory || r.categoria || 'Sin categoría' %>
-                    </p>
-
-                    <p class="text-xs sm:text-sm text-gray-600">
-                      <span class="font-medium">Origen:</span>
-                      <%= r.strArea || r.origen || 'Personal' %>
-                    </p>
-
-                    <!-- Enlace para ver receta completa -->
-                    <% if (r.idMeal) { %>
-                      <!-- Receta de la API -->
-                      <a href="/recetas/api/<%= r.idMeal %>"
-                        class="mt-2 inline-block bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-xs sm:text-sm font-medium py-1 px-2 sm:py-1 sm:px-3 rounded-full transition-colors">
-                        <i class="fas fa-external-link-alt mr-1"></i> Ver receta
+                    <% if (r.origen === 'api') { %>
+                      <form action="/recetas/importar-api" method="POST">
+                        <input type="hidden" name="titulo" value="<%= r.titulo %>">
+                        <input type="hidden" name="categoria" value="<%= r.categoria %>">
+                        <input type="hidden" name="dataAPI" value='<%= r.dataAPI %>'>
+                        <button type="submit"
+                          class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold py-1.5 px-3 rounded-lg shadow transition-all">
+                          <i class="fas fa-download"></i> Importar
+                        </button>
+                      </form>
+                    <% } else { %>
+                      <a href="/recetas/editar/<%= r.id %>" class="text-blue-600 hover:text-blue-800" title="Editar">
+                        <i class="fas fa-edit"></i>
                       </a>
-                      <% } else if (r.id) { %>
-                        <!-- Receta local -->
-                        <a href="/recetas/detalle/<%= r.id %>"
-                          class="mt-2 inline-block bg-blue-100 hover:bg-blue-200 text-blue-800 text-xs sm:text-sm font-medium py-1 px-2 sm:py-1 sm:px-3 rounded-full transition-colors">
-                          <i class="fas fa-eye mr-1"></i> Ver detalles
-                        </a>
-                        <% } %>
-
-                          <!-- Botones de edición/eliminación (solo para recetas locales del usuario) -->
-                          <% if (r.id && usuario && r.usuarioId===usuario.id) { %>
-                            <div class="mt-3 flex gap-2">
-                              <a href="/recetas/editar/<%= r.id %>"
-                                class="text-blue-600 hover:text-blue-800 text-xs sm:text-sm font-medium flex items-center gap-1">
-                                <i class="fas fa-edit"></i> Editar
-                              </a>
-                              <form action="/recetas/eliminar/<%= r.id %>" method="POST"
-                                onsubmit="return confirm('¿Estás seguro de que quieres eliminar esta receta?')">
-                                <button type="submit"
-                                  class="text-red-600 hover:text-red-800 text-xs sm:text-sm font-medium flex items-center gap-1">
-                                  <i class="fas fa-trash-alt"></i> Eliminar
-                                </button>
-                              </form>
-                            </div>
-                            <% } %>
+                      <form action="/recetas/archivar/<%= r.id %>" method="POST"
+                        onsubmit="return confirm('¿Deseas archivar esta receta?')">
+                        <button type="submit" class="text-gray-700 hover:text-yellow-600" title="Archivar">
+                          <i class="fas fa-box-archive"></i>
+                        </button>
+                      </form>
+                    <% } %>
                   </div>
-          </div>
-          <% }) %>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
       </div>
+    </div>
+  <% } %>
+
+  <div class="mt-6">
+    <a href="/recetas/papelera"
+      class="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-300 px-4 py-2 rounded transition">
+      <i class="fas fa-trash-alt"></i> Papelera
+    </a>
+  </div>
+
 </main>
+
+<!-- Script para búsqueda en tiempo real con control de cursor -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const searchForm = document.getElementById('searchForm');
+    let debounceTimer;
+    let lastCursorPosition = 0;
+
+    // Guardar posición del cursor mientras se escribe
+    searchInput.addEventListener('keyup', function() {
+      lastCursorPosition = this.selectionStart;
+    });
+
+    // Guardar posición al hacer clic
+    searchInput.addEventListener('click', function() {
+      lastCursorPosition = this.selectionStart;
+    });
+
+    function performSearch() {
+      const searchTerm = searchInput.value.trim();
+      const currentCursorPos = searchInput.selectionStart;
+      
+      if (searchTerm === '') {
+        window.location.href = '/recetas';
+        return;
+      }
+      
+      // Guardar posición antes de la búsqueda
+      lastCursorPosition = currentCursorPos;
+      
+      // Usar AJAX para mantener la posición del cursor
+      fetch(`/recetas?q=${encodeURIComponent(searchTerm)}`)
+        .then(response => response.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+          const newResults = doc.getElementById('resultsContainer');
+          
+          if (newResults) {
+            document.getElementById('resultsContainer').innerHTML = newResults.innerHTML;
+          }
+          
+          // Restaurar posición del cursor
+          searchInput.focus();
+          searchInput.setSelectionRange(lastCursorPosition, lastCursorPosition);
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          // Fallback a recarga normal si hay error
+          searchForm.submit();
+        });
+    }
+
+    // Búsqueda con debounce
+    searchInput.addEventListener('input', function() {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(performSearch, 500);
+    });
+
+    // Evitar submit tradicional
+    searchForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      performSearch();
+    });
+
+    // Manejo de mensajes de error
+    const errorElement = document.getElementById('errorMessage');
+    if (errorElement) {
+      // Ocultar automáticamente después de 8 segundos
+      setTimeout(() => {
+        errorElement.classList.add('translate-x-full', 'opacity-0');
+        setTimeout(() => errorElement.remove(), 300);
+        fetch('/recetas/clear-flash-error', { method: 'POST' });
+      }, 8000);
+
+      // Función para cerrar manualmente
+      window.dismissError = function() {
+        errorElement.classList.add('translate-x-full', 'opacity-0');
+        setTimeout(() => errorElement.remove(), 300);
+        fetch('/recetas/clear-flash-error', { method: 'POST' });
+      };
+    }
+  });
+</script>

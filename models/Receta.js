@@ -26,6 +26,33 @@ const Receta = sequelize.define('Receta', {
     },
     usuario_id: {
         type: DataTypes.INTEGER
+    },
+    archivada: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    },
+    etiquetas: {
+        type: DataTypes.STRING
+    },
+    tiempo_preparacion: {
+        type: DataTypes.STRING
+    },
+    dificultad: {
+        type: DataTypes.STRING
+    },
+    porciones: {
+        type: DataTypes.INTEGER
+    },
+    tamano_porcion: {
+        type: DataTypes.STRING
+    },
+    equivalentes_simplificados: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    },
+    equivalentes_smae: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
     }
 }, {
     tableName: 'recetas',
