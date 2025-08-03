@@ -12,19 +12,18 @@
     </a>
   </div>
 
-
   <div class="flex flex-col lg:flex-row gap-4 sm:gap-6">
-    <!-- Columna principal: Lista de pacientes -->
+    <!-- Barra de búsqueda -->
     <div class="w-full lg:w-2/3">
-      <!-- Barra de búsqueda -->
       <div class="bg-white shadow rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
         <div class="flex flex-col sm:flex-row items-center gap-3">
           <div class="flex-1 w-full">
             <label for="search" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Buscar pacientes</label>
             <div class="relative">
-              <input type="text" id="search" name="search" placeholder="Buscar por nombre, edad..."
+              <input type="text" id="searchInput" name="search" placeholder="Buscar por nombre, edad..."
                 class="w-full p-2 sm:p-3 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
-              <button class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-emerald-600">
+              <button id="searchButton"
+                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-emerald-600">
                 <i class="fas fa-search text-sm"></i>
               </button>
             </div>
@@ -42,7 +41,7 @@
       </div>
 
       <!-- Lista de pacientes -->
-      <div class="space-y-3 sm:space-y-4">
+      <div id="pacientesList" class="space-y-3 sm:space-y-4">
         <% if (pacientes.length===0) { %>
           <div class="bg-white p-4 sm:p-6 rounded-lg shadow text-center">
             <i class="fas fa-user-injured text-3xl sm:text-4xl text-gray-300 mb-3"></i>
@@ -53,87 +52,75 @@
               <i class="fas fa-plus"></i> Agregar paciente
             </a>
           </div>
-        <% } else { %>
-          <% pacientes.forEach(p=> { 
-              // Calcular la edad a partir de la fecha de nacimiento
+          <% } else { %>
+            <% pacientes.forEach(p=> {
               let edadTexto = '';
+              let edadNumero = null;
               if (p.fecha_nacimiento) {
-                const hoy = new Date();
-                const nacimiento = new Date(p.fecha_nacimiento);
-                let edad = hoy.getFullYear() - nacimiento.getFullYear();
-                const mes = hoy.getMonth() - nacimiento.getMonth();
-                if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
-                  edad--;
-                }
-                edadTexto = edad + ' años';
-              }
-              
-              // Formatear fecha de registro
-              let fechaRegistro = 'No registrado';
-              if (p.fecha_registro) {
-                const fecha = new Date(p.fecha_registro);
-                fechaRegistro = fecha.toLocaleDateString('es-MX');
-              }
-            %>
-            <div class="bg-white shadow rounded-lg overflow-hidden">
-              <div class="p-3 sm:p-4 flex flex-col md:flex-row gap-3 sm:gap-4">
-                <!-- Avatar e información principal -->
-                <div class="flex items-center gap-3 flex-1">
-                  <div
-                    class="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-lg sm:text-xl">
-                    <i class="fas fa-user"></i>
+              const hoy = new Date();
+              const nacimiento = new Date(p.fecha_nacimiento);
+              let edad = hoy.getFullYear() - nacimiento.getFullYear();
+              const mes = hoy.getMonth() - nacimiento.getMonth();
+              if (mes < 0 || (mes===0 && hoy.getDate() < nacimiento.getDate())) edad--; edadTexto=edad + ' años' ;
+                edadNumero=edad; } let fechaRegistro='No registrado' ; if (p.fecha_registro) { const fecha=new
+                Date(p.fecha_registro); fechaRegistro=fecha.toLocaleDateString('es-MX'); } %>
+                <div class="paciente bg-white shadow rounded-lg overflow-hidden"
+                  data-nombre="<%= p.nombre.toLowerCase() %>" data-edad="<%= edadNumero || '' %>"
+                  data-historial="<%= (p.historial || '').toLowerCase() %>" data-telefono="<%= p.telefono || '' %>"
+                  data-email="<%= p.email || '' %>">
+                  <div class="p-3 sm:p-4 flex flex-col md:flex-row gap-3 sm:gap-4">
+                    <div class="flex items-center gap-3 flex-1">
+                      <div
+                        class="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-lg sm:text-xl">
+                        <i class="fas fa-user"></i>
+                      </div>
+                      <div class="min-w-0">
+                        <h3 class="font-bold text-gray-800 text-base sm:text-lg truncate">
+                          <%= p.nombre %>
+                        </h3>
+                        <p class="text-xs sm:text-sm text-gray-600"><span class="font-medium">Edad:</span>
+                          <%= edadTexto || 'No especificada' %>
+                        </p>
+                        <p class="text-xs text-gray-400 mt-0.5">Registrado el <%= fechaRegistro %>
+                        </p>
+                      </div>
+                    </div>
+                    <div class="flex-1 text-xs sm:text-sm text-gray-700 mt-2 md:mt-0">
+                      <p class="truncate"><span class="font-medium">Historial:</span>
+                        <%= p.historial || 'Sin historial registrado' %>
+                      </p>
+                      <p class="mt-1 truncate"><span class="font-medium">Contacto:</span>
+                        <%= p.telefono || 'Sin teléfono' %> | <%= p.email || 'Sin email' %>
+                      </p>
+                    </div>
+                    <div class="flex gap-1 sm:gap-2 self-center mt-2 md:mt-0">
+                      <a href="/pacientes/editar/<%= p.id %>"
+                        class="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors">
+                        <i class="fas fa-pen text-xs sm:text-sm"></i>
+                      </a>
+                      <form action="/pacientes/eliminar/<%= p.id %>" method="POST"
+                        onsubmit="return confirm('¿Eliminar este paciente?')">
+                        <button type="submit"
+                          class="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition-colors">
+                          <i class="fas fa-trash-alt text-xs sm:text-sm"></i>
+                        </button>
+                      </form>
+                    </div>
                   </div>
-                  <div class="min-w-0">
-                    <h3 class="font-bold text-gray-800 text-base sm:text-lg truncate">
-                      <%= p.nombre %>
-                    </h3>
-                    <p class="text-xs sm:text-sm text-gray-600"><span class="font-medium">Edad:</span>
-                      <%= edadTexto || 'No especificada' %>
-                    </p>
-                    <p class="text-xs text-gray-400 mt-0.5">Registrado el <%= fechaRegistro %></p>
-                  </div>
                 </div>
-
-                <!-- Información secundaria -->
-                <div class="flex-1 text-xs sm:text-sm text-gray-700 mt-2 md:mt-0">
-                  <p class="truncate"><span class="font-medium">Historial:</span>
-                    <%= p.historial || 'Sin historial registrado' %>
-                  </p>
-                  <p class="mt-1 truncate"><span class="font-medium">Contacto:</span>
-                    <%= p.telefono || 'Sin teléfono' %> | <%= p.email || 'Sin email' %>
-                  </p>
-                </div>
-
-                <!-- Acciones -->
-                <div class="flex gap-1 sm:gap-2 self-center mt-2 md:mt-0">
-                  <a href="/pacientes/editar/<%= p.id %>"
-                    class="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors">
-                    <i class="fas fa-pen text-xs sm:text-sm"></i>
-                  </a>
-                  <form action="/pacientes/eliminar/<%= p.id %>" method="POST"
-                    onsubmit="return confirm('¿Eliminar este paciente?')">
-                    <button type="submit"
-                      class="w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition-colors">
-                      <i class="fas fa-trash-alt text-xs sm:text-sm"></i>
-                    </button>
-                  </form>
-                </div>
-              </div>
-            </div>
-          <% }) %>
-        <% } %>
+                <% }) %>
+                  <% } %>
       </div>
     </div>
 
-    <!-- Columna lateral: Estadísticas -->
+    <!-- Estadísticas -->
     <div class="w-full lg:w-1/3 mt-4 sm:mt-0">
       <div class="bg-white shadow rounded-lg p-4 sm:p-5">
         <h2 class="text-base sm:text-lg font-bold text-gray-800 mb-3">Informaciones Generales</h2>
-
         <div class="grid grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-5">
           <div class="bg-gray-50 p-3 rounded-lg">
             <p class="text-xs sm:text-sm text-gray-600">Total de pacientes</p>
-            <p class="text-xl sm:text-2xl font-bold text-gray-800">
+            <p id="totalPacientes" class="text-xl sm:text-2xl font-bold text-gray-800">
               <%= pacientes.length %>
             </p>
           </div>
@@ -144,7 +131,6 @@
             </p>
           </div>
         </div>
-
         <div class="mb-4 sm:mb-5">
           <h3 class="font-medium text-gray-800 text-sm sm:text-base mb-1.5">Nuevos pacientes</h3>
           <div class="bg-gray-200 rounded-full h-2">
@@ -152,7 +138,6 @@
           </div>
           <p class="text-xs text-gray-500 mt-1.5">En las últimas 6 semanas</p>
         </div>
-
         <div>
           <h3 class="font-medium text-gray-800 text-sm sm:text-base mb-1.5">Distribución por edad</h3>
           <div class="h-32 sm:h-40 bg-white rounded-lg">
@@ -166,10 +151,13 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    // Datos de distribución pasados desde el controlador
-    const distribucionEdades = JSON.parse('<%- JSON.stringify(distribucionEdades) %>');
+    let distribucionEdades = {};
+    try {
+      distribucionEdades = JSON.parse('<%- JSON.stringify(distribucionEdades) %>');
+    } catch (error) {
+      console.error("Error al parsear distribución de edades", error);
+    }
 
-    // Configuración del gráfico...
     const ctx = document.getElementById('edadChart').getContext('2d');
     new Chart(ctx, {
       type: 'bar',
@@ -178,20 +166,8 @@
         datasets: [{
           label: 'Pacientes',
           data: Object.values(distribucionEdades),
-          backgroundColor: [
-            'rgba(16, 185, 129, 0.7)',
-            'rgba(59, 130, 246, 0.7)',
-            'rgba(139, 92, 246, 0.7)',
-            'rgba(245, 158, 11, 0.7)',
-            'rgba(239, 68, 68, 0.7)'
-          ],
-          borderColor: [
-            'rgba(16, 185, 129, 1)',
-            'rgba(59, 130, 246, 1)',
-            'rgba(139, 92, 246, 1)',
-            'rgba(245, 158, 11, 1)',
-            'rgba(239, 68, 68, 1)'
-          ],
+          backgroundColor: ['rgba(16,185,129,0.7)', 'rgba(59,130,246,0.7)', 'rgba(139,92,246,0.7)', 'rgba(245,158,11,0.7)', 'rgba(239,68,68,0.7)'],
+          borderColor: ['rgba(16,185,129,1)', 'rgba(59,130,246,1)', 'rgba(139,92,246,1)', 'rgba(245,158,11,1)', 'rgba(239,68,68,1)'],
           borderWidth: 1
         }]
       },
@@ -199,9 +175,7 @@
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
-          legend: {
-            display: false
-          },
+          legend: { display: false },
           tooltip: {
             callbacks: {
               label: function (context) {
@@ -211,23 +185,55 @@
           }
         },
         scales: {
-          y: {
-            beginAtZero: true,
-            ticks: {
-              precision: 0,
-              stepSize: 1
-            },
-            grid: {
-              display: false
-            }
-          },
-          x: {
-            grid: {
-              display: false
-            }
-          }
+          y: { beginAtZero: true, ticks: { precision: 0, stepSize: 1 }, grid: { display: false } },
+          x: { grid: { display: false } }
         }
       }
+    });
+
+    const searchInput = document.getElementById('searchInput');
+    const searchButton = document.getElementById('searchButton');
+    const pacientesList = document.getElementById('pacientesList');
+    const totalPacientes = document.getElementById('totalPacientes');
+    const pacientes = document.querySelectorAll('.paciente');
+
+    function filtrarPacientes() {
+      const term = searchInput.value.toLowerCase().trim();
+      let visibleCount = 0;
+
+      pacientes.forEach(paciente => {
+        const nombre = paciente.dataset.nombre;
+        const edad = paciente.dataset.edad;
+        const historial = paciente.dataset.historial;
+        const telefono = paciente.dataset.telefono;
+        const email = paciente.dataset.email;
+
+        const matches = nombre.includes(term) || (edad && edad.includes(term)) ||
+          historial.includes(term) || telefono.includes(term) || email.includes(term);
+
+        if (matches || term === '') {
+          paciente.style.display = '';
+          visibleCount++;
+        } else {
+          paciente.style.display = 'none';
+        }
+      });
+
+      totalPacientes.textContent = visibleCount;
+      if (visibleCount === 0) {
+        pacientesList.innerHTML = `
+          <div class="bg-white p-4 sm:p-6 rounded-lg shadow text-center">
+            <i class="fas fa-search text-3xl sm:text-4xl text-gray-300 mb-3"></i>
+            <h3 class="text-lg sm:text-xl font-medium text-gray-700 mb-2">No se encontraron pacientes</h3>
+            <p class="text-xs sm:text-sm text-gray-500 mb-4">Intenta con otro término de búsqueda</p>
+          </div>`;
+      }
+    }
+
+    searchInput.addEventListener('input', filtrarPacientes);
+    searchButton.addEventListener('click', filtrarPacientes);
+    searchInput.addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') filtrarPacientes();
     });
   });
 </script>
