@@ -1,11 +1,18 @@
-const express = require('express');
+const fs = require('fs');
 const path = require('path');
+const express = require('express');
 const session = require('express-session');
 const expressLayouts = require('express-ejs-layouts');
 const flash = require('connect-flash');
+const Progreso = require('./models/Progreso');
+Progreso.sync({ alter: true });
 
 const app = express();
 const sequelize = require('./config/db');
+const uploadDir = path.join(__dirname, 'public', 'uploads', 'pacientes');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
 
 // Middlewares
 app.use(session({
@@ -19,7 +26,7 @@ app.use(flash());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(expressLayouts);
-app.set('layout', 'layouts/sistema'); 
+app.set('layout', 'layouts/sistema');
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
@@ -31,7 +38,7 @@ app.use('/css', express.static(path.join(__dirname, 'public/css')));
 
 
 const { requireAuth, redirectIfAuthenticated } = require('./middlewares/auth');
-const userMiddleware = require('./middlewares/user'); 
+const userMiddleware = require('./middlewares/user');
 app.use(userMiddleware);
 
 

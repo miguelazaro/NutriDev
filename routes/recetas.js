@@ -11,4 +11,5 @@ router.post('/actualizar/:id', upload.single('imagen'), recetasController.actual
 router.post('/eliminar/:id', recetasController.eliminar);
 router.get('/api/:idMeal', recetasController.detalleApi); // 👈 Usa idMeal
 
+
 module.exports = router;
