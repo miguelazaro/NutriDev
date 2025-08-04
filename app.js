@@ -1,4 +1,3 @@
-const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const session = require('express-session');
@@ -21,9 +20,9 @@ app.use(session({
     saveUninitialized: false
 }));
 
-
 app.use(flash());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 app.use(expressLayouts);
 app.set('layout', 'layouts/sistema');
@@ -36,12 +35,12 @@ app.use('/assets', express.static(path.join(__dirname, 'public/assets')));
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 app.use('/css', express.static(path.join(__dirname, 'public/css')));
 
-
+// Autenticación
 const { requireAuth, redirectIfAuthenticated } = require('./middlewares/auth');
 const userMiddleware = require('./middlewares/user');
 app.use(userMiddleware);
 
-
+// Controladores de autenticación
 const authController = require('./controllers/authController');
 
 app.get('/login', redirectIfAuthenticated, (req, res) => {
@@ -64,19 +63,19 @@ app.post('/login', authController.loginUser);
 app.post('/register', authController.registerUser);
 app.get('/logout', authController.logout);
 
-// Página principa
+// Página principal
 app.get('/', (req, res) => {
     res.redirect('/login');
 });
 
-
+// Dashboard
 const dashboardController = require('./controllers/dashboardController');
 app.get('/dashboard', requireAuth, (req, res, next) => {
     res.locals.active = 'dashboard';
     next();
 }, dashboardController.renderDashboard);
 
-
+// Otras vistas
 app.get('/progreso', requireAuth, (req, res) => {
     res.render('progreso', { active: 'progreso' });
 });
@@ -85,26 +84,26 @@ app.get('/cobros', requireAuth, (req, res) => {
     res.render('cobros', { active: 'cobros' });
 });
 
-
+// Rutas: Pacientes
 const pacientesRouter = require('./routes/pacientes');
 app.use('/pacientes', requireAuth, (req, res, next) => {
     res.locals.active = 'pacientes';
     next();
 }, pacientesRouter);
 
-// Rutas protegidas de recetas
+// Rutas: Recetas (Ahora maneja todo)
 const recetasRouter = require('./routes/recetas');
 app.use('/recetas', requireAuth, (req, res, next) => {
     res.locals.active = 'recetas';
     next();
 }, recetasRouter);
 
-
+// Conexión BD
 sequelize.sync({ force: false })
     .then(() => console.log('Bd conectada'))
     .catch(err => console.error('Error al conectar con la BD:', err));
 
-
+// Servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en http://localhost:${PORT}`);

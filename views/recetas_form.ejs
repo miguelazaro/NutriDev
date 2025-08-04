@@ -1,92 +1,191 @@
-<!DOCTYPE html>
-<html lang="es">
+<!-- Breadcrumb -->
+<div class="px-6 py-4 text-sm text-gray-500 text-right">
+  <a href="/" class="hover:underline text-emerald-600">Inicio</a> /
+  <a href="/recetas" class="hover:underline text-emerald-600">Recetas</a> /
+  <span><%= receta ? 'Editar' : 'Nueva' %></span>
+</div>
 
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>
-        <%= receta ? 'Editar' : 'Nueva' %> Receta | NutriDev
-    </title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
+<h1 class="text-2xl font-bold mb-6 text-gray-800">
+  <%= receta ? 'Editar' : 'Nueva' %> Receta
+</h1>
 
-<body class="bg-gray-50 text-gray-800 font-inter">
+<form method="POST" enctype="multipart/form-data" action="<%= receta ? '/recetas/actualizar/' + receta.id : '/recetas/guardar' %>" class="space-y-8">
 
-    <div class="max-w-4xl mx-auto p-6">
-        <!-- Breadcrumb -->
-        <div class="text-sm text-gray-500 mb-4 text-right">
-            <a href="/" class="hover:underline text-emerald-600">Inicio</a> /
-            <a href="/recetas" class="hover:underline text-emerald-600">Recetas</a> /
-            <%= receta ? 'Editar' : 'Nueva' %>
-        </div>
+  <!-- Información general de la receta -->
+  <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
+    <h2 class="text-xl font-semibold mb-4 text-gray-800">Información básica</h2>
 
-        <!-- Título -->
-        <h1 class="text-3xl font-bold mb-6 text-gray-800">
-            <%= receta ? 'Editar' : 'Nueva' %> Receta
-        </h1>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Nombre -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Nombre de la receta*</label>
+        <input type="text" name="titulo" value="<%= receta?.titulo || '' %>" required
+          class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+          placeholder="Ej: Ensalada de pollo">
+      </div>
 
-        <!-- Formulario -->
-        <form method="POST" action="<%= receta ? '/recetas/actualizar/' + receta.id : '/recetas/guardar' %>"
-            enctype="multipart/form-data" class="bg-white p-6 rounded-lg shadow-md space-y-5">
-
-            <div>
-                <label for="titulo" class="block font-semibold mb-1">Título:</label>
-                <input type="text" id="titulo" name="titulo" value="<%= receta ? receta.titulo : '' %>" required
-                    class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" />
-            </div>
-
-            <div>
-                <label for="descripcion" class="block font-semibold mb-1">Descripción:</label>
-                <textarea id="descripcion" name="descripcion" rows="3"
-                    class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"><%= receta ? receta.descripcion : '' %></textarea>
-            </div>
-
-            <div>
-                <label for="ingredientes" class="block font-semibold mb-1">Ingredientes:</label>
-                <textarea id="ingredientes" name="ingredientes" rows="3"
-                    class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"><%= receta ? receta.ingredientes : '' %></textarea>
-            </div>
-
-            <div>
-                <label for="calorias" class="block font-semibold mb-1">Calorías:</label>
-                <input type="number" id="calorias" name="calorias" value="<%= receta ? receta.calorias : '' %>"
-                    class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" />
-            </div>
-
-            <div>
-                <label for="categoria" class="block font-semibold mb-1">Categoría:</label>
-                <input type="text" id="categoria" name="categoria" value="<%= receta ? receta.categoria : '' %>"
-                    class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500" />
-            </div>
-
-            <div>
-                <label for="preparacion" class="block font-semibold mb-1">Preparación:</label>
-                <textarea id="preparacion" name="preparacion" rows="4"
-                    class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"><%= receta ? receta.preparacion : '' %></textarea>
-            </div>
-
-            <div>
-                <label for="imagen" class="block font-semibold mb-1">Imagen:</label>
-                <input type="file" id="imagen" name="imagen" accept="image/*"
-                    class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100" />
-
-                <% if (receta && receta.imagen) { %>
-                    <p class="mt-4 text-sm text-gray-700 font-medium">Imagen actual:</p>
-                    <img src="/uploads/<%= receta.imagen %>" alt="Imagen actual"
-                        class="mt-2 rounded-md max-w-xs border border-gray-200 shadow-sm" />
-                    <% } %>
-            </div>
-
-            <button type="submit"
-                class="w-full bg-gradient-to-br from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold py-3 rounded-lg shadow-lg transition-transform transform hover:scale-105">
-                <%= receta ? 'Actualizar Receta' : 'Guardar Receta' %>
-            </button>
-
-        </form>
+      <!-- Categoría -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Categoría*</label>
+        <select name="categoria" required
+          class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          <option value="">Selecciona una categoría</option>
+          <option value="Desayuno" <%= receta?.categoria === 'Desayuno' ? 'selected' : '' %>>Desayuno</option>
+          <option value="Comida" <%= receta?.categoria === 'Comida' ? 'selected' : '' %>>Comida</option>
+          <option value="Cena" <%= receta?.categoria === 'Cena' ? 'selected' : '' %>>Cena</option>
+          <option value="Colación" <%= receta?.categoria === 'Colación' ? 'selected' : '' %>>Colación</option>
+        </select>
+      </div>
     </div>
 
-</body>
+    <!-- Descripción -->
+    <div class="mt-6">
+      <label class="block text-sm font-medium text-gray-700 mb-1">Descripción breve*</label>
+      <textarea name="descripcion" rows="3" required
+        class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+        placeholder="Describe brevemente la receta"><%= receta?.descripcion || '' %></textarea>
+    </div>
 
-</html>
+    <!-- Información nutricional -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+      <!-- Calorías -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Calorías totales</label>
+        <input type="number" name="calorias" value="<%= receta?.calorias || '' %>"
+          class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+          placeholder="Ej: 350">
+      </div>
+
+      <!-- Porciones -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Número de porciones</label>
+        <input type="number" name="porciones" value="<%= receta?.porciones || '' %>"
+          class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+          placeholder="Ej: 4">
+      </div>
+
+      <!-- Tiempo estimado -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Tiempo estimado (min)</label>
+        <input type="number" name="tiempo" value="<%= receta?.tiempo || '' %>"
+          class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+          placeholder="Ej: 30">
+      </div>
+    </div>
+
+    <!-- Etiquetas y dificultad -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+      <!-- Etiquetas -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Etiquetas</label>
+        <input type="text" name="etiquetas" value="<%= receta?.etiquetas || '' %>"
+          class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+          placeholder="Ej: Low-Carb, Vegetariano, Sin gluten">
+        <p class="text-xs text-gray-500 mt-1">Separa las etiquetas con comas</p>
+      </div>
+
+      <!-- Dificultad -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">Dificultad</label>
+        <select name="dificultad"
+          class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+          <option value="Fácil" <%= receta?.dificultad === 'Fácil' ? 'selected' : '' %>>Fácil</option>
+          <option value="Media" <%= receta?.dificultad === 'Media' ? 'selected' : '' %>>Media</option>
+          <option value="Difícil" <%= receta?.dificultad === 'Difícil' ? 'selected' : '' %>>Difícil</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ingredientes -->
+  <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
+    <h2 class="text-xl font-semibold mb-4 text-gray-800">Ingredientes*</h2>
+    <div class="mb-2">
+      <p class="text-sm text-gray-600">Ingresa cada ingrediente en una nueva línea o con viñetas (-)</p>
+    </div>
+    <textarea name="ingredientes" rows="8" required
+      class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none font-mono"
+      placeholder="Ej: 
+- 2 tazas de lechuga romana
+- 100g de pollo cocido
+- 1/2 aguacate
+- 1 cucharada de aceite de oliva"><%= receta?.ingredientes || '' %></textarea>
+  </div>
+
+  <!-- Instrucciones -->
+  <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
+    <h2 class="text-xl font-semibold mb-4 text-gray-800">Preparación*</h2>
+    <div class="mb-2">
+      <p class="text-sm text-gray-600">Describe cada paso en un nuevo párrafo o numerado</p>
+    </div>
+    <textarea name="preparacion" rows="10" required
+      class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+      placeholder="Describe paso a paso cómo preparar la receta. Ej:
+
+1. Lavar y cortar todos los vegetales.
+2. Cocinar el pollo a la plancha con un poco de sal.
+3. Mezclar todos los ingredientes en un tazón grande.
+4. Servir inmediatamente."><%= receta?.preparacion || '' %></textarea>
+  </div>
+
+  <!-- Imagen -->
+  <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
+    <h2 class="text-xl font-semibold mb-4 text-gray-800">Imagen (opcional)</h2>
+    <div class="flex items-center space-x-4">
+      <div class="flex-1">
+        <input type="file" name="imagen" accept="image/*"
+          class="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4
+          file:rounded-lg file:border-0 file:text-sm file:font-semibold
+          file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
+      </div>
+      <% if (receta?.imagen) { %>
+        <div class="flex-shrink-0">
+          <p class="text-sm text-gray-600 mb-1">Imagen actual:</p>
+          <img src="/uploads/<%= receta.imagen %>" alt="Imagen receta" class="w-24 h-24 object-cover rounded-lg shadow">
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Botones -->
+  <div class="flex justify-between pt-4">
+    <a href="/recetas"
+      class="flex items-center gap-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 px-6 rounded-lg transition-colors duration-300">
+      <i class="fas fa-arrow-left"></i> Cancelar
+    </a>
+    <button type="submit"
+      class="flex items-center gap-2 bg-gradient-to-br from-emerald-500 to-emerald-700 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:from-emerald-600 hover:to-emerald-800 transition-transform transform hover:scale-105">
+      <i class="fas fa-save"></i> <%= receta ? 'Actualizar' : 'Guardar' %>
+    </button>
+  </div>
+</form>
+
+<!-- Estilos adicionales -->
+<style>
+  /* Mejoras de estilo general */
+  textarea {
+    min-height: 120px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  
+  textarea:focus, input:focus, select:focus {
+    border-color: #10b981;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+  }
+  
+  /* Estilo para campos requeridos */
+  input:required, textarea:required, select:required {
+    border-left: 3px solid #f59e0b;
+  }
+  
+  /* Mejora para el textarea de ingredientes */
+  textarea[name="ingredientes"] {
+    line-height: 1.6;
+  }
+  
+  /* Estilo para los placeholders */
+  ::placeholder {
+    color: #9ca3af;
+    opacity: 1;
+  }
+</style>

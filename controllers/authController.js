@@ -1,14 +1,17 @@
 const bcrypt = require('bcryptjs');
 const Usuario = require('../models/Usuario');
 
+// Mostrar vista de login
 exports.loginView = (req, res) => {
   res.render('login', { error: req.flash('error') });
 };
 
+// Mostrar vista de registro
 exports.registerView = (req, res) => {
   res.render('register', { error: req.flash('error') });
 };
 
+// Registrar nuevo usuario
 exports.registerUser = async (req, res) => {
   const { nombre, email, password } = req.body;
   try {
@@ -19,7 +22,12 @@ exports.registerUser = async (req, res) => {
     }
 
     const hashed = await bcrypt.hash(password, 10);
-    await Usuario.create({ nombre, email, password: hashed });
+    await Usuario.create({
+      nombre,
+      email,
+      password: hashed,
+      rol: 'user' // ✅ Asignar rol por defecto
+    });
 
     res.redirect('/login');
   } catch (err) {
@@ -29,18 +37,23 @@ exports.registerUser = async (req, res) => {
   }
 };
 
+// Iniciar sesión
 exports.loginUser = async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await Usuario.findOne({ where: { email } });
-    if (!user || !await bcrypt.compare(password, user.password)) {
+    const isValidPassword = user && await bcrypt.compare(password, user.password);
+
+    if (!isValidPassword) {
       req.flash('error', 'Credenciales incorrectas');
       return res.redirect('/login');
     }
 
+    // ✅ Guardar datos en sesión
     req.session.userId = user.id;
     req.session.rol = user.rol;
-    req.session.nombreUsuario = user.nombre; 
+    req.session.nombreUsuario = user.nombre;
+
     res.redirect('/dashboard');
   } catch (err) {
     console.error(err);
@@ -49,6 +62,7 @@ exports.loginUser = async (req, res) => {
   }
 };
 
+// Cerrar sesión
 exports.logout = (req, res) => {
   req.session.destroy(() => res.redirect('/login'));
 };
