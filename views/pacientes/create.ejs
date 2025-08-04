@@ -1,0 +1,101 @@
+<form action="/pacientes/guardar" method="POST" enctype="multipart/form-data"
+    class="max-w-5xl mx-auto px-4 py-6 space-y-8">
+    <h1 class="text-2xl font-bold text-gray-800">Registrar nuevo Paciente</h1>
+
+    <!-- Información Básica -->
+    <div class="bg-white shadow rounded-lg p-6 space-y-4">
+        <h2 class="text-lg font-semibold text-gray-700">Información básica</h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+                <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre completo</label>
+                <input type="text" name="nombre" id="nombre" required
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500" />
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Género</label>
+                <div class="mt-1 flex gap-4">
+                    <label><input type="radio" name="genero" value="Masculino" required /> Masculino</label>
+                    <label><input type="radio" name="genero" value="Femenino" /> Femenino</label>
+                    <label><input type="radio" name="genero" value="Otro" /> Otro</label>
+                </div>
+            </div>
+
+            <div>
+                <label for="fecha_nacimiento" class="block text-sm font-medium text-gray-700">Fecha de
+                    nacimiento</label>
+                <input type="date" name="fecha_nacimiento" id="fecha_nacimiento"
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500" />
+            </div>
+
+            <div>
+                <label for="pais" class="block text-sm font-medium text-gray-700">País de residencia</label>
+                <select name="pais" id="pais"
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500">
+                    <option>México</option>
+                    <option>Otro</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contacto -->
+    <div class="bg-white shadow rounded-lg p-6 space-y-4">
+        <h2 class="text-lg font-semibold text-gray-700">Contacto</h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+                <label for="telefono" class="block text-sm font-medium text-gray-700">Número de teléfono móvil</label>
+                <input type="text" name="telefono" id="telefono" placeholder="Ej: 5512345678"
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500" />
+            </div>
+
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700">Correo electrónico</label>
+                <input type="email" name="email" id="email" placeholder="correo@ejemplo.com"
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500" />
+            </div>
+        </div>
+
+        <label class="inline-flex items-center mt-2">
+            <input type="checkbox" name="enviar_anamnesis" value="1" class="form-checkbox text-emerald-600" />
+            <span class="ml-2 text-sm text-gray-700">Enviar cuestionario de la anamnesis por mensaje y por correo</span>
+        </label>
+    </div>
+
+    <!-- Historial Médico -->
+    <div class="bg-white shadow rounded-lg p-6 space-y-4">
+        <h2 class="text-lg font-semibold text-gray-700">Historial médico</h2>
+        <textarea name="historial" rows="4" placeholder="Alergias, condiciones crónicas, cirugías previas, etc."
+            class="w-full border border-gray-300 rounded-md p-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none"></textarea>
+    </div>
+
+    <!-- Subida de archivos -->
+    <div class="bg-white shadow rounded-lg p-6 space-y-4">
+        <h2 class="text-lg font-semibold text-gray-700">Archivos del paciente</h2>
+
+        <div>
+            <label for="foto" class="block text-sm font-medium text-gray-700">Foto de perfil (opcional)</label>
+            <input type="file" name="foto" id="foto" accept="image/*"
+                class="mt-1 block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100" />
+        </div>
+
+        <div>
+            <label for="archivo" class="block text-sm font-medium text-gray-700">Archivo PDF (opcional)</label>
+            <input type="file" name="archivo" id="archivo" accept=".pdf"
+                class="mt-1 block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100" />
+        </div>
+    </div>
+
+    <!-- Botones -->
+    <div class="flex justify-end gap-4">
+        <a href="/pacientes" class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold">
+            Cancelar
+        </a>
+        <button type="submit"
+            class="px-6 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow">
+            Registrar
+        </button>
+    </div>
+</form>

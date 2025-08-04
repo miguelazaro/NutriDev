@@ -1,7 +1,6 @@
-const Paciente = require('../models/Paciente');
-const ArchivoPaciente = require('../models/ArchivoPaciente');
-const Progreso = require('../models/Progreso');
+const { Paciente, ArchivoPaciente, Progreso, NotaNutriologo } = require('../models/associations');
 
+// Distribución por edades
 function calcularDistribucionEdades(pacientes) {
     const hoy = new Date();
     const grupos = {
@@ -16,17 +15,11 @@ function calcularDistribucionEdades(pacientes) {
         if (p.fecha_nacimiento) {
             try {
                 const nacimiento = new Date(p.fecha_nacimiento);
-                // Verificar si la fecha es válida
-                if (isNaN(nacimiento.getTime())) {
-                    return;
-                }
+                if (isNaN(nacimiento.getTime())) return;
 
                 let edad = hoy.getFullYear() - nacimiento.getFullYear();
                 const mes = hoy.getMonth() - nacimiento.getMonth();
-
-                if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
-                    edad--;
-                }
+                if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) edad--;
 
                 if (edad <= 18) grupos['0-18']++;
                 else if (edad <= 30) grupos['19-30']++;
@@ -42,6 +35,7 @@ function calcularDistribucionEdades(pacientes) {
     return grupos;
 }
 
+// Contar nuevos del mes
 function contarNuevosEsteMes(pacientes) {
     const hoy = new Date();
     const mesActual = hoy.getMonth();
@@ -52,15 +46,8 @@ function contarNuevosEsteMes(pacientes) {
 
         try {
             const registro = new Date(p.fecha_registro);
-            // Verificar si la fecha es válida
-            if (isNaN(registro.getTime())) {
-                return false;
-            }
-
-            return (
-                registro.getMonth() === mesActual &&
-                registro.getFullYear() === añoActual
-            );
+            if (isNaN(registro.getTime())) return false;
+            return registro.getMonth() === mesActual && registro.getFullYear() === añoActual;
         } catch (error) {
             console.error(`Error procesando fecha_registro para paciente ${p.id}:`, error);
             return false;
@@ -68,10 +55,116 @@ function contarNuevosEsteMes(pacientes) {
     }).length;
 }
 
+// Nuevo paciente
+exports.guardar = async (req, res) => {
+    try {
+        const {
+            nombre, genero, fecha_nacimiento, pais_residencia, telefono,
+            enviar_cuestionario, lugar_consulta, ocupacion, codigo_postal,
+            email, historial
+        } = req.body;
+
+        const foto = req.files?.foto?.[0]?.filename || null;
+        const archivo = req.files?.archivo?.[0]?.filename || null;
+
+        await Paciente.create({
+            nombre,
+            genero,
+            fecha_nacimiento,
+            pais_residencia,
+            telefono,
+            enviar_cuestionario: enviar_cuestionario === 'on',
+            lugar_consulta,
+            ocupacion,
+            codigo_postal,
+            email,
+            historial,
+            foto,
+            archivo
+        });
+
+        res.redirect('/pacientes');
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error al guardar paciente');
+    }
+};
+
+// Formulario nuevo
+exports.form = (req, res) => {
+    res.render('../views/pacientes/create.ejs');
+};
+
+// Formulario editar
+exports.editar = async (req, res) => {
+    try {
+        const paciente = await Paciente.findByPk(req.params.id);
+        if (!paciente) return res.status(404).send('Paciente no encontrado');
+        res.render('pacientes/edit', { paciente });
+    } catch (error) {
+        console.error('Error en editar:', error);
+        res.status(500).send('Error al cargar el formulario de edición');
+    }
+};
+
+// Actualizar paciente
+exports.actualizar = async (req, res) => {
+    try {
+        const {
+            nombre, genero, fecha_nacimiento, pais_residencia, telefono,
+            enviar_cuestionario, lugar_consulta, ocupacion, codigo_postal,
+            email, historial
+        } = req.body;
+
+        const paciente = await Paciente.findByPk(req.params.id);
+        if (!paciente) return res.status(404).send('Paciente no encontrado');
+
+        const foto = req.files?.foto?.[0]?.filename || paciente.foto;
+        const archivo = req.files?.archivo?.[0]?.filename || paciente.archivo;
+
+        await paciente.update({
+            nombre,
+            genero,
+            fecha_nacimiento,
+            pais_residencia,
+            telefono,
+            enviar_cuestionario: enviar_cuestionario === 'on',
+            lugar_consulta,
+            ocupacion,
+            codigo_postal,
+            email: email?.trim() || null,
+            historial,
+            foto,
+            archivo
+        });
+
+        res.redirect('/pacientes');
+    } catch (error) {
+        console.error('Error en actualizar:', error);
+        res.status(500).send('Error al actualizar el paciente');
+    }
+};
+
+// Eliminar paciente
+exports.eliminar = async (req, res) => {
+    try {
+        await Paciente.destroy({ where: { id: req.params.id } });
+        res.redirect('/pacientes');
+    } catch (error) {
+        console.error('Error en eliminar:', error);
+        res.status(500).send('Error al eliminar el paciente');
+    }
+};
+
+// Vista detalle
 exports.detalle = async (req, res) => {
     try {
         const paciente = await Paciente.findByPk(req.params.id, {
-            include: [ArchivoPaciente, Progreso]
+            include: [
+                { model: ArchivoPaciente },
+                { model: Progreso },
+                { model: NotaNutriologo, as: 'NotaNutriologos' } // ← AQUÍ está la clave
+            ]
         });
 
         if (!paciente) {
@@ -87,6 +180,8 @@ exports.detalle = async (req, res) => {
     }
 };
 
+
+// Subir archivo
 exports.subirArchivo = async (req, res) => {
     const pacienteId = req.params.id;
     const file = req.file;
@@ -104,35 +199,15 @@ exports.subirArchivo = async (req, res) => {
             pacienteId
         });
         req.flash('success', 'Archivo subido correctamente');
-        res.redirect(`/pacientes/${pacienteId}`);
     } catch (error) {
         console.error(error);
         req.flash('error', 'Error al guardar el archivo');
-        res.redirect(`/pacientes/${pacienteId}`);
     }
+
+    res.redirect(`/pacientes/${pacienteId}`);
 };
 
-exports.index = async (req, res) => {
-    try {
-        const pacientes = await Paciente.findAll();
-
-        // Calcular distribución por edades
-        const distribucionEdades = calcularDistribucionEdades(pacientes);
-
-        // Contar nuevos pacientes este mes
-        const nuevosEsteMes = contarNuevosEsteMes(pacientes);
-
-        res.render('pacientes', {
-            pacientes,
-            distribucionEdades,
-            nuevosEsteMes
-        });
-    } catch (error) {
-        console.error('Error en index:', error);
-        res.status(500).send('Error al cargar los pacientes');
-    }
-};
-
+// Guardar progreso
 exports.guardarProgreso = async (req, res) => {
     const { peso, fecha, observaciones } = req.body;
     const pacienteId = req.params.id;
@@ -148,118 +223,50 @@ exports.guardarProgreso = async (req, res) => {
     res.redirect(`/pacientes/${pacienteId}`);
 };
 
-// Formulario nuevo paciente
-exports.form = (req, res) => {
-    res.render('pacientes_form', { paciente: null });
+// Guardar nota
+exports.guardarNota = async (req, res) => {
+    const { nota } = req.body;
+    const pacienteId = req.params.id;
+
+    try {
+        await NotaNutriologo.create({ nota, pacienteId });
+        req.flash('success', 'Nota guardada correctamente');
+    } catch (error) {
+        console.error('Error al guardar nota:', error);
+        req.flash('error', 'No se pudo guardar la nota');
+    }
+
+    res.redirect(`/pacientes/${pacienteId}`);
 };
 
-// Guardar 
-exports.guardar = async (req, res) => {
+// Eliminar nota
+exports.eliminarNota = async (req, res) => {
+    const { id, notaId } = req.params;
     try {
-        // Recoger todos los campos del formulario
-        const {
-            nombre,
-            genero,
-            fecha_nacimiento,
-            pais_residencia,
-            telefono,
-            enviar_cuestionario,
-            lugar_consulta,
-            ocupacion,
-            codigo_postal,
-            email,
-            historial
-        } = req.body;
+        await NotaNutriologo.destroy({ where: { id: notaId, pacienteId: id } });
+        req.flash('success', 'Nota eliminada');
+    } catch (error) {
+        console.error('Error eliminando nota:', error);
+        req.flash('error', 'No se pudo eliminar la nota');
+    }
+    res.redirect(`/pacientes/${id}`);
+};
 
-        // Convertir email vacío a null
-        const cleanedEmail = (email && email.trim() === '') ? null : email;
+// Vista principal
+exports.index = async (req, res) => {
+    try {
+        const pacientes = await Paciente.findAll();
 
-        await Paciente.create({
-            nombre,
-            genero,
-            fecha_nacimiento,
-            pais_residencia,
-            telefono,
-            enviar_cuestionario: enviar_cuestionario === 'on',
-            lugar_consulta,
-            ocupacion,
-            codigo_postal,
-            email: cleanedEmail,
-            historial
+        const distribucionEdades = calcularDistribucionEdades(pacientes);
+        const nuevosEsteMes = contarNuevosEsteMes(pacientes);
+
+        res.render('pacientes', {
+            pacientes,
+            distribucionEdades,
+            nuevosEsteMes
         });
-
-        res.redirect('/pacientes');
     } catch (error) {
-        console.error('Error en guardar:', error);
-        res.status(500).send('Error al guardar el paciente');
-    }
-};
-
-// Formulario editar
-exports.editar = async (req, res) => {
-    try {
-        const paciente = await Paciente.findByPk(req.params.id);
-        if (!paciente) {
-            return res.status(404).send('Paciente no encontrado');
-        }
-        res.render('pacientes_form', { paciente });
-    } catch (error) {
-        console.error('Error en editar:', error);
-        res.status(500).send('Error al cargar el formulario de edición');
-    }
-};
-
-// Actualizar 
-exports.actualizar = async (req, res) => {
-    try {
-        // Recoger todos los campos del formulario
-        const {
-            nombre,
-            genero,
-            fecha_nacimiento,
-            pais_residencia,
-            telefono,
-            enviar_cuestionario,
-            lugar_consulta,
-            ocupacion,
-            codigo_postal,
-            email,
-            historial
-        } = req.body;
-
-        // Convertir email vacío a null
-        const cleanedEmail = (email && email.trim() === '') ? null : email;
-
-        await Paciente.update({
-            nombre,
-            genero,
-            fecha_nacimiento,
-            pais_residencia,
-            telefono,
-            enviar_cuestionario: enviar_cuestionario === 'on',
-            lugar_consulta,
-            ocupacion,
-            codigo_postal,
-            email: cleanedEmail,
-            historial
-        }, {
-            where: { id: req.params.id }
-        });
-
-        res.redirect('/pacientes');
-    } catch (error) {
-        console.error('Error en actualizar:', error);
-        res.status(500).send('Error al actualizar el paciente');
-    }
-};
-
-// Eliminar
-exports.eliminar = async (req, res) => {
-    try {
-        await Paciente.destroy({ where: { id: req.params.id } });
-        res.redirect('/pacientes');
-    } catch (error) {
-        console.error('Error en eliminar:', error);
-        res.status(500).send('Error al eliminar el paciente');
+        console.error('Error en index:', error);
+        res.status(500).send('Error al cargar los pacientes');
     }
 };

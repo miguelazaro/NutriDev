@@ -1,136 +1,218 @@
-<div class="max-w-4xl mx-auto bg-white p-6 shadow rounded">
-    <h1 class="text-2xl font-bold text-gray-800 mb-4">Detalle del Paciente</h1>
+<div class="max-w-5xl mx-auto bg-white p-6 sm:p-8 shadow rounded-lg space-y-6">
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-        <div><strong>Nombre:</strong>
-            <%= paciente.nombre %>
+    <!-- ENCABEZADO -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <!-- FOTO DE PERFIL + NOMBRE -->
+        <div class="flex items-center gap-4">
+            <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden border-4 border-emerald-300 shadow">
+                <% if (paciente.foto) { %>
+                    <img src="/uploads/pacientes/<%= paciente.foto %>" alt="Foto de perfil"
+                        class="object-cover w-full h-full">
+                    <% } else { %>
+                        <i
+                            class="fas fa-user text-emerald-600 text-2xl flex items-center justify-center w-full h-full bg-emerald-100"></i>
+                        <% } %>
+            </div>
+            <div>
+                <h1 class="text-2xl sm:text-3xl font-bold text-emerald-600">
+                    <%= paciente.nombre %>
+                </h1>
+                <p class="text-sm text-gray-500">Ficha del paciente</p>
+            </div>
         </div>
-        <div><strong>Edad:</strong>
-            <%= paciente.edad %> años
-        </div>
-        <div><strong>Sexo:</strong>
-            <%= paciente.sexo %>
-        </div>
-        <div><strong>Correo:</strong>
-            <%= paciente.correo %>
-        </div>
-        <div><strong>Teléfono:</strong>
-            <%= paciente.telefono %>
-        </div>
-        <div><strong>Dirección:</strong>
-            <%= paciente.direccion %>
-        </div>
+
+        <!-- ENLACE DE VOLVER -->
+        <a href="/pacientes" class="text-sm text-emerald-600 hover:underline">
+            ← Volver a la lista
+        </a>
     </div>
 
-    <div class="space-y-4">
 
-        <!-- Historial -->
-        <section class="p-4 bg-gray-100 rounded">
-            <h2 class="text-lg font-semibold">Historial médico</h2>
+    <!-- INFO DEL PACIENTE -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+        <div class="bg-gray-50 p-4 rounded-lg shadow">
+            <p class="text-gray-500">Nombre</p>
+            <p class="font-semibold">
+                <%= paciente.nombre %>
+            </p>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg shadow">
+            <p class="text-gray-500">Edad</p>
+            <p class="font-semibold">
+                <%= paciente.edad %>
+                    <p class="font-semibold">
+                        <% if (paciente.fecha_nacimiento) { const nacimiento=new Date(paciente.fecha_nacimiento); const
+                            hoy=new Date(); let edad=hoy.getFullYear() - nacimiento.getFullYear(); const
+                            m=hoy.getMonth() - nacimiento.getMonth(); if (m < 0 || (m===0 && hoy.getDate() <
+                            nacimiento.getDate())) edad--; %>
+                            <%= edad %> años
+                                <% } else { %>
+                                    No especificada
+                                    <% } %>
+                    </p>
+            </p>
+        </div>
+
+        <!-- Sexo -->
+        <div class="bg-gray-50 p-4 rounded-lg shadow">
+            <p class="text-gray-500">Sexo</p>
+            <p class="font-semibold">
+                <%= paciente.genero || 'No especificado' %>
+            </p>
+        </div>
+
+        <!-- Correo -->
+        <div class="bg-gray-50 p-4 rounded-lg shadow">
+            <p class="text-gray-500">Correo</p>
+            <p class="font-semibold">
+                <%= paciente.email || 'No especificado' %>
+            </p>
+        </div>
+
+        <div class="bg-gray-50 p-4 rounded-lg shadow">
+            <p class="text-gray-500">Teléfono</p>
+            <p class="font-semibold">
+                <%= paciente.telefono %>
+            </p>
+        </div>
+    </section>
+
+    <!-- HISTORIAL MÉDICO Y NOTAS -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="bg-white border rounded-lg p-4">
+            <h2 class="text-lg font-semibold text-emerald-700 mb-2">📝 Historial Médico</h2>
             <p class="text-gray-700 italic">
                 <%= paciente.historial || 'No registrado' %>
             </p>
-        </section>
+        </div>
 
-        <!-- Notas -->
-        <section class="p-4 bg-gray-100 rounded">
-            <h2 class="text-lg font-semibold">Notas privadas</h2>
-            <textarea class="w-full mt-2 border border-gray-300 rounded p-2" rows="3"
-                placeholder="Notas del nutriólogo..."></textarea>
-        </section>
 
-        <!-- Subir archivo -->
-        <section class="p-4 bg-gray-100 rounded">
-            <h2 class="text-lg font-semibold mb-2">Subir archivo (foto o documento)</h2>
-            <form action="/pacientes/<%= paciente.id %>/subir" method="POST" enctype="multipart/form-data"
-                class="space-y-3">
-                <input type="file" name="archivo" accept="image/*,.pdf" required
-                    class="block w-full border rounded p-2">
-                <button type="submit"
-                    class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded shadow">Subir</button>
+        <div class="bg-white border rounded-lg p-4">
+            <h2 class="text-lg font-semibold text-emerald-700 mb-2">📒 Notas del Nutriólogo</h2>
+
+            <!-- Formulario para guardar nueva nota -->
+            <form method="POST" action="/pacientes/<%= paciente.id %>/notas">
+                <textarea name="nota" class="form-textarea w-full" rows="4"
+                    placeholder="Escribe tus notas aquí..."></textarea>
+                <button type="submit" class="btn btn-success mt-2">Guardar notas</button>
             </form>
-        </section>
 
-        <!-- Mostrar archivos subidos -->
-        <section class="p-4 bg-gray-100 rounded">
-            <h2 class="text-lg font-semibold mb-2">Archivos subidos</h2>
-            <% if (paciente.ArchivoPacientes && paciente.ArchivoPacientes.length> 0) { %>
-                <ul class="space-y-2">
-                    <% paciente.ArchivoPacientes.forEach(a=> { %>
-                        <li>
-                            <a href="<%= a.ruta %>" target="_blank" class="text-blue-600 underline">
-                                <%= a.nombre_archivo %>
-                            </a> - <%= a.tipo %>
+            <!-- Mostrar notas existentes -->
+            <% if (paciente.NotaNutriologos && paciente.NotaNutriologos.length> 0) { %>
+                <ul class="mt-4 space-y-2">
+                    <% paciente.NotaNutriologos.forEach(n=> { %>
+                        <li class="bg-gray-100 p-2 rounded shadow text-sm flex justify-between items-center">
+                            <span>
+                                <%= n.nota %>
+                            </span>
+                            <form action="/pacientes/<%= paciente.id %>/notas/<%= n.id %>/eliminar" method="POST"
+                                class="inline">
+                                <button type="submit" class="text-red-600 hover:underline ml-4">Eliminar</button>
+                            </form>
                         </li>
                         <% }) %>
                 </ul>
                 <% } else { %>
-                    <p class="text-gray-500 italic">No se han subido archivos</p>
+                    <p class="text-gray-500 text-sm mt-2">No hay notas registradas.</p>
                     <% } %>
-        </section>
+        </div>
 
-        <section class="p-4 bg-gray-100 rounded">
-            <h2 class="text-lg font-semibold mb-2">Registrar progreso</h2>
-            <form action="/pacientes/<%= paciente.id %>/progreso" method="POST" class="space-y-3">
-                <div>
-                    <label class="block text-sm font-medium">Peso (kg):</label>
-                    <input type="number" step="0.1" name="peso" required class="w-full border rounded p-2">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium">Fecha:</label>
-                    <input type="date" name="fecha" class="w-full border rounded p-2">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium">Observaciones:</label>
-                    <textarea name="observaciones" class="w-full border rounded p-2" rows="2"></textarea>
-                </div>
-                <button type="submit" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded shadow">
-                    Guardar
+
+
+    </section>
+
+    <!-- ARCHIVOS -->
+    <section class="bg-white border rounded-lg p-4">
+        <h2 class="text-lg font-semibold text-emerald-700 mb-4">📂 Archivos del paciente</h2>
+
+        <form action="/pacientes/<%= paciente.id %>/subir" method="POST" enctype="multipart/form-data"
+            class="flex flex-col sm:flex-row items-center gap-4">
+            <input type="file" name="archivo" accept="image/*,.pdf" required class="flex-1 border rounded p-2">
+            <button type="submit" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded shadow">
+                Subir
+            </button>
+        </form>
+
+        <div class="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-4">
+            <% if (paciente.ArchivoPacientes && paciente.ArchivoPacientes.length> 0) { %>
+                <% paciente.ArchivoPacientes.forEach(a=> { %>
+                    <div class="border rounded p-2 bg-gray-50 text-center text-sm">
+                        <% if (a.tipo==='imagen' ) { %>
+                            <img src="<%= a.ruta %>" alt="archivo" class="w-full h-32 object-cover rounded mb-2">
+                            <% } else if (a.tipo==='pdf' ) { %>
+                                <i class="fas fa-file-pdf text-red-500 text-4xl mb-2"></i>
+                                <% } %>
+                                    <a href="<%= a.ruta %>" target="_blank"
+                                        class="text-blue-600 hover:underline block truncate">
+                                        <%= a.nombre_archivo %>
+                                    </a>
+                    </div>
+                    <% }) %>
+                        <% } else { %>
+                            <p class="col-span-2 text-gray-500 italic">No se han subido archivos</p>
+                            <% } %>
+        </div>
+    </section>
+
+    <!-- REGISTRO DE PROGRESO -->
+    <section class="bg-white border rounded-lg p-4">
+        <h2 class="text-lg font-semibold text-emerald-700 mb-4">📈 Registrar progreso</h2>
+        <form action="/pacientes/<%= paciente.id %>/progreso" method="POST"
+            class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+                <label class="block text-sm font-medium">Peso (kg)</label>
+                <input type="number" step="0.1" name="peso" required class="w-full border rounded p-2">
+            </div>
+            <div>
+                <label class="block text-sm font-medium">Fecha</label>
+                <input type="date" name="fecha" class="w-full border rounded p-2">
+            </div>
+            <div>
+                <label class="block text-sm font-medium">Observaciones</label>
+                <input type="text" name="observaciones" class="w-full border rounded p-2">
+            </div>
+            <div class="col-span-1 sm:col-span-3">
+                <button type="submit"
+                    class="mt-2 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded shadow">
+                    Guardar progreso
                 </button>
-            </form>
-        </section>
+            </div>
+        </form>
+    </section>
 
-        <section class="p-4 bg-gray-100 rounded">
-            <h2 class="text-lg font-semibold mb-2">Gráfica de evolución</h2>
-            <% if (paciente.Progresos && paciente.Progresos.length> 0) { %>
-                <canvas id="graficaProgreso" class="w-full h-64"></canvas>
-                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-                <script>
-                    const ctx = document.getElementById('graficaProgreso').getContext('2d');
-                    new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: <% - JSON.stringify(paciente.Progresos.map(p => p.fecha)) %>,
-                            datasets: [{
-                                label: 'Peso (kg)',
-                                data: <% - JSON.stringify(paciente.Progresos.map(p => p.peso)) %>,
-                                borderColor: 'rgba(16,185,129,1)',
-                                backgroundColor: 'rgba(16,185,129,0.2)',
-                                borderWidth: 2,
-                                tension: 0.3,
-                                fill: true
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            scales: {
-                                y: {
-                                    beginAtZero: false,
-                                    title: { display: true, text: 'Peso (kg)' }
-                                },
-                                x: {
-                                    title: { display: true, text: 'Fecha' }
-                                }
-                            }
+    <!-- GRÁFICA -->
+    <section class="bg-white border rounded-lg p-4">
+        <h2 class="text-lg font-semibold text-emerald-700 mb-4">📊 Evolución de peso</h2>
+        <% if (paciente.Progresos && paciente.Progresos.length> 0) { %>
+            <canvas id="graficaProgreso" class="w-full h-64"></canvas>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script>
+                const ctx = document.getElementById('graficaProgreso').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: <% - JSON.stringify(paciente.Progresos.map(p => p.fecha)) %>,
+                        datasets: [{
+                            label: 'Peso (kg)',
+                            data: <% - JSON.stringify(paciente.Progresos.map(p => p.peso)) %>,
+                            borderColor: 'rgba(16,185,129,1)',
+                            backgroundColor: 'rgba(16,185,129,0.2)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: { beginAtZero: false, title: { display: true, text: 'Peso (kg)' } },
+                            x: { title: { display: true, text: 'Fecha' } }
                         }
-                    });
-                </script>
-                <% } else { %>
-                    <p class="text-gray-500 italic">No hay registros de progreso aún</p>
-                    <% } %>
-        </section>
-
-
-
-    </div>
+                    }
+                });
+            </script>
+            <% } else { %>
+                <p class="text-gray-500 italic">No hay registros de progreso aún.</p>
+                <% } %>
+    </section>
 </div>

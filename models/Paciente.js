@@ -13,7 +13,7 @@ const Paciente = sequelize.define('Paciente', {
     },
     genero: {
         type: DataTypes.ENUM('Masculino', 'Femenino', 'Otro'),
-        allowNull: true,
+        allowNull: true
     },
     fecha_nacimiento: {
         type: DataTypes.DATEONLY,
@@ -27,7 +27,7 @@ const Paciente = sequelize.define('Paciente', {
     pais_residencia: {
         type: DataTypes.STRING,
         defaultValue: 'México',
-        allowNull: true,
+        allowNull: true
     },
     telefono: {
         type: DataTypes.STRING,
@@ -41,15 +41,15 @@ const Paciente = sequelize.define('Paciente', {
     },
     enviar_cuestionario: {
         type: DataTypes.BOOLEAN,
-        defaultValue: false,
+        defaultValue: false
     },
     lugar_consulta: {
         type: DataTypes.STRING,
-        allowNull: true,
+        allowNull: true
     },
     ocupacion: {
         type: DataTypes.STRING,
-        allowNull: true,
+        allowNull: true
     },
     codigo_postal: {
         type: DataTypes.STRING,
@@ -61,21 +61,26 @@ const Paciente = sequelize.define('Paciente', {
             }
         }
     },
+    foto: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    archivo: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
     email: {
         type: DataTypes.STRING,
         allowNull: true,
         validate: {
             isEmail: {
-                msg: 'Debe ser un correo válido',
-                args: {
-                    allow_empty: true  // Permite cadenas vacías
-                }
+                msg: 'Debe ser un correo válido'
             }
         }
     },
     historial: {
         type: DataTypes.TEXT,
-        allowNull: true,
+        allowNull: true
     }
 }, {
     tableName: 'pacientes',
@@ -84,13 +89,11 @@ const Paciente = sequelize.define('Paciente', {
     updatedAt: 'fecha_actualizacion',
     hooks: {
         beforeCreate: (paciente) => {
-            // Limpiar email si está vacío
             if (paciente.email && paciente.email.trim() === '') {
                 paciente.email = null;
             }
         },
         beforeUpdate: (paciente) => {
-            // Limpiar email si está vacío
             if (paciente.email && paciente.email.trim() === '') {
                 paciente.email = null;
             }

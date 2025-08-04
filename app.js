@@ -1,3 +1,4 @@
+const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const session = require('express-session');
@@ -91,12 +92,15 @@ app.use('/pacientes', requireAuth, (req, res, next) => {
     next();
 }, pacientesRouter);
 
-// Rutas: Recetas (Ahora maneja todo)
+// Rutas: Recetas
 const recetasRouter = require('./routes/recetas');
 app.use('/recetas', requireAuth, (req, res, next) => {
     res.locals.active = 'recetas';
     next();
 }, recetasRouter);
+
+// Carga asociaciones ANTES de sincronizar
+require('./models/associations');
 
 // Conexión BD
 sequelize.sync({ force: false })
