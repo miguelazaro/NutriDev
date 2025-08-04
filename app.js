@@ -1,17 +1,17 @@
-// --- CORRECCIÓN AQUÍ ---
-// Movemos dotenv.config() al principio de todo para asegurar que las variables
-// de entorno estén disponibles para toda la aplicación desde el inicio.
-const dotenv = require('dotenv');
-dotenv.config();
-
-const express = require('express');
 const path = require('path');
+const express = require('express');
 const session = require('express-session');
 const expressLayouts = require('express-ejs-layouts');
 const flash = require('connect-flash');
+const Progreso = require('./models/Progreso');
+Progreso.sync({ alter: true });
 
 const app = express();
 const sequelize = require('./config/db');
+const uploadDir = path.join(__dirname, 'public', 'uploads', 'pacientes');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
 
 // Middlewares
 app.use(session({
