@@ -21,6 +21,5 @@ const Progreso = sequelize.define('Progreso', {
 });
 
 Progreso.belongsTo(Paciente, { foreignKey: 'pacienteId' });
-Paciente.hasMany(Progreso, { foreignKey: 'pacienteId' });
 
 module.exports = Progreso;

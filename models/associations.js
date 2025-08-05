@@ -4,7 +4,7 @@ const Progreso = require('./Progreso');
 const ArchivoPaciente = require('./ArchivoPaciente');
 
 // Relación: Paciente → Progreso
-Paciente.hasMany(Progreso, { foreignKey: 'pacienteId', onDelete: 'CASCADE' });
+Paciente.hasMany(Progreso, { foreignKey: 'pacienteId', onDelete: 'CASCADE', as: 'Progresos' });
 Progreso.belongsTo(Paciente, { foreignKey: 'pacienteId' });
 
 // Relación: Paciente → ArchivoPaciente

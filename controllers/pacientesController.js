@@ -1,5 +1,4 @@
-const { Paciente, ArchivoPaciente, Progreso, NotaNutriologo } = require('../models/associations');
-
+const { Paciente, Progreso, NotaNutriologo, ArchivoPaciente } = require('../models/associations');
 // Distribución por edades
 function calcularDistribucionEdades(pacientes) {
     const hoy = new Date();
@@ -162,14 +161,19 @@ exports.detalle = async (req, res) => {
         const paciente = await Paciente.findByPk(req.params.id, {
             include: [
                 { model: ArchivoPaciente },
-                { model: Progreso },
-                { model: NotaNutriologo, as: 'NotaNutriologos' } // ← AQUÍ está la clave
+                { model: Progreso, as: 'Progresos' },
+                { model: NotaNutriologo, as: 'NotaNutriologos' }
             ]
         });
 
         if (!paciente) {
             req.flash('error', 'Paciente no encontrado');
             return res.redirect('/pacientes');
+        }
+
+        // Convierte los progresos a objetos planos
+        if (paciente.Progresos) {
+            paciente.Progresos = paciente.Progresos.map(p => p.toJSON());
         }
 
         res.render('pacientes/detalle', { paciente });
@@ -179,7 +183,6 @@ exports.detalle = async (req, res) => {
         res.redirect('/pacientes');
     }
 };
-
 
 // Subir archivo
 exports.subirArchivo = async (req, res) => {
@@ -206,14 +209,20 @@ exports.subirArchivo = async (req, res) => {
 
     res.redirect(`/pacientes/${pacienteId}`);
 };
-
-// Guardar progreso
+//GUARDAR PROGRESO
 exports.guardarProgreso = async (req, res) => {
     const { peso, fecha, observaciones } = req.body;
     const pacienteId = req.params.id;
 
     try {
-        await Progreso.create({ peso, fecha, observaciones, pacienteId });
+        const progresoNuevo = await Progreso.create({ peso, fecha, observaciones, pacienteId });
+
+        const pacienteConProgresos = await Paciente.findByPk(pacienteId, {
+            include: [{ model: Progreso }]
+        });
+
+        console.log(JSON.stringify(pacienteConProgresos, null, 2)); // 👀 Aquí revisas si trae los progresos
+
         req.flash('success', 'Progreso registrado correctamente');
     } catch (error) {
         console.error(error);
