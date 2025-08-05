@@ -39,3 +39,5 @@ router.post('/:id/subir', upload.single('archivo'), pacientesController.subirArc
 router.post('/:id/progreso', pacientesController.guardarProgreso);
 
 module.exports = router;
+
+console.log(typeof pacientesController.guardarProgreso); // Debería mostrar "function"

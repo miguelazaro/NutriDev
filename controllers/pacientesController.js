@@ -54,6 +54,30 @@ function contarNuevosEsteMes(pacientes) {
     }).length;
 }
 
+// Vista principal
+exports.index = async (req, res) => {
+    try {
+        const pacientes = await Paciente.findAll();
+
+        const distribucionEdades = calcularDistribucionEdades(pacientes);
+        const nuevosEsteMes = contarNuevosEsteMes(pacientes);
+
+        res.render('pacientes', {
+            pacientes,
+            distribucionEdades,
+            nuevosEsteMes
+        });
+    } catch (error) {
+        console.error('Error en index:', error);
+        res.status(500).send('Error al cargar los pacientes');
+    }
+};
+
+// Formulario nuevo
+exports.form = (req, res) => {
+    res.render('../views/pacientes/create.ejs');
+};
+
 // Nuevo paciente
 exports.guardar = async (req, res) => {
     try {
@@ -87,11 +111,6 @@ exports.guardar = async (req, res) => {
         console.error(error);
         res.status(500).send('Error al guardar paciente');
     }
-};
-
-// Formulario nuevo
-exports.form = (req, res) => {
-    res.render('../views/pacientes/create.ejs');
 };
 
 // Formulario editar
@@ -163,6 +182,9 @@ exports.detalle = async (req, res) => {
                 { model: ArchivoPaciente },
                 { model: Progreso, as: 'Progresos' },
                 { model: NotaNutriologo, as: 'NotaNutriologos' }
+            ],
+            order: [
+                [{ model: Progreso, as: 'Progresos' }, 'fecha', 'ASC']
             ]
         });
 
@@ -171,12 +193,9 @@ exports.detalle = async (req, res) => {
             return res.redirect('/pacientes');
         }
 
-        // Convierte los progresos a objetos planos
-        if (paciente.Progresos) {
-            paciente.Progresos = paciente.Progresos.map(p => p.toJSON());
-        }
-
-        res.render('pacientes/detalle', { paciente });
+        res.render('pacientes/detalle', {
+            paciente: paciente.get({ plain: true })
+        });
     } catch (error) {
         console.error(error);
         req.flash('error', 'Error al cargar paciente');
@@ -209,23 +228,27 @@ exports.subirArchivo = async (req, res) => {
 
     res.redirect(`/pacientes/${pacienteId}`);
 };
-//GUARDAR PROGRESO
+
+//Guardar progreso
 exports.guardarProgreso = async (req, res) => {
     const { peso, fecha, observaciones } = req.body;
     const pacienteId = req.params.id;
 
     try {
-        const progresoNuevo = await Progreso.create({ peso, fecha, observaciones, pacienteId });
+        // Crear el nuevo progreso
+        await Progreso.create({ peso, fecha, observaciones, pacienteId });
 
-        const pacienteConProgresos = await Paciente.findByPk(pacienteId, {
-            include: [{ model: Progreso }]
+        // Obtener TODOS los progresos del paciente
+        const progresos = await Progreso.findAll({
+            where: { pacienteId },
+            order: [['fecha', 'ASC']]
         });
 
-        console.log(JSON.stringify(pacienteConProgresos, null, 2)); // 👀 Aquí revisas si trae los progresos
+        console.log('Progresos del paciente:', progresos);
 
         req.flash('success', 'Progreso registrado correctamente');
     } catch (error) {
-        console.error(error);
+        console.error('Error al guardar progreso:', error);
         req.flash('error', 'Error al guardar el progreso');
     }
 
@@ -259,23 +282,4 @@ exports.eliminarNota = async (req, res) => {
         req.flash('error', 'No se pudo eliminar la nota');
     }
     res.redirect(`/pacientes/${id}`);
-};
-
-// Vista principal
-exports.index = async (req, res) => {
-    try {
-        const pacientes = await Paciente.findAll();
-
-        const distribucionEdades = calcularDistribucionEdades(pacientes);
-        const nuevosEsteMes = contarNuevosEsteMes(pacientes);
-
-        res.render('pacientes', {
-            pacientes,
-            distribucionEdades,
-            nuevosEsteMes
-        });
-    } catch (error) {
-        console.error('Error en index:', error);
-        res.status(500).send('Error al cargar los pacientes');
-    }
 };
