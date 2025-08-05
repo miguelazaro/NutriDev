@@ -15,6 +15,8 @@ router.post('/archivar/:id', recetasController.archivar);
 router.post('/restaurar/:id', requireAuth, recetasController.restaurar);
 router.post('/eliminar-definitivo/:id', requireAuth, recetasController.eliminar);
 router.get('/ver/:tipo/:id', requireAuth, recetasController.ver);
+router.post('/importar-api', recetasController.importarDesdeAPI);
+
 
 // Nueva ruta para limpiar mensajes flash de error
 router.post('/clear-flash-error', (req, res) => {

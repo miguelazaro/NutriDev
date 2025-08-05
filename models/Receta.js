@@ -21,9 +21,6 @@ const Receta = sequelize.define('Receta', {
     preparacion: {
         type: DataTypes.TEXT
     },
-    imagen: {
-        type: DataTypes.STRING
-    },
     usuario_id: {
         type: DataTypes.INTEGER
     },
@@ -31,8 +28,9 @@ const Receta = sequelize.define('Receta', {
         type: DataTypes.BOOLEAN,
         defaultValue: false
     },
-    etiquetas: {
-        type: DataTypes.STRING
+     etiquetas: {
+        type: DataTypes.TEXT, // Cambiado de STRING a TEXT
+        allowNull: true
     },
     tiempo_preparacion: {
         type: DataTypes.STRING
@@ -43,6 +41,10 @@ const Receta = sequelize.define('Receta', {
     porciones: {
         type: DataTypes.INTEGER
     },
+imagen: {
+  type: DataTypes.TEXT, // Cambiar de STRING a TEXT si es necesario
+  allowNull: true
+},
     tamano_porcion: {
         type: DataTypes.STRING
     },

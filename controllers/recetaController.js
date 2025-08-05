@@ -120,7 +120,6 @@ const index = async (req, res) => {
         });
     }
 };
-
 // --- VER RECETA ---
 const ver = async (req, res) => {
     const { tipo, id } = req.params;
@@ -135,10 +134,21 @@ const ver = async (req, res) => {
             const receta = await Receta.findByPk(id);
             if (!receta) return res.status(404).send('Receta no encontrada');
 
+            // Función para formatear correctamente la imagen
+            const formatearImagen = (imagen) => {
+                if (!imagen) return null;
+                // Si ya es una URL completa (http o https)
+                if (imagen.startsWith('http://') || imagen.startsWith('https://')) {
+                    return imagen;
+                }
+                // Si es un nombre de archivo local
+                return `/uploads/${imagen}`;
+            };
+
             // Formatear los datos para la vista
             const recetaFormateada = {
                 ...receta.dataValues,
-                imagen: receta.imagen ? `/uploads/${receta.imagen}` : null,
+                imagen: formatearImagen(receta.imagen),
                 tiempo: receta.tiempo_preparacion || 'N/A',
                 tamanoPorcion: receta.tamano_porcion || 'N/A',
                 etiquetas: receta.etiquetas || 'N/A',
@@ -237,6 +247,21 @@ const ver = async (req, res) => {
                 })
             );
 
+            // Procesar imagen para la vista
+            const procesarImagenVista = (url) => {
+                if (!url) return null;
+                try {
+                    // Si es una URL de Edamam, asegurarse de que tenga el protocolo correcto
+                    if (url.includes('edamam-product-images')) {
+                        return url.startsWith('http') ? url : `https:${url}`;
+                    }
+                    return url;
+                } catch (e) {
+                    console.error('Error procesando imagen:', e);
+                    return null;
+                }
+            };
+
             // Formatear datos para la vista
             const recetaAPIFormateada = {
                 ...recetaAPI,
@@ -253,10 +278,11 @@ const ver = async (req, res) => {
                 calorias: Math.round(data.calories) || 'N/A',
                 porciones: data.yield || 'N/A',
                 dificultad: 'Fácil',
-                imagen: data.image || null,
+                imagen: procesarImagenVista(data.image),
                 descripcion: `Receta importada desde ${data.source || 'fuente externa'}.`,
                 urlOriginal: data.url || null,
-                ingredientesTraducidos: ingredientesTraducidos // Para usar en la vista
+                ingredientesTraducidos: ingredientesTraducidos,
+                dataAPI: recetaAPI.dataAPI // Mantener los datos originales para posible reimportación
             };
 
             return res.render('recetas_ver', {
@@ -283,14 +309,38 @@ const importarDesdeAPI = async (req, res) => {
         const { titulo, categoria, dataAPI } = req.body;
         const recetaData = JSON.parse(dataAPI);
 
+        // Función mejorada para procesar imágenes al importar
+        const procesarImagenImportar = (url) => {
+            if (!url) return null;
+            try {
+                // Si es una URL de Edamam, limpiar parámetros innecesarios
+                if (url.includes('edamam-product-images')) {
+                    const cleanUrl = url.split('?')[0];
+                    return cleanUrl.startsWith('http') ? cleanUrl : `https:${cleanUrl}`;
+                }
+                // Para otras URLs, validar que sean correctas
+                new URL(url);
+                return url;
+            } catch (e) {
+                console.error('URL de imagen no válida al importar:', url);
+                return null;
+            }
+        };
+
         const descripcion = `Receta importada automáticamente. Contiene ${Math.round(recetaData.calories)} calorías en total y rinde aproximadamente ${recetaData.yield || 'N/A'} porciones.`;
-        const ingredientes = recetaData.ingredientLines.join('\n');
-        const calorias = Math.round(recetaData.calories);
+        const ingredientes = recetaData.ingredientLines?.join('\n') || '';
+        const calorias = Math.round(recetaData.calories || 0);
         const porciones = recetaData.yield || null;
         const tiempoPreparacion = recetaData.totalTime ? `${recetaData.totalTime} minutos` : null;
-        const etiquetas = recetaData.dietLabels?.join(', ') || null;
-        const dificultad = 'Fácil'; // La API no tiene este dato, se asigna por defecto
+        
+        // Mejor manejo de etiquetas combinando dietLabels y healthLabels
+        const etiquetas = [...(recetaData.dietLabels || []), ...(recetaData.healthLabels || [])]
+            .filter((value, index, self) => self.indexOf(value) === index) // Eliminar duplicados
+            .join(', ') || null;
+            
+        const dificultad = 'Fácil';
         const tamanoPorcion = porciones ? `${Math.round(calorias / porciones)} cal c/u` : null;
+        const imagen = procesarImagenImportar(recetaData.image?.trim());
 
         await Receta.create({
             titulo,
@@ -304,6 +354,7 @@ const importarDesdeAPI = async (req, res) => {
             etiquetas,
             dificultad,
             tamano_porcion: tamanoPorcion,
+            imagen,
             equivalentes_simplificados: false,
             equivalentes_smae: false,
             usuario_id: req.session.userId,
@@ -314,7 +365,7 @@ const importarDesdeAPI = async (req, res) => {
         res.redirect('/recetas');
     } catch (error) {
         console.error('Error al importar receta desde API:', error);
-        req.flash('error', 'No se pudo importar la receta.');
+        req.flash('error', 'No se pudo importar la receta. Verifica los datos e intenta nuevamente.');
         res.redirect('/recetas');
     }
 };

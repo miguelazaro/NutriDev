@@ -26,9 +26,18 @@
   <% } %>
   
   <% if (messages.success && messages.success.length > 0) { %>
-    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
-      <strong class="font-bold">Éxito:</strong>
-      <span class="block sm:inline"><%= messages.success %></span>
+    <div id="successMessage" class="fixed bottom-4 right-4 w-80 bg-green-50 border-l-4 border-green-500 p-4 shadow-lg transform transition-all duration-300 ease-in-out">
+      <div class="flex items-start">
+        <div class="flex-shrink-0">
+          <i class="fas fa-check-circle text-green-500"></i>
+        </div>
+        <div class="ml-3">
+          <p class="text-sm font-medium text-green-800"><%= messages.success %></p>
+        </div>
+        <button onclick="dismissSuccess()" class="ml-auto text-green-500 hover:text-green-700">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
     </div>
   <% } %>
 
@@ -133,20 +142,51 @@
 
 </main>
 
-<!-- Script para búsqueda en tiempo real con control de cursor -->
+<!-- Script para mensajes flash y búsqueda -->
 <script>
   document.addEventListener('DOMContentLoaded', function() {
+    // Manejo de mensajes de éxito
+    const successElement = document.getElementById('successMessage');
+    if (successElement) {
+      // Ocultar automáticamente después de 3 segundos
+      setTimeout(() => {
+        successElement.classList.add('translate-x-full', 'opacity-0');
+        setTimeout(() => successElement.remove(), 300);
+      }, 3000);
+
+      // Función para cerrar manualmente
+      window.dismissSuccess = function() {
+        successElement.classList.add('translate-x-full', 'opacity-0');
+        setTimeout(() => successElement.remove(), 300);
+      };
+    }
+
+    // Manejo de mensajes de error
+    const errorElement = document.getElementById('errorMessage');
+    if (errorElement) {
+      // Ocultar automáticamente después de 3 segundos
+      setTimeout(() => {
+        errorElement.classList.add('translate-x-full', 'opacity-0');
+        setTimeout(() => errorElement.remove(), 300);
+      }, 3000);
+
+      // Función para cerrar manualmente
+      window.dismissError = function() {
+        errorElement.classList.add('translate-x-full', 'opacity-0');
+        setTimeout(() => errorElement.remove(), 300);
+      };
+    }
+
+    // Búsqueda en tiempo real (tu código existente)
     const searchInput = document.getElementById('searchInput');
     const searchForm = document.getElementById('searchForm');
     let debounceTimer;
     let lastCursorPosition = 0;
 
-    // Guardar posición del cursor mientras se escribe
     searchInput.addEventListener('keyup', function() {
       lastCursorPosition = this.selectionStart;
     });
 
-    // Guardar posición al hacer clic
     searchInput.addEventListener('click', function() {
       lastCursorPosition = this.selectionStart;
     });
@@ -160,10 +200,8 @@
         return;
       }
       
-      // Guardar posición antes de la búsqueda
       lastCursorPosition = currentCursorPos;
       
-      // Usar AJAX para mantener la posición del cursor
       fetch(`/recetas?q=${encodeURIComponent(searchTerm)}`)
         .then(response => response.text())
         .then(html => {
@@ -175,45 +213,23 @@
             document.getElementById('resultsContainer').innerHTML = newResults.innerHTML;
           }
           
-          // Restaurar posición del cursor
           searchInput.focus();
           searchInput.setSelectionRange(lastCursorPosition, lastCursorPosition);
         })
         .catch(error => {
           console.error('Error:', error);
-          // Fallback a recarga normal si hay error
           searchForm.submit();
         });
     }
 
-    // Búsqueda con debounce
     searchInput.addEventListener('input', function() {
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(performSearch, 500);
     });
 
-    // Evitar submit tradicional
     searchForm.addEventListener('submit', function(e) {
       e.preventDefault();
       performSearch();
     });
-
-    // Manejo de mensajes de error
-    const errorElement = document.getElementById('errorMessage');
-    if (errorElement) {
-      // Ocultar automáticamente después de 8 segundos
-      setTimeout(() => {
-        errorElement.classList.add('translate-x-full', 'opacity-0');
-        setTimeout(() => errorElement.remove(), 300);
-        fetch('/recetas/clear-flash-error', { method: 'POST' });
-      }, 8000);
-
-      // Función para cerrar manualmente
-      window.dismissError = function() {
-        errorElement.classList.add('translate-x-full', 'opacity-0');
-        setTimeout(() => errorElement.remove(), 300);
-        fetch('/recetas/clear-flash-error', { method: 'POST' });
-      };
-    }
   });
 </script>
