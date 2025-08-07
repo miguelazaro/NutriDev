@@ -49,6 +49,12 @@
             </p>
         </div>
         <div class="bg-gray-50 p-4 rounded-lg shadow">
+            <p class="text-gray-500">Estatura</p>
+            <p class="font-semibold">
+                <%= paciente.estatura || 'No especificado' %>
+            </p>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg shadow">
             <p class="text-gray-500">Correo</p>
             <p class="font-semibold">
                 <%= paciente.email || 'No especificado' %>
@@ -174,11 +180,38 @@
                 </div>
             </form>
         </section>
+
         <section class="bg-white border rounded-lg p-4 mt-6">
             <h2 class="text-lg font-semibold text-blue-700 mb-4">📊 Evolución de peso</h2>
             <% if (paciente.Progresos && paciente.Progresos.length> 0) { %>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white">
+                        <thead>
+                            <tr>
+                                <th class="py-2 px-4 border-b">Fecha</th>
+                                <th class="py-2 px-4 border-b">Peso (kg)</th>
+                                <th class="py-2 px-4 border-b">Observaciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% paciente.Progresos.forEach(progreso=> { %>
+                                <tr>
+                                    <td class="py-2 px-4 border-b">
+                                        <%= progreso.fecha %>
+                                    </td>
+                                    <td class="py-2 px-4 border-b">
+                                        <%= progreso.peso %>
+                                    </td>
+                                    <td class="py-2 px-4 border-b">
+                                        <%= progreso.observaciones %>
+                                    </td>
+                                </tr>
+                                <% }); %>
+                        </tbody>
+                    </table>
+                </div>
 
-                <canvas id="graficaProgreso" class="w-full h-64"></canvas>
+                <canvas id="graficaProgreso" class="w-full h-64 mt-4"></canvas>
                 <% } else { %>
                     <p class="text-gray-500 italic">No hay registros de progreso aún.</p>
                     <% } %>
@@ -210,6 +243,11 @@
 
             document.getElementById(tab).classList.remove("hidden");
             btn.setAttribute("data-active", "true");
+
+            // Si es la pestaña de progreso, renderizar la gráfica
+            if (tab === 'progreso') {
+                renderGraficaProgreso();
+            }
         });
     });
 
@@ -220,27 +258,31 @@
 </script>
 
 <!-- Agrega la librería Chart.js aquí -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>z
 <script>
     function renderGraficaProgreso() {
-        const progresos = <% - JSON.stringify(paciente.Progresos) %>;
+        const progresos = <% - JSON.stringify(paciente.Progresos || []) %>;
         const ctx = document.getElementById('graficaProgreso')?.getContext('2d');
-        if (!ctx) return;
 
-        if (window.graficoProgreso) {
-            window.graficoProgreso.destroy();
+        if (!ctx || !progresos || progresos.length === 0) return;
+
+        // Ordenar progresos por fecha
+        progresos.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+
+        // Destruir gráfica anterior si existe
+        if (window.graficaProgreso) {
+            window.graficaProgreso.destroy();
         }
 
-        window.graficoProgreso = new Chart(ctx, {
+        window.graficaProgreso = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: progresos.map(p => p.fecha),
                 datasets: [{
                     label: 'Peso (kg)',
                     data: progresos.map(p => Number(p.peso)),
-                    borderColor: 'rgba(37,99,235,1)',
-                    backgroundColor: 'rgba(37,99,235,0.2)',
+                    borderColor: 'rgba(37, 99, 235, 1)',
+                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
                     borderWidth: 2,
                     tension: 0.3,
                     fill: true
@@ -253,7 +295,7 @@
                         callbacks: {
                             afterBody: function (context) {
                                 const idx = context[0].dataIndex;
-                                return 'Obs: ' + (progresos[idx].observaciones || '');
+                                return 'Obs: ' + (progresos[idx].observaciones || 'N/A');
                             }
                         }
                     }
@@ -271,13 +313,13 @@
         });
     }
 
-    document.querySelector('[data-tab="progreso"]').addEventListener('click', () => {
-        setTimeout(renderGraficaProgreso, 100);
-    });
-
-    window.addEventListener('DOMContentLoaded', () => {
-        if (document.querySelector('[data-tab="progreso"]').getAttribute('data-active') === 'true') {
-            setTimeout(renderGraficaProgreso, 100);
+    // Renderizar gráfica al cargar la página si estamos en la pestaña de progreso
+    document.addEventListener('DOMContentLoaded', function () {
+        if (!document.getElementById('progreso').classList.contains('hidden')) {
+            renderGraficaProgreso();
         }
     });
 </script>
+
+<!-- IA Plan Alimenticio -->
+<script src="/js/iaPlan.js"></script>

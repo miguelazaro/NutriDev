@@ -2,6 +2,8 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 
 const Paciente = sequelize.define('Paciente', {
+
+    //Información básica
     nombre: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -29,6 +31,38 @@ const Paciente = sequelize.define('Paciente', {
         defaultValue: 'México',
         allowNull: true
     },
+
+    //Datos para plan alimenticio (IA)
+    estatura: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        validate: {
+            min: 50,
+            max: 250
+        }
+    },
+    actividad: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
+    objetivo: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
+    comidas_dia: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        validate: {
+            min: 1,
+            max: 10
+        }
+    },
+    preferencias: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+    },
+
+    //Contacto
     telefono: {
         type: DataTypes.STRING,
         allowNull: true,
@@ -39,36 +73,6 @@ const Paciente = sequelize.define('Paciente', {
             }
         }
     },
-    enviar_cuestionario: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false
-    },
-    lugar_consulta: {
-        type: DataTypes.STRING,
-        allowNull: true
-    },
-    ocupacion: {
-        type: DataTypes.STRING,
-        allowNull: true
-    },
-    codigo_postal: {
-        type: DataTypes.STRING,
-        allowNull: true,
-        validate: {
-            len: {
-                args: [0, 10],
-                msg: 'El código postal no puede exceder los 10 caracteres'
-            }
-        }
-    },
-    foto: {
-        type: DataTypes.STRING,
-        allowNull: true
-    },
-    archivo: {
-        type: DataTypes.STRING,
-        allowNull: true
-    },
     email: {
         type: DataTypes.STRING,
         allowNull: true,
@@ -78,10 +82,28 @@ const Paciente = sequelize.define('Paciente', {
             }
         }
     },
+    enviar_cuestionario: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    },
+
+    //Historial médico
     historial: {
         type: DataTypes.TEXT,
         allowNull: true
+    },
+
+    //Archivos del paciente
+    foto: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    archivo: {
+        type: DataTypes.STRING,
+        allowNull: true
     }
+
+
 }, {
     tableName: 'pacientes',
     timestamps: true,

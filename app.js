@@ -25,6 +25,8 @@ app.use(session({
 app.use('/ia', iaRoutes);
 
 
+app.use('/ia', iaRoutes);
+
 app.use(flash());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
