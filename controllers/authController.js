@@ -1,19 +1,23 @@
 const bcrypt = require('bcryptjs');
 const Usuario = require('../models/Usuario');
 
-// Mostrar vista de login
+
 exports.loginView = (req, res) => {
   res.render('login', { error: req.flash('error') });
 };
 
-// Mostrar vista de registro
 exports.registerView = (req, res) => {
   res.render('register', { error: req.flash('error') });
 };
 
-// Registrar nuevo usuario
 exports.registerUser = async (req, res) => {
-  const { nombre, email, password } = req.body;
+  const { nombre, email, password, terms } = req.body; 
+
+  if (!terms) {
+    req.flash('error', 'Debes aceptar los Términos y la Política de Privacidad para continuar.');
+    return res.redirect('/register');
+  }
+
   try {
     const exists = await Usuario.findOne({ where: { email } });
     if (exists) {
@@ -29,7 +33,9 @@ exports.registerUser = async (req, res) => {
       rol: 'nutriologo' 
     });
 
+    req.flash('success', '¡Cuenta creada exitosamente! Ahora puedes iniciar sesión.');
     res.redirect('/login');
+    
   } catch (err) {
     console.error(err);
     req.flash('error', 'Error al registrar usuario');
@@ -37,7 +43,6 @@ exports.registerUser = async (req, res) => {
   }
 };
 
-// Iniciar sesión
 exports.loginUser = async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -49,7 +54,6 @@ exports.loginUser = async (req, res) => {
       return res.redirect('/login');
     }
 
-    // Guardar toda la info en la sesión como objeto `usuario`
     req.session.usuario = {
       id: user.id,
       nombre: user.nombre,
@@ -66,7 +70,6 @@ exports.loginUser = async (req, res) => {
   }
 };
 
-// Cerrar sesión
 exports.logout = (req, res) => {
   req.session.destroy(() => res.redirect('/login'));
 };

@@ -1,5 +1,3 @@
-// middlewares/auth.js
-
 exports.requireAuth = (req, res, next) => {
   const usuario = req.session.usuario;
 
