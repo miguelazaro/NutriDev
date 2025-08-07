@@ -5,6 +5,7 @@ const session = require('express-session');
 const expressLayouts = require('express-ejs-layouts');
 const flash = require('connect-flash');
 const Progreso = require('./models/Progreso');
+const iaRoutes = require('./routes/ia');
 Progreso.sync({ alter: true });
 
 const app = express();
@@ -20,6 +21,8 @@ app.use(session({
     resave: false,
     saveUninitialized: false
 }));
+
+app.use('/ia', iaRoutes);
 
 app.use(flash());
 app.use(express.urlencoded({ extended: true }));

@@ -83,8 +83,8 @@ exports.guardar = async (req, res) => {
     try {
         const {
             nombre, genero, fecha_nacimiento, pais_residencia, telefono,
-            enviar_cuestionario, lugar_consulta, ocupacion, codigo_postal,
-            email, historial
+            enviar_cuestionario, email, historial,
+            estatura, actividad, objetivo, comidas_dia, preferencias
         } = req.body;
 
         const foto = req.files?.foto?.[0]?.filename || null;
@@ -97,13 +97,15 @@ exports.guardar = async (req, res) => {
             pais_residencia,
             telefono,
             enviar_cuestionario: enviar_cuestionario === 'on',
-            lugar_consulta,
-            ocupacion,
-            codigo_postal,
-            email,
+            email: email?.trim() || null,
             historial,
             foto,
-            archivo
+            archivo,
+            estatura: estatura ? parseInt(estatura) : null,
+            actividad,
+            objetivo,
+            comidas_dia: comidas_dia ? parseInt(comidas_dia) : null,
+            preferencias
         });
 
         res.redirect('/pacientes');
@@ -112,6 +114,7 @@ exports.guardar = async (req, res) => {
         res.status(500).send('Error al guardar paciente');
     }
 };
+
 
 // Formulario editar
 exports.editar = async (req, res) => {
@@ -130,8 +133,8 @@ exports.actualizar = async (req, res) => {
     try {
         const {
             nombre, genero, fecha_nacimiento, pais_residencia, telefono,
-            enviar_cuestionario, lugar_consulta, ocupacion, codigo_postal,
-            email, historial
+            enviar_cuestionario, email, historial,
+            estatura, actividad, objetivo, comidas_dia, preferencias
         } = req.body;
 
         const paciente = await Paciente.findByPk(req.params.id);
@@ -147,13 +150,15 @@ exports.actualizar = async (req, res) => {
             pais_residencia,
             telefono,
             enviar_cuestionario: enviar_cuestionario === 'on',
-            lugar_consulta,
-            ocupacion,
-            codigo_postal,
             email: email?.trim() || null,
             historial,
             foto,
-            archivo
+            archivo,
+            estatura: estatura ? parseInt(estatura) : null,
+            actividad,
+            objetivo,
+            comidas_dia: comidas_dia ? parseInt(comidas_dia) : null,
+            preferencias
         });
 
         res.redirect('/pacientes');

@@ -49,6 +49,12 @@
             </p>
         </div>
         <div class="bg-gray-50 p-4 rounded-lg shadow">
+            <p class="text-gray-500">Estatura</p>
+            <p class="font-semibold">
+                <%= paciente.estatura || 'No especificado' %>
+            </p>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg shadow">
             <p class="text-gray-500">Correo</p>
             <p class="font-semibold">
                 <%= paciente.email || 'No especificado' %>
@@ -252,7 +258,7 @@
 </script>
 
 <!-- Agrega la librería Chart.js aquí -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>z
 <script>
     function renderGraficaProgreso() {
         const progresos = <% - JSON.stringify(paciente.Progresos || []) %>;
@@ -314,3 +320,6 @@
         }
     });
 </script>
+
+<!-- IA Plan Alimenticio -->
+<script src="/js/iaPlan.js"></script>

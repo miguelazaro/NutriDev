@@ -40,6 +40,61 @@
         </div>
     </div>
 
+    <!-- Información nutricional adicional -->
+    <div class="bg-white shadow rounded-lg p-6 space-y-4">
+        <h2 class="text-lg font-semibold text-gray-700">Datos para plan alimenticio (IA)</h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+                <label for="estatura" class="block text-sm font-medium text-gray-700">Estatura (en cm)</label>
+                <input type="number" name="estatura" id="estatura" min="50" max="250" step="1" required
+                    class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-emerald-500 focus:border-emerald-500" />
+            </div>
+
+            <div>
+                <label for="actividad" class="block text-sm font-medium text-gray-700">Nivel de actividad física</label>
+                <select name="actividad" id="actividad" required
+                    class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-emerald-500 focus:border-emerald-500">
+                    <option value="sedentario">Sedentario</option>
+                    <option value="ligero">Ligero (1-3 días/semana)</option>
+                    <option value="moderado">Moderado (3-5 días/semana)</option>
+                    <option value="intenso">Intenso (6-7 días/semana)</option>
+                    <option value="muy_intenso">Muy intenso (2x por día o entrenamientos pesados)</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="objetivo" class="block text-sm font-medium text-gray-700">Objetivo principal</label>
+                <select name="objetivo" id="objetivo" required
+                    class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-emerald-500 focus:border-emerald-500">
+                    <option value="bajar_peso">Bajar de peso</option>
+                    <option value="mantener_peso">Mantener peso</option>
+                    <option value="ganar_musculo">Ganar masa muscular</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="comidas_dia" class="block text-sm font-medium text-gray-700">¿Cuántas comidas al día
+                    desea?</label>
+                <select name="comidas_dia" id="comidas_dia" required
+                    class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-emerald-500 focus:border-emerald-500">
+                    <option value="3">3 (Desayuno, comida, cena)</option>
+                    <option value="4">4 (Incluye snack)</option>
+                    <option value="5">5 (Incluye dos snacks)</option>
+                    <option value="6">6 (Frecuente en volumen)</option>
+                </select>
+            </div>
+        </div>
+
+        <div>
+            <label for="preferencias" class="block text-sm font-medium text-gray-700">Preferencias y alergias</label>
+            <textarea name="preferencias" id="preferencias" rows="3"
+                placeholder="Ej. No le gusta el pescado, es alérgico a nueces"
+                class="w-full border border-gray-300 rounded-md p-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none"></textarea>
+        </div>
+    </div>
+
+
     <!-- Contacto -->
     <div class="bg-white shadow rounded-lg p-6 space-y-4">
         <h2 class="text-lg font-semibold text-gray-700">Contacto</h2>
