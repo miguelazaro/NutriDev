@@ -1,70 +1,51 @@
+const axios = require('axios');
 const Paciente = require('../models/Paciente');
 const Progreso = require('../models/Progreso');
-const fetch = (...args) => import('node-fetch').then(mod => mod.default(...args));
-require('dotenv').config();
 
 exports.generarPlan = async (req, res) => {
+    const { id } = req.params;
+
     try {
-        const { id } = req.params;
         const paciente = await Paciente.findByPk(id, {
-            include: [{ model: Progreso, as: 'Progresos' }],
+            include: [{ model: Progreso, as: 'Progresos' }]
         });
 
-        if (!paciente) return res.status(404).json({ error: 'Paciente no encontrado' });
 
-        // Edad
-        const nacimiento = new Date(paciente.fecha_nacimiento);
-        const hoy = new Date();
-        let edad = hoy.getFullYear() - nacimiento.getFullYear();
-        const m = hoy.getMonth() - nacimiento.getMonth();
-        if (m < 0 || (m === 0 && hoy.getDate() < nacimiento.getDate())) edad--;
+        if (!paciente) {
+            return res.status(404).json({ error: 'Paciente no encontrado' });
+        }
 
-        // Último peso
-        const ultimoPeso = paciente.Progresos?.length > 0
-            ? paciente.Progresos[paciente.Progresos.length - 1].peso
-            : 'No registrado';
+        const prompt = `Genera un plan alimenticio detallado para un paciente con los siguientes datos:
+Nombre: ${paciente.nombre}
+Edad: ${paciente.edad}
+Peso: ${paciente.peso} kg
+Altura: ${paciente.altura} cm
+Historial Médico: ${paciente.historialMedico || 'N/A'}
+Últimos progresos:
+${paciente.Progresos.map(p => `- (${p.fecha}) ${p.descripcion}`).join('\n')}
 
-        const prompt = `
-Eres un nutriólogo profesional. Crea un plan alimenticio semanal para el siguiente paciente:
 
-- Nombre: ${paciente.nombre}
-- Edad: ${edad} años
-- Sexo: ${paciente.genero}
-- Estatura: ${paciente.estatura} cm
-- Peso actual: ${ultimoPeso} kg
-- Nivel de actividad: ${paciente.actividad}
-- Objetivo: ${paciente.objetivo}
-- Comidas por día: ${paciente.comidas_dia}
-- Preferencias o alergias: ${paciente.preferencias || 'Ninguna'}
-- Historial médico: ${paciente.historial || 'No especificado'}
+El plan debe estar estructurado por días de la semana e incluir desayuno, comida, cena y snacks.`;
 
-El plan debe incluir desayuno, comida, cena y snacks para 7 días, con estimación de calorías y macros. Usa un lenguaje claro y accesible para pacientes.
-`;
-
-        const response = await fetch(
-            'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + process.env.GEMINI_API_KEY,
-
+        const mistralResponse = await axios.post(
+            'https://api.mistral.ai/v1/chat/completions',
             {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: prompt }] }],
-                }),
+                model: 'mistral-medium',
+                messages: [{ role: 'user', content: prompt }],
+                temperature: 0.7
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${process.env.MISTRAL_API_KEY}`,
+                    'Content-Type': 'application/json'
+                }
             }
         );
 
-        const data = await response.json();
-
-        if (!response.ok || !data.candidates || !data.candidates.length) {
-            console.error('Respuesta de Gemini inválida:', data);
-            return res.status(500).json({ error: 'Error al generar el plan con Gemini' });
-        }
-
-        const text = data.candidates[0].content.parts[0].text;
-        res.json({ plan: text });
-
+        const plan = mistralResponse.data.choices[0].message.content;
+        res.json({ plan });
     } catch (error) {
-        console.error('Error al generar plan con Gemini (fetch):', error);
-        res.status(500).json({ error: 'Error al generar el plan con Gemini' });
+        console.error('Error al generar plan IA con Mistral:', error.message);
+        res.status(500).json({ error: 'Error al generar el plan con Mistral.' });
     }
 };

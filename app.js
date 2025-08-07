@@ -22,8 +22,9 @@ app.use(session({
     resave: false,
     saveUninitialized: false
 }));
-app.use('/ia', iaRoutes);
-app.use('/ia', iaRoutes);
+
+app.use('/ia', require('./routes/ia'));
+
 
 app.use(flash());
 app.use(express.urlencoded({ extended: true }));
@@ -103,7 +104,7 @@ const planesRouter = require('./routes/planes');
 app.use('/planes', planesRouter);
 
 const cobrosRouter = require('./routes/cobros');
-app.use('/cobros', cobrosRouter); 
+app.use('/cobros', cobrosRouter);
 
 require('./models/associations');
 
