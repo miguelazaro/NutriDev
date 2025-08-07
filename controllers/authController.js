@@ -2,6 +2,12 @@ const bcrypt = require('bcryptjs');
 const Usuario = require('../models/Usuario');
 
 
+exports.vistaBienvenida = (req, res) => {
+  res.render('bienvenida', {
+    layout: 'layouts/auth',
+    title: 'Bienvenido a NutriDev'
+  });
+};
 exports.loginView = (req, res) => {
   res.render('login', { error: req.flash('error') });
 };

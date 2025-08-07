@@ -23,8 +23,6 @@ app.use(session({
     saveUninitialized: false
 }));
 app.use('/ia', iaRoutes);
-
-
 app.use('/ia', iaRoutes);
 
 app.use(flash());
@@ -71,9 +69,7 @@ app.post('/register', authController.registerUser);
 app.get('/logout', authController.logout);
 
 // Página principal
-app.get('/', (req, res) => {
-    res.redirect('/login');
-});
+app.get('/', authController.vistaBienvenida);
 
 // Dashboard
 const dashboardController = require('./controllers/dashboardController');
@@ -103,24 +99,20 @@ app.use('/recetas', requireAuth, (req, res, next) => {
     next();
 }, recetasRouter);
 
-// Rutas: Planes (para el nutriólogo)
 const planesRouter = require('./routes/planes');
 app.use('/planes', planesRouter);
 
-// --- AÑADIMOS EL NUEVO ROUTER DE COBROS ---
 const cobrosRouter = require('./routes/cobros');
-app.use('/cobros', cobrosRouter); // Ahora /cobros es manejado por su propio router
-// -----------------------------------------
+app.use('/cobros', cobrosRouter); 
 
-// Carga asociaciones ANTES de sincronizar
 require('./models/associations');
 
-// Conexión BD
+
 sequelize.sync({ force: false })
     .then(() => console.log('Bd conectada'))
     .catch(err => console.error('Error al conectar con la BD:', err));
 
-// Servidor
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en http://localhost:${PORT}`);
