@@ -26,7 +26,7 @@ exports.registerUser = async (req, res) => {
       nombre,
       email,
       password: hashed,
-      rol: 'user' // ✅ Asignar rol por defecto
+      rol: 'nutriologo' 
     });
 
     res.redirect('/login');
@@ -49,10 +49,14 @@ exports.loginUser = async (req, res) => {
       return res.redirect('/login');
     }
 
-    // ✅ Guardar datos en sesión
-    req.session.userId = user.id;
-    req.session.rol = user.rol;
-    req.session.nombreUsuario = user.nombre;
+    // Guardar toda la info en la sesión como objeto `usuario`
+    req.session.usuario = {
+      id: user.id,
+      nombre: user.nombre,
+      email: user.email,
+      rol: user.rol,
+      plan: user.plan 
+    };
 
     res.redirect('/dashboard');
   } catch (err) {

@@ -1,3 +1,4 @@
+require('dotenv').config()
 const fs = require('fs');
 const path = require('path');
 const express = require('express');
@@ -5,6 +6,7 @@ const session = require('express-session');
 const expressLayouts = require('express-ejs-layouts');
 const flash = require('connect-flash');
 const Progreso = require('./models/Progreso');
+const iaRoutes = require('./routes/ia');
 Progreso.sync({ alter: true });
 
 const app = express();
@@ -20,6 +22,8 @@ app.use(session({
     resave: false,
     saveUninitialized: false
 }));
+app.use('/ia', iaRoutes);
+
 
 app.use(flash());
 app.use(express.urlencoded({ extended: true }));
@@ -81,9 +85,7 @@ app.get('/progreso', requireAuth, (req, res) => {
     res.render('progreso', { active: 'progreso' });
 });
 
-app.get('/cobros', requireAuth, (req, res) => {
-    res.render('cobros', { active: 'cobros' });
-});
+// --- SE ELIMINÓ LA RUTA ANTIGUA DE /cobros DE AQUÍ ---
 
 // Rutas: Pacientes
 const pacientesRouter = require('./routes/pacientes');
@@ -98,6 +100,15 @@ app.use('/recetas', requireAuth, (req, res, next) => {
     res.locals.active = 'recetas';
     next();
 }, recetasRouter);
+
+// Rutas: Planes (para el nutriólogo)
+const planesRouter = require('./routes/planes');
+app.use('/planes', planesRouter);
+
+// --- AÑADIMOS EL NUEVO ROUTER DE COBROS ---
+const cobrosRouter = require('./routes/cobros');
+app.use('/cobros', cobrosRouter); // Ahora /cobros es manejado por su propio router
+// -----------------------------------------
 
 // Carga asociaciones ANTES de sincronizar
 require('./models/associations');

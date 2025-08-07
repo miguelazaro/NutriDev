@@ -1,21 +1,21 @@
 // middlewares/auth.js
+
 exports.requireAuth = (req, res, next) => {
-  if (!req.session.userId) {
+  const usuario = req.session.usuario;
+
+  if (!usuario || !usuario.id) {
     req.flash('error', 'Por favor inicia sesión para acceder');
     return res.redirect('/login');
   }
 
-  res.locals.user = {
-    id: req.session.userId,
-    nombre: req.session.nombreUsuario,
-    rol: req.session.rol
-  };
-  
+  // Hacerlo disponible en todas las vistas
+  res.locals.user = usuario;
+
   next();
 };
 
 exports.redirectIfAuthenticated = (req, res, next) => {
-  if (req.session.userId) {
+  if (req.session.usuario && req.session.usuario.id) {
     return res.redirect('/dashboard');
   }
   next();
@@ -24,10 +24,13 @@ exports.redirectIfAuthenticated = (req, res, next) => {
 // Middleware para verificar rol de usuario
 exports.checkRol = (rolesPermitidos = []) => {
   return (req, res, next) => {
-    if (!rolesPermitidos.includes(req.session.rol)) {
+    const usuario = req.session.usuario;
+
+    if (!usuario || !rolesPermitidos.includes(usuario.rol)) {
       req.flash('error', 'No tienes permisos para acceder a esta sección');
       return res.redirect('/dashboard');
     }
+
     next();
   };
 };

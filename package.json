@@ -28,7 +28,8 @@
     "mysql2": "^3.14.3",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
-    "sequelize": "^6.37.7"
+    "sequelize": "^6.37.7",
+    "stripe": "^18.4.0"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.21",
