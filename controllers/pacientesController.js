@@ -132,9 +132,10 @@ exports.editar = async (req, res) => {
 exports.actualizar = async (req, res) => {
     try {
         const {
-            nombre, genero, fecha_nacimiento, pais_residencia, telefono,
-            enviar_cuestionario, email, historial,
-            estatura, actividad, objetivo, comidas_dia, preferencias
+            nombre, genero, fecha_nacimiento, pais,
+            telefono, email, historial,
+            estatura, actividad, objetivo, comidas_dia, preferencias,
+            enviar_anamnesis
         } = req.body;
 
         const paciente = await Paciente.findByPk(req.params.id);
@@ -146,25 +147,29 @@ exports.actualizar = async (req, res) => {
         await paciente.update({
             nombre,
             genero,
-            fecha_nacimiento,
-            pais_residencia,
-            telefono,
-            enviar_cuestionario: enviar_cuestionario === 'on',
-            email: email?.trim() || null,
-            historial,
-            foto,
-            archivo,
+            fecha_nacimiento: fecha_nacimiento || null,
             estatura: estatura ? parseInt(estatura) : null,
             actividad,
             objetivo,
             comidas_dia: comidas_dia ? parseInt(comidas_dia) : null,
-            preferencias
+            pais_residencia: pais || 'México',
+            telefono,
+            enviar_cuestionario: enviar_anamnesis === '1' ? 1 : 0,
+            email: email?.trim() || null,
+            historial,
+            preferencias,
+            foto,
+            archivo,
+            fecha_actualizacion: new Date()
         });
 
+        // Agrega mensaje flash
+        req.flash('success', 'Paciente actualizado correctamente');
         res.redirect('/pacientes');
     } catch (error) {
         console.error('Error en actualizar:', error);
-        res.status(500).send('Error al actualizar el paciente');
+        req.flash('error', 'Ocurrió un error al actualizar el paciente');
+        res.redirect('/pacientes');
     }
 };
 
