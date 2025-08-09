@@ -110,48 +110,15 @@
     <div class="mt-8">
         <div class="flex flex-wrap gap-3 text-sm font-medium">
             <button
-                class="tab-button bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded-md shadow-sm hover:bg-emerald-50 data-[active=true]:bg-emerald-100 data-[active=true]:text-emerald-700"
-                data-tab="archivos">📂 Archivos</button>
-            <button
                 class="tab-button bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded-md shadow-sm hover:bg-blue-50 data-[active=true]:bg-blue-100 data-[active=true]:text-blue-700"
                 data-tab="progreso">📈 Progreso</button>
+            <button
+                class="tab-button bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded-md shadow-sm hover:bg-emerald-50 data-[active=true]:bg-emerald-100 data-[active=true]:text-emerald-700"
+                data-tab="archivos">📂 Archivos</button>
             <button
                 class="tab-button bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded-md shadow-sm hover:bg-indigo-50 data-[active=true]:bg-indigo-100 data-[active=true]:text-indigo-700"
                 data-tab="planes">🤖 Plan Alimenticio (IA)</button>
         </div>
-    </div>
-
-    <!-- TAB: ARCHIVOS -->
-    <div class="tab-content mt-6" id="archivos">
-        <section class="bg-white border rounded-lg p-4">
-            <h2 class="text-lg font-semibold text-emerald-700 mb-4">📂 Archivos del paciente</h2>
-            <form action="/pacientes/<%= paciente.id %>/subir" method="POST" enctype="multipart/form-data"
-                class="flex flex-col sm:flex-row items-center gap-4">
-                <input type="file" name="archivo" accept="image/*,.pdf" required class="flex-1 border rounded p-2">
-                <button type="submit" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded shadow">
-                    Subir
-                </button>
-            </form>
-            <div class="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-4">
-                <% if (paciente.ArchivoPacientes && paciente.ArchivoPacientes.length> 0) { %>
-                    <% paciente.ArchivoPacientes.forEach(a=> { %>
-                        <div class="border rounded p-2 bg-gray-50 text-center text-sm">
-                            <% if (a.tipo==='imagen' ) { %>
-                                <img src="<%= a.ruta %>" alt="archivo" class="w-full h-32 object-cover rounded mb-2">
-                                <% } else if (a.tipo==='pdf' ) { %>
-                                    <i class="fas fa-file-pdf text-red-500 text-4xl mb-2"></i>
-                                    <% } %>
-                                        <a href="<%= a.ruta %>" target="_blank"
-                                            class="text-blue-600 hover:underline block truncate">
-                                            <%= a.nombre_archivo %>
-                                        </a>
-                        </div>
-                        <% }) %>
-                            <% } else { %>
-                                <p class="col-span-2 text-gray-500 italic">No se han subido archivos</p>
-                                <% } %>
-            </div>
-        </section>
     </div>
 
     <!-- TAB: PROGRESO -->
@@ -218,27 +185,75 @@
         </section>
     </div>
 
+    <!-- TAB: ARCHIVOS -->
+    <div class="tab-content mt-6" id="archivos">
+        <section class="bg-white border rounded-lg p-4">
+            <h2 class="text-lg font-semibold text-emerald-700 mb-4">📂 Archivos del paciente</h2>
+            <form action="/pacientes/<%= paciente.id %>/subir" method="POST" enctype="multipart/form-data"
+                class="flex flex-col sm:flex-row items-center gap-4">
+                <input type="file" name="archivo" accept="image/*,.pdf" required class="flex-1 border rounded p-2">
+                <button type="submit" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded shadow">
+                    Subir
+                </button>
+            </form>
+            <div class="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-4">
+                <% if (paciente.ArchivoPacientes && paciente.ArchivoPacientes.length> 0) { %>
+                    <% paciente.ArchivoPacientes.forEach(a=> { %>
+                        <div class="border rounded p-2 bg-gray-50 text-center text-sm">
+                            <% if (a.tipo==='imagen' ) { %>
+                                <img src="<%= a.ruta %>" alt="archivo" class="w-full h-32 object-cover rounded mb-2">
+                                <% } else if (a.tipo==='pdf' ) { %>
+                                    <i class="fas fa-file-pdf text-red-500 text-4xl mb-2"></i>
+                                    <% } %>
+                                        <a href="<%= a.ruta %>" target="_blank"
+                                            class="text-blue-600 hover:underline block truncate">
+                                            <%= a.nombre_archivo %>
+                                        </a>
+                        </div>
+                        <% }) %>
+                            <% } else { %>
+                                <p class="col-span-2 text-gray-500 italic">No se han subido archivos</p>
+                                <% } %>
+            </div>
+        </section>
+    </div>
+
     <!-- TAB: PLAN ALIMENTICIO -->
     <div class="tab-content mt-6 hidden" id="planes">
         <section class="bg-white border rounded-lg p-4">
             <h2 class="text-lg font-semibold text-indigo-700 mb-4">🤖 Plan alimenticio sugerido por IA</h2>
-            <p class="text-sm text-gray-600 italic mb-4">Aquí se generará automáticamente un plan basado en los
-                progresos,
-                historial médico y otros factores del paciente.</p>
+            <p class="text-sm text-gray-600 italic mb-4">
+                Aquí se generará automáticamente un plan basado en los progresos,
+                historial médico y otros factores del paciente.
+            </p>
 
             <button id="btn-generar-plan" data-id="<%= paciente.id %>"
                 class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
                 Generar Plan IA
             </button>
 
+            <!-- Resultado generado por la IA -->
+            <div id="resultado-plan" class="mt-4 whitespace-pre-wrap text-gray-800"></div>
 
-            <div id="resultado-plan" class="mt-6 whitespace-pre-wrap text-gray-800 bg-gray-100 rounded p-4 text-sm">
-            </div>
-        </section>
+            <form id="form-guardar-plan" class="hidden" method="POST" action="/planes-alimenticios/guardar">
+                <input type="hidden" name="contenido" id="input-contenido-plan">
+                <input type="hidden" name="paciente_id" value="<%= paciente.id %>">
+                <input type="hidden" name="tipo" value="ia">
+                <input type="hidden" name="titulo" value="Plan IA generado automáticamente">
+                <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 mt-3">
+                    Guardar plan
+                </button>
+            </form>
+
+
+            <div id="flash" class="mt-3"></div>
+
     </div>
-
-
+    </section>
 </div>
+
+<!-- IA Plan Alimenticio -->
+<script src="/js/iaPlan.js"></script>
 
 <!-- SCRIPT PARA TABS -->
 <script>
@@ -331,6 +346,3 @@
         }
     });
 </script>
-
-<!-- IA Plan Alimenticio -->
-<script src="/js/iaPlan.js"></script>

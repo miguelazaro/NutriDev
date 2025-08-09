@@ -17,7 +17,7 @@
                 <label class="block text-sm font-medium text-gray-700">Género</label>
                 <div class="mt-1 flex gap-4">
                     <label><input type="radio" name="genero" value="Masculino" <%=paciente.genero==='Masculino'
-                            ? 'checked' : '' %> /> Masculino</label>
+                            ? 'checked' : '' %> required /> Masculino</label>
                     <label><input type="radio" name="genero" value="Femenino" <%=paciente.genero==='Femenino'
                             ? 'checked' : '' %> /> Femenino</label>
                     <label><input type="radio" name="genero" value="Otro" <%=paciente.genero==='Otro' ? 'checked' : ''
@@ -44,6 +44,70 @@
         </div>
     </div>
 
+    <!-- Información nutricional adicional -->
+    <div class="bg-white shadow rounded-lg p-6 space-y-4">
+        <h2 class="text-lg font-semibold text-gray-700">Datos para plan alimenticio (IA)</h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+                <label for="estatura" class="block text-sm font-medium text-gray-700">Estatura (en cm)</label>
+                <input type="number" name="estatura" id="estatura" min="50" max="250" step="1"
+                    value="<%= paciente.estatura || '' %>" required
+                    class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-emerald-500 focus:border-emerald-500" />
+            </div>
+
+            <div>
+                <label for="actividad" class="block text-sm font-medium text-gray-700">Nivel de actividad física</label>
+                <select name="actividad" id="actividad" required
+                    class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-emerald-500 focus:border-emerald-500">
+                    <option value="sedentario" <%=paciente.actividad==='sedentario' ? 'selected' : '' %>>Sedentario
+                    </option>
+                    <option value="ligero" <%=paciente.actividad==='ligero' ? 'selected' : '' %>>Ligero (1-3
+                        días/semana)</option>
+                    <option value="moderado" <%=paciente.actividad==='moderado' ? 'selected' : '' %>>Moderado (3-5
+                        días/semana)</option>
+                    <option value="intenso" <%=paciente.actividad==='intenso' ? 'selected' : '' %>>Intenso (6-7
+                        días/semana)</option>
+                    <option value="muy_intenso" <%=paciente.actividad==='muy_intenso' ? 'selected' : '' %>>Muy intenso
+                        (2x por día o entrenamientos pesados)</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="objetivo" class="block text-sm font-medium text-gray-700">Objetivo principal</label>
+                <select name="objetivo" id="objetivo" required
+                    class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-emerald-500 focus:border-emerald-500">
+                    <option value="bajar_peso" <%=paciente.objetivo==='bajar_peso' ? 'selected' : '' %>>Bajar de peso
+                    </option>
+                    <option value="mantener_peso" <%=paciente.objetivo==='mantener_peso' ? 'selected' : '' %>>Mantener
+                        peso</option>
+                    <option value="ganar_musculo" <%=paciente.objetivo==='ganar_musculo' ? 'selected' : '' %>>Ganar masa
+                        muscular</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="comidas_dia" class="block text-sm font-medium text-gray-700">¿Cuántas comidas al día
+                    desea?</label>
+                <select name="comidas_dia" id="comidas_dia" required
+                    class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-emerald-500 focus:border-emerald-500">
+                    <option value="3" <%=paciente.comidas_dia==3 ? 'selected' : '' %>>3 (Desayuno, comida, cena)
+                    </option>
+                    <option value="4" <%=paciente.comidas_dia==4 ? 'selected' : '' %>>4 (Incluye snack)</option>
+                    <option value="5" <%=paciente.comidas_dia==5 ? 'selected' : '' %>>5 (Incluye dos snacks)</option>
+                    <option value="6" <%=paciente.comidas_dia==6 ? 'selected' : '' %>>6 (Frecuente en volumen)</option>
+                </select>
+            </div>
+        </div>
+
+        <div>
+            <label for="preferencias" class="block text-sm font-medium text-gray-700">Preferencias y alergias</label>
+            <textarea name="preferencias" id="preferencias" rows="3"
+                placeholder="Ej. No le gusta el pescado, es alérgico a nueces"
+                class="w-full border border-gray-300 rounded-md p-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none"><%= paciente.preferencias || '' %></textarea>
+        </div>
+    </div>
+
     <!-- Contacto -->
     <div class="bg-white shadow rounded-lg p-6 space-y-4">
         <h2 class="text-lg font-semibold text-gray-700">Contacto</h2>
@@ -52,25 +116,32 @@
             <div>
                 <label for="telefono" class="block text-sm font-medium text-gray-700">Número de teléfono móvil</label>
                 <input type="text" name="telefono" id="telefono" value="<%= paciente.telefono %>"
+                    placeholder="Ej: 5512345678"
                     class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500" />
             </div>
 
             <div>
                 <label for="email" class="block text-sm font-medium text-gray-700">Correo electrónico</label>
                 <input type="email" name="email" id="email" value="<%= paciente.email %>"
+                    placeholder="correo@ejemplo.com"
                     class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500" />
             </div>
         </div>
+
+        <label class="inline-flex items-center mt-2">
+            <input type="checkbox" name="enviar_anamnesis" value="1" class="form-checkbox text-emerald-600" />
+            <span class="ml-2 text-sm text-gray-700">Enviar cuestionario de la anamnesis por mensaje y por correo</span>
+        </label>
     </div>
 
     <!-- Historial Médico -->
     <div class="bg-white shadow rounded-lg p-6 space-y-4">
         <h2 class="text-lg font-semibold text-gray-700">Historial médico</h2>
-        <textarea name="historial" rows="4"
+        <textarea name="historial" rows="4" placeholder="Alergias, condiciones crónicas, cirugías previas, etc."
             class="w-full border border-gray-300 rounded-md p-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none"><%= paciente.historial || '' %></textarea>
     </div>
 
-    <!-- Archivos -->
+    <!-- Subida de archivos -->
     <div class="bg-white shadow rounded-lg p-6 space-y-4">
         <h2 class="text-lg font-semibold text-gray-700">Archivos del paciente</h2>
 
@@ -90,8 +161,10 @@
 
                 <% if (paciente.archivo) { %>
                     <div>
-                        <p class="text-sm text-gray-600">Archivo actual: <a href="/uploads/<%= paciente.archivo %>"
-                                target="_blank" class="text-emerald-600 underline">Ver PDF</a></p>
+                        <p class="text-sm text-gray-600">Archivo actual:
+                            <a href="/uploads/<%= paciente.archivo %>" target="_blank"
+                                class="text-emerald-600 underline">Ver PDF</a>
+                        </p>
                     </div>
                     <% } %>
 
