@@ -1,271 +1,345 @@
-<div class="flex justify-between items-center px-4 sm:px-6 py-4 bg-white shadow-sm">
-  <h1 class="text-xl sm:text-2xl font-bold text-gray-800">Recetario</h1>
+<%
+// helper para saber si el usuario es premium o admin
+const isPremium = user && (user.rol === 'admin' || user.plan === 'premium');
+const isAdmin   = user && user.rol === 'admin';
+%>
+
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center px-4 sm:px-6 py-4 bg-white shadow-sm">
+  <div>
+    <h1 class="text-xl sm:text-2xl font-bold text-gray-800">
+      <%= typeof tituloPagina !== 'undefined' ? tituloPagina : 'Recetario General' %>
+    </h1>
+
+    <div class="mt-2 flex items-center gap-2">
+      <!-- Siempre visible -->
+      <a href="/recetas" class="text-sm font-medium pb-1 <%= typeof tituloPagina === 'undefined' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-blue-600' %>">
+        <i class="fas fa-globe-americas mr-1"></i> Todas las Recetas
+      </a>
+
+      <span class="mx-1 text-gray-300">|</span>
+
+      <% if (isPremium) { %>
+        <!-- Premium/Admin: link normal -->
+        <a href="/recetas/mis-recetas" class="text-sm font-medium pb-1 <%= typeof tituloPagina !== 'undefined' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-blue-600' %>">
+          <i class="fas fa-user mr-1"></i> Mis Recetas
+        </a>
+      <% } else { %>
+        <!-- No premium: upsell bloqueado -->
+        <button type="button" onclick="openPremiumModal()"
+          class="text-sm font-medium pb-1 text-gray-400 hover:text-yellow-600 inline-flex items-center gap-1"
+          title="Disponible en Premium">
+          <i class="fas fa-lock mr-1"></i> Mis Recetas
+        </button>
+      <% } %>
+    </div>
+  </div>
+
   <a href="/recetas/nueva"
-    class="group inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base font-semibold py-2 px-3 sm:py-2.5 sm:px-4 rounded-lg shadow transition-all hover:scale-105">
+     class="mt-4 sm:mt-0 group w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base font-semibold py-2 px-3 sm:py-2.5 sm:px-4 rounded-lg shadow transition-all hover:scale-105">
     <i class="fas fa-plus"></i>
     <span class="hidden sm:inline">Crear Receta</span>
   </a>
 </div>
+
+<!-- Banner de upsell (solo usuarios no premium) -->
+<% if (!isPremium) { %>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 mt-3">
+    <div class="rounded-lg border border-yellow-200 bg-yellow-50 px-4 py-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+      <p class="text-sm text-yellow-900">
+        <strong class="mr-1">Desbloquea Premium:</strong>
+        accede a <span class="font-medium">Mis Recetas</span>, edita y archiva tus recetas, y gestiona tu papelera.
+      </p>
+      <a href="/planes" class="inline-flex items-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-white text-sm font-semibold py-2 px-3 rounded-md transition">
+        <i class="fas fa-crown"></i> Ver planes
+      </a>
+    </div>
+  </div>
+<% } %>
 
 <main class="max-w-7xl mx-auto p-4 sm:p-6 space-y-6">
 
   <% if (messages.error && messages.error.length > 0) { %>
     <div id="errorMessage" class="fixed bottom-4 right-4 w-80 bg-red-50 border-l-4 border-red-500 p-4 shadow-lg transform transition-all duration-300 ease-in-out">
       <div class="flex items-start">
-        <div class="flex-shrink-0">
-          <i class="fas fa-exclamation-circle text-red-500"></i>
-        </div>
-        <div class="ml-3">
-          <p class="text-sm font-medium text-red-800"><%= messages.error %></p>
-        </div>
-        <button onclick="dismissError()" class="ml-auto text-red-500 hover:text-red-700">
-          <i class="fas fa-times"></i>
-        </button>
+        <div class="flex-shrink-0"><i class="fas fa-exclamation-circle text-red-500"></i></div>
+        <div class="ml-3"><p class="text-sm font-medium text-red-800"><%= messages.error %></p></div>
+        <button onclick="dismissError()" class="ml-auto text-red-500 hover:text-red-700"><i class="fas fa-times"></i></button>
       </div>
     </div>
   <% } %>
-  
+
   <% if (messages.success && messages.success.length > 0) { %>
     <div id="successMessage" class="fixed bottom-4 right-4 w-80 bg-green-50 border-l-4 border-green-500 p-4 shadow-lg transform transition-all duration-300 ease-in-out">
       <div class="flex items-start">
-        <div class="flex-shrink-0">
-          <i class="fas fa-check-circle text-green-500"></i>
-        </div>
-        <div class="ml-3">
-          <p class="text-sm font-medium text-green-800"><%= messages.success %></p>
-        </div>
-        <button onclick="dismissSuccess()" class="ml-auto text-green-500 hover:text-green-700">
-          <i class="fas fa-times"></i>
-        </button>
+        <div class="flex-shrink-0"><i class="fas fa-check-circle text-green-500"></i></div>
+        <div class="ml-3"><p class="text-sm font-medium text-green-800"><%= messages.success %></p></div>
+        <button onclick="dismissSuccess()" class="ml-auto text-green-500 hover:text-green-700"><i class="fas fa-times"></i></button>
       </div>
     </div>
   <% } %>
 
-  <form id="searchForm" method="GET" action="/recetas" class="flex flex-col sm:flex-row gap-3 mb-4">
-    <input
-      type="text"
-      name="q"
-      id="searchInput"
-      value="<%= busqueda || '' %>"
-      placeholder="Buscar en mis recetas y en la web..."
-      class="w-full sm:w-1/3 px-4 py-2 border border-gray-300 rounded focus:ring-emerald-500 focus:ring-2"
-      autocomplete="off"
-    />
-    <button type="submit"
-      class="bg-emerald-600 text-white px-4 py-2 rounded hover:bg-emerald-700 transition-all">
-      <i class="fas fa-search"></i> Buscar
-    </button>
-  </form>
-
-  <% if (recetas.length === 0 && busqueda) { %>
-    <p class="text-center text-gray-500 py-8">No se encontraron recetas para "<%= busqueda %>".</p>
-  <% } else if (recetas.length === 0) { %>
-    <p class="text-center text-gray-500 py-8">No se encontraron recetas. ¡Crea una nueva o busca en la web!</p>
+  <!-- Filtros -->
+  <% if (typeof tituloPagina !== 'undefined') { %>
+    <!-- Buscador simple para "Mis Recetas" -->
+    <div class="bg-white p-4 rounded-lg shadow">
+      <form method="GET" action="/recetas/mis-recetas" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="md:col-span-3">
+          <label for="searchInput" class="block text-sm font-medium text-gray-700 mb-1">Buscar en mis recetas</label>
+          <input type="text" name="q" id="searchInput" value="<%= busqueda || '' %>" placeholder="Nombre de la receta..." class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" autocomplete="off" />
+        </div>
+        <div class="flex items-end space-x-2">
+          <button type="submit" class="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"><i class="fas fa-search mr-2"></i>Buscar</button>
+          <a href="/recetas/mis-recetas" class="w-full text-center bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300"><i class="fas fa-times mr-2"></i>Limpiar</a>
+        </div>
+      </form>
+    </div>
   <% } else { %>
-    <div id="resultsContainer">
-      <div class="overflow-x-auto bg-white border rounded shadow-sm">
-       <table class="min-w-full table-auto text-sm text-gray-700">
-  <thead class="bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase">
-    <tr>
-      <th class="px-6 py-3">Categoría</th>
-      <th class="px-6 py-3">Nombre</th>
-      <th class="px-6 py-3">Imagen</th>
-      <th class="px-6 py-3 text-right">Acciones</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% recetas.forEach(r => { %>
-      <tr class="border-b hover:bg-gray-50">
-        <td class="px-6 py-4 font-medium">
-          <span class="<%= r.origen === 'api' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800' %> text-xs px-2 py-1 rounded-full">
-            <%= r.categoria || (r.origen === 'api' ? 'Recomendada' : 'Personalizada') %>
-          </span>
-        </td>
-        <td class="px-6 py-4">
-          <%= r.titulo %>
-          <% if (r.origen === 'api' && r.esRecomendacion) { %>
-            <span class="text-xs text-blue-600 ml-1">(Recomendación)</span>
-          <% } %>
-        </td>
-        <td class="px-6 py-4">
-          <% if (r.imagen) { %>
-            <img src="<%= r.imagen %>" alt="Imagen" class="w-12 h-12 object-cover rounded shadow">
-          <% } else { %>
-            <span class="text-gray-400">Sin imagen</span>
-          <% } %>
-        </td>
-        
-        <td class="px-6 py-4 text-right">
-          <div class="inline-flex items-center gap-2 justify-end">
-            <!-- Botón Ver (para todos) -->
-            <a href="/recetas/ver/<%= r.origen %>/<%= encodeURIComponent(r.id) %>"
-              class="text-emerald-600 hover:text-emerald-800" title="Ver Detalles">
-              <i class="fas fa-eye"></i>
-            </a>
+    <!-- Filtros completos para el recetario general -->
+    <div class="bg-white p-4 rounded-lg shadow">
+      <form method="GET" action="/recetas" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div>
+          <label for="searchInput" class="block text-sm font-medium text-gray-700 mb-1">Buscar</label>
+          <input type="text" name="q" id="searchInput" value="<%= busqueda || '' %>" placeholder="Nombre o descripción" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" autocomplete="off" />
+        </div>
+        <div>
+          <label for="categoriaFilter" class="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
+          <select id="categoriaFilter" name="categoria" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            <option value="">Todas</option>
+            <% categorias.forEach(cat => { %>
+              <option value="<%= cat %>" <%= categoriaSeleccionada === cat ? 'selected' : '' %>><%= cat %></option>
+            <% }); %>
+          </select>
+        </div>
+        <div>
+          <label for="etiquetaFilter" class="block text-sm font-medium text-gray-700 mb-1">Etiqueta</label>
+          <select id="etiquetaFilter" name="etiqueta" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            <option value="">Todas</option>
+            <% etiquetas.forEach(etq => { %>
+              <option value="<%= etq %>" <%= etiquetaSeleccionada === etq ? 'selected' : '' %>><%= etq %></option>
+            <% }); %>
+          </select>
+        </div>
+        <div class="flex items-end space-x-2">
+          <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"><i class="fas fa-search mr-2"></i>Filtrar</button>
+          <a href="/recetas" class="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300"><i class="fas fa-times mr-2"></i>Limpiar</a>
+        </div>
+      </form>
+    </div>
+  <% } %>
 
-            <% if (r.origen === 'api') { %>
-              <!-- Botón Importar (para todos) -->
-              <form action="/recetas/importar-api" method="POST">
-                <input type="hidden" name="titulo" value="<%= r.titulo %>">
-                <input type="hidden" name="categoria" value="<%= r.categoria %>">
-                <input type="hidden" name="dataAPI" value='<%= r.dataAPI %>'>
-                <button type="submit"
-                  class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold py-1.5 px-3 rounded-lg shadow transition-all">
-                  <i class="fas fa-download"></i> Importar
-                </button>
-              </form>
-            <% } else { %>
-              <!-- ================================================== -->
-              <!-- LÓGICA PARA MOSTRAR BOTONES NORMALES O BLOQUEADOS  -->
-              <!-- ================================================== -->
-              <% if (user && (user.plan === 'premium' || user.rol === 'admin')) { %>
-                <!-- Si es Premium o Admin, los botones funcionan normal -->
-                <a href="/recetas/editar/<%= r.id %>" class="text-blue-600 hover:text-blue-800" title="Editar">
-                  <i class="fas fa-edit"></i>
-                </a>
-                <form action="/recetas/archivar/<%= r.id %>" method="POST" onsubmit="return confirm('¿Deseas archivar esta receta?')">
-                  <button type="submit" class="text-gray-700 hover:text-yellow-600" title="Archivar">
-                    <i class="fas fa-box-archive"></i>
-                  </button>
-                </form>
-              <% } else { %>
-                <!-- Si es Básico, mostramos los botones bloqueados con tooltip -->
-                <div class="relative group">
-                  <button disabled class="text-blue-300 cursor-not-allowed" title="Editar">
-                    <i class="fas fa-edit"></i>
-                  </button>
-                  <div class="absolute bottom-full mb-2 hidden group-hover:block w-48 bg-gray-800 text-white text-xs rounded py-2 px-3 right-0 z-10 text-left">
-                    Esta es una función <span class="font-bold text-yellow-300">Premium</span>.
-                    <a href="/planes" class="underline block mt-1">¡Actualiza tu plan!</a>
-                  </div>
-                </div>
-                <div class="relative group">
-                  <button disabled class="text-gray-400 cursor-not-allowed" title="Archivar">
-                    <i class="fas fa-box-archive"></i>
-                  </button>
-                  <div class="absolute bottom-full mb-2 hidden group-hover:block w-48 bg-gray-800 text-white text-xs rounded py-2 px-3 right-0 z-10 text-left">
-                    Esta es una función <span class="font-bold text-yellow-300">Premium</span>.
-                    <a href="/planes" class="underline block mt-1">¡Actualiza tu plan!</a>
-                  </div>
-                </div>
-              <% } %>
-              <!-- ================================================== -->
+  <% if (recetas.length === 0) { %>
+    <div class="text-center py-12">
+      <i class="fas fa-utensils text-4xl text-gray-400 mb-4"></i>
+      <p class="text-gray-500 text-lg">
+        <% if (typeof tituloPagina !== 'undefined') { %>
+          Aún no has creado ninguna receta.
+        <% } else { %>
+          No se encontraron recetas con los filtros actuales.
+        <% } %>
+      </p>
+      <a href="/recetas/nueva" class="text-blue-600 hover:text-blue-800 mt-4 inline-block">
+        <i class="fas fa-plus mr-1"></i>Crear primera receta
+      </a>
+    </div>
+  <% } else { %>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <% recetas.forEach(receta => { %>
+        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+          <div class="h-48 bg-gray-200 overflow-hidden relative">
+            <img src="<%= receta.imagen || '/img/receta-default.jpg' %>" alt="<%= receta.titulo %>" class="w-full h-full object-cover" onerror="this.src='/img/receta-default.jpg'">
+            <% if (!isPremium) { %>
+              <!-- overlay sutil para indicar feature premium en acciones -->
+              <div class="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/20 via-transparent"></div>
             <% } %>
           </div>
-        </td>
-      </tr>
-    <% }) %>
-  </tbody>
-</table>
+          <div class="p-4">
+            <div class="flex flex-wrap gap-2 mb-2">
+              <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full capitalize"><%= receta.categoria || 'General' %></span>
+              <% if (receta.etiquetas) { %>
+                <% receta.etiquetas.split(',').slice(0, 2).forEach(etq => { %>
+                  <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full"><%= etq.trim() %></span>
+                <% }); %>
+              <% } %>
+            </div>
+            <h3 class="font-bold text-lg mb-2 text-gray-800"><%= receta.titulo %></h3>
+            <div class="flex items-center justify-between text-sm text-gray-600 mb-3">
+              <span><i class="fas fa-clock mr-1"></i> <%= receta.tiempo_preparacion || 'N/A' %> min</span>
+              <span><i class="fas fa-fire mr-1"></i> <%= receta.calorias || 'N/A' %> cal</span>
+              <span><i class="fas fa-utensils mr-1"></i> <%= receta.porciones || 'N/A' %> porc.</span>
+            </div>
+            <div class="flex justify-between items-center pt-3 border-t border-gray-100">
+              <a href="/recetas/ver/<%= receta.id %>" class="text-blue-600 hover:text-blue-800 text-sm font-medium"><i class="fas fa-eye mr-1"></i> Ver</a>
 
+              <!-- Acciones -->
+              <% if (isPremium && (user && (user.id === receta.usuario_id || user.rol === 'admin'))) { %>
+                <!-- Premium/Admin con permisos -->
+                <div class="flex space-x-3">
+                  <a href="/recetas/editar/<%= receta.id %>" class="text-gray-600 hover:text-gray-900" title="Editar"><i class="fas fa-edit"></i></a>
+                  <form action="/recetas/archivar/<%= receta.id %>?_method=PATCH" method="POST" onsubmit="return confirm('¿Archivar esta receta?')">
+                    <button type="submit" class="text-gray-600 hover:text-yellow-600" title="Archivar"><i class="fas fa-box-archive"></i></button>
+                  </form>
+                </div>
+              <% } else { %>
+                <!-- No premium: acciones bloqueadas -->
+                <div class="flex items-center gap-3 text-gray-400">
+                  <button type="button" onclick="openPremiumModal()" class="inline-flex items-center gap-1 hover:text-yellow-600" title="Editar (Premium)">
+                    <i class="fas fa-lock"></i><span class="sr-only">Editar (Premium)</span>
+                  </button>
+                  <button type="button" onclick="openPremiumModal()" class="inline-flex items-center gap-1 hover:text-yellow-600" title="Archivar (Premium)">
+                    <i class="fas fa-lock"></i><span class="sr-only">Archivar (Premium)</span>
+                  </button>
+                </div>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+
+    <div class="flex items-center justify-between mt-8 px-4 py-3 bg-white border-t border-gray-200 sm:px-6 rounded-b-lg">
+      <div class="flex-1 flex justify-between sm:hidden">
+        <% if (pagination.currentPage > 1) { %>
+          <a 
+            href="/recetas?page=<%= pagination.currentPage - 1 %><%= busqueda ? `&q=${busqueda}` : '' %><%= categoriaSeleccionada ? `&categoria=${categoriaSeleccionada}` : '' %><%= etiquetaSeleccionada ? `&etiqueta=${etiquetaSeleccionada}` : '' %>" 
+            class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+          >Anterior</a>
+        <% } %>
+        <% if (pagination.currentPage < pagination.totalPages) { %>
+          <a 
+            href="/recetas?page=<%= pagination.currentPage + 1 %><%= busqueda ? `&q=${busqueda}` : '' %><%= categoriaSeleccionada ? `&categoria=${categoriaSeleccionada}` : '' %><%= etiquetaSeleccionada ? `&etiqueta=${etiquetaSeleccionada}` : '' %>" 
+            class="ml-auto relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+          >Siguiente</a>
+        <% } %>
+      </div>
+      
+      <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+        <div>
+          <p class="text-sm text-gray-700">
+            Mostrando 
+            <span class="font-medium"><%= pagination.offset + 1 %></span>
+            a 
+            <span class="font-medium"><%= Math.min(pagination.offset + pagination.limit, pagination.totalItems) %></span>
+            de 
+            <span class="font-medium"><%= pagination.totalItems %></span>
+            resultados
+          </p>
+        </div>
+        <div>
+          <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+            <a 
+              href="/recetas?page=<%= Math.max(1, pagination.currentPage - 1) %><%= busqueda ? `&q=${busqueda}` : '' %><%= categoriaSeleccionada ? `&categoria=${categoriaSeleccionada}` : '' %><%= etiquetaSeleccionada ? `&etiqueta=${etiquetaSeleccionada}` : '' %>" 
+              class="<%= pagination.currentPage <= 1 ? 'pointer-events-none opacity-50' : '' %> relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+            ><span class="sr-only">Anterior</span><i class="fas fa-chevron-left"></i></a>
+
+            <%
+              const currentPage = pagination.currentPage;
+              const totalPages = pagination.totalPages;
+              const pagesToShow = [];
+              const windowPages = 2;
+              pagesToShow.push(1);
+              if (currentPage > windowPages + 2) { pagesToShow.push('...'); }
+              for (let i = Math.max(2, currentPage - windowPages); i <= Math.min(totalPages - 1, currentPage + windowPages); i++) {
+                pagesToShow.push(i);
+              }
+              if (currentPage < totalPages - (windowPages + 1)) { pagesToShow.push('...'); }
+              if (totalPages > 1) { pagesToShow.push(totalPages); }
+              const uniquePages = [...new Set(pagesToShow)];
+            %>
+
+            <% uniquePages.forEach(page => { %>
+              <% if (page === '...') { %>
+                <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">...</span>
+              <% } else if (page === currentPage) { %>
+                <span aria-current="page" class="z-10 bg-blue-50 border-blue-500 text-blue-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium"><%= page %></span>
+              <% } else { %>
+                <a href="/recetas?page=<%= page %><%= busqueda ? `&q=${busqueda}` : '' %><%= categoriaSeleccionada ? `&categoria=${categoriaSeleccionada}` : '' %><%= etiquetaSeleccionada ? `&etiqueta=${etiquetaSeleccionada}` : '' %>" class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium"><%= page %></a>
+              <% } %>
+            <% }); %>
+
+            <a 
+              href="/recetas?page=<%= Math.min(totalPages, pagination.currentPage + 1) %><%= busqueda ? `&q=${busqueda}` : '' %><%= categoriaSeleccionada ? `&categoria=${categoriaSeleccionada}` : '' %><%= etiquetaSeleccionada ? `&etiqueta=${etiquetaSeleccionada}` : '' %>" 
+              class="<%= pagination.currentPage >= totalPages ? 'pointer-events-none opacity-50' : '' %> relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+            ><span class="sr-only">Siguiente</span><i class="fas fa-chevron-right"></i></a>
+          </nav>
+        </div>
       </div>
     </div>
   <% } %>
 
-  <!-- ================================================== -->
-  <!-- ENLACE A PAPELERA (SOLO PARA PREMIUM Y ADMIN)      -->
-  <!-- ================================================== -->
-  <div class="mt-6">
-    <% if (user && (user.plan === 'premium' || user.rol === 'admin')) { %>
-      <a href="/recetas/papelera"
-        class="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-300 px-4 py-2 rounded transition">
-        <i class="fas fa-trash-alt"></i> Papelera
+  <% if (isPremium) { %>
+    <div class="mt-6 text-center">
+      <a href="/recetas/papelera" class="inline-flex items-center text-gray-600 hover:text-gray-900">
+        <i class="fas fa-trash-alt mr-2"></i> Ver recetas archivadas
       </a>
-    <% } %>
-  </div>
-  <!-- ================================================== -->
-
+    </div>
+  <% } %>
 </main>
 
+<!-- Modal Premium -->
+<div id="premiumModal" class="fixed inset-0 z-50 hidden">
+  <div class="absolute inset-0 bg-black/40" onclick="closePremiumModal()"></div>
+  <div class="relative mx-auto mt-24 w-[90%] max-w-md bg-white rounded-xl shadow-lg overflow-hidden">
+    <div class="px-5 py-4 bg-yellow-500 text-white flex items-center justify-between">
+      <h3 class="font-semibold text-lg"><i class="fas fa-crown mr-2"></i> Función Premium</h3>
+      <button class="text-white/90 hover:text-white" onclick="closePremiumModal()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="p-5 space-y-3">
+      <p class="text-gray-700">
+        Esta acción está disponible para usuarios con plan <strong>Premium</strong>.
+        Desbloquea <em>Mis Recetas</em>, edición y archivado de recetas, y acceso a tu papelera.
+      </p>
+      <a href="/planes" class="w-full inline-flex items-center justify-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2.5 rounded-md transition">
+        Ver planes y precios <i class="fas fa-arrow-right"></i>
+      </a>
+    </div>
+  </div>
+</div>
 
-<!-- Script para mensajes flash y búsqueda -->
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    // Manejo de mensajes de éxito
-    const successElement = document.getElementById('successMessage');
-    if (successElement) {
-      // Ocultar automáticamente después de 3 segundos
-      setTimeout(() => {
-        successElement.classList.add('translate-x-full', 'opacity-0');
-        setTimeout(() => successElement.remove(), 300);
-      }, 3000);
-
-      // Función para cerrar manualmente
-      window.dismissSuccess = function() {
-        successElement.classList.add('translate-x-full', 'opacity-0');
-        setTimeout(() => successElement.remove(), 300);
-      };
-    }
-
-    // Manejo de mensajes de error
-    const errorElement = document.getElementById('errorMessage');
-    if (errorElement) {
-      // Ocultar automáticamente después de 3 segundos
-      setTimeout(() => {
-        errorElement.classList.add('translate-x-full', 'opacity-0');
-        setTimeout(() => errorElement.remove(), 300);
-      }, 3000);
-
-      // Función para cerrar manualmente
-      window.dismissError = function() {
-        errorElement.classList.add('translate-x-full', 'opacity-0');
-        setTimeout(() => errorElement.remove(), 300);
-      };
-    }
-
-    // Búsqueda en tiempo real (tu código existente)
-    const searchInput = document.getElementById('searchInput');
-    const searchForm = document.getElementById('searchForm');
-    let debounceTimer;
-    let lastCursorPosition = 0;
-
-    searchInput.addEventListener('keyup', function() {
-      lastCursorPosition = this.selectionStart;
-    });
-
-    searchInput.addEventListener('click', function() {
-      lastCursorPosition = this.selectionStart;
-    });
-
-    function performSearch() {
-      const searchTerm = searchInput.value.trim();
-      const currentCursorPos = searchInput.selectionStart;
-      
-      if (searchTerm === '') {
-        window.location.href = '/recetas';
-        return;
+    // Manejo de mensajes flash
+    const dismissMessage = (elementId) => {
+      const element = document.getElementById(elementId);
+      if (element) {
+        element.classList.add('translate-x-full', 'opacity-0');
+        setTimeout(() => element.remove(), 300);
       }
-      
-      lastCursorPosition = currentCursorPos;
-      
-      fetch(`/recetas?q=${encodeURIComponent(searchTerm)}`)
-        .then(response => response.text())
-        .then(html => {
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(html, 'text/html');
-          const newResults = doc.getElementById('resultsContainer');
-          
-          if (newResults) {
-            document.getElementById('resultsContainer').innerHTML = newResults.innerHTML;
-          }
-          
-          searchInput.focus();
-          searchInput.setSelectionRange(lastCursorPosition, lastCursorPosition);
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          searchForm.submit();
-        });
+    };
+    ['errorMessage', 'successMessage'].forEach(id => {
+      const msg = document.getElementById(id);
+      if (msg) setTimeout(() => dismissMessage(id), 5000);
+    });
+    window.dismissError = () => dismissMessage('errorMessage');
+    window.dismissSuccess = () => dismissMessage('successMessage');
+
+    const searchInput = document.getElementById('searchInput');
+
+    // Foco cuando hay búsqueda activa
+    const urlParams = new URLSearchParams(window.location.search);
+    const busquedaActiva = urlParams.get('q');
+    if (searchInput && busquedaActiva) {
+      searchInput.focus();
+      const end = searchInput.value.length;
+      searchInput.setSelectionRange(end, end);
     }
 
-    searchInput.addEventListener('input', function() {
-      clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(performSearch, 1000);
-    });
+    // Búsqueda en tiempo real (debounce)
+    if (searchInput && (typeof tituloPagina === 'undefined')) {
+      let debounceTimer;
+      searchInput.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          this.form.submit();
+        }, 800);
+      });
+    }
 
-    searchForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      performSearch();
+    // Auto-submit en selects de filtros
+    const filterSelects = document.querySelectorAll('select[name="categoria"], select[name="etiqueta"]');
+    filterSelects.forEach(select => {
+      select.addEventListener('change', function() {
+        this.form.submit();
+      });
     });
   });
 </script>

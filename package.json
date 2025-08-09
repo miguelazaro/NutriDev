@@ -36,7 +36,8 @@
     "puppeteer": "^24.16.0",
     "sanitize-html": "^2.17.0",
     "sequelize": "^6.37.7",
-    "stripe": "^18.4.0"
+    "stripe": "^18.4.0",
+    "translate-google": "^1.5.0"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.21",
