@@ -1,13 +1,23 @@
 const express = require('express');
 const router = express.Router();
 const { requireAuth } = require('../middlewares/auth');
-const cobrosController = require('../controllers/cobrosController');
+const cobrosCtrl = require('../controllers/cobrosController');
 
-// Ruta principal que mostrará el dashboard de cobros.
-// En el futuro, esta función también será premium.
-router.get('/', requireAuth, cobrosController.vistaPrincipal);
+// Vista principal
+router.get('/', requireAuth, cobrosCtrl.vistaPrincipal);
 
-// Aquí iremos añadiendo más rutas después, como la de vincular Stripe
-// y la de crear un nuevo cobro.
+// --- Stripe Connect (onboarding) ---
+router.get('/stripe/connect', requireAuth, cobrosCtrl.stripeConnectStart);
+router.get('/stripe/return',  requireAuth, cobrosCtrl.stripeReturn);   // success_url
+router.get('/stripe/refresh', requireAuth, cobrosCtrl.stripeRefresh);  // refresh_url
+
+// --- Crear cobro (Checkout Session) ---
+router.get('/nuevo',  requireAuth, cobrosCtrl.formNuevoCobro);
+router.post('/crear', requireAuth, cobrosCtrl.crearCobroCheckout);
+
+// (Placeholders opcionales para acciones sobre un cobro)
+router.get('/:id',               requireAuth, cobrosCtrl.verCobro);
+router.get('/:id/reenviar',      requireAuth, cobrosCtrl.reenviarRecibo);
+router.delete('/:id',            requireAuth, cobrosCtrl.eliminarCobro);
 
 module.exports = router;

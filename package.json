@@ -33,6 +33,7 @@
     "openai": "^5.12.0",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
+    "pdfkit": "^0.17.1",
     "puppeteer": "^24.16.0",
     "sanitize-html": "^2.17.0",
     "sequelize": "^6.37.7",
