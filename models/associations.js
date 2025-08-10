@@ -44,6 +44,7 @@ PlanAlimenticio.belongsTo(Paciente, {
     as: 'paciente'
 });
 
+
 module.exports = {
     Paciente,
     NotaNutriologo,

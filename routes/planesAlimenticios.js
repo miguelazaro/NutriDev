@@ -1,46 +1,49 @@
 const express = require('express');
 const router = express.Router();
 const planesController = require('../controllers/planesAlimenticiosController');
-const requireAuth = require('../middlewares/auth').requireAuth;
+const { requireAuth } = require('../middlewares/auth');
 const puppeteer = require('puppeteer');
 
 // =============================
-// Rutas para planes alimenticios IA
+// Listado
 // =============================
 router.get('/', requireAuth, planesController.index);
+
+// =============================
+// NUEVO plan manual (debe ir ANTES de cualquier '/:id')
+// =============================
+router.get('/nuevo', requireAuth, planesController.nuevoForm);
+router.post('/', requireAuth, planesController.guardarManual);
+
+// Eliminar plan (usar method-override)
+router.delete('/:id', requireAuth, planesController.eliminar);
+
+
+// =============================
+// Planes IA
+// =============================
 router.post('/guardar-desde-ia/:id', requireAuth, planesController.guardarDesdeIA);
 router.post('/guardar', requireAuth, planesController.guardarDesdeIA);
 
 // =============================
-// Rutas para editar y actualizar
+// Editar / actualizar (antes de '/:id')
 // =============================
 router.get('/:id/editar', requireAuth, planesController.editarVista);
 router.put('/:id', requireAuth, planesController.actualizar);
 
 // =============================
-// Rutas para ver, imprimir y descargar PDF
+// Ver / imprimir / PDF / debug (pueden ir antes o después, '/:id' al final)
 // =============================
-router.get('/:id', requireAuth, planesController.verVista);            // Ver plan (HTML)
-router.get('/:id/print', requireAuth, planesController.verImprimible); // Versión imprimible (HTML)
-router.get('/:id/pdf', requireAuth, planesController.descargarPDF);    // Descargar PDF
-
-// =============================
-// Ruta de debug: ver HTML usado para el PDF
-// (reusa el render imprimible para inspección)
-// =============================
+router.get('/:id/print', requireAuth, planesController.verImprimible);
+router.get('/:id/pdf', requireAuth, planesController.descargarPDF);
 router.get('/:id/html-debug', requireAuth, planesController.verImprimible);
 
 // =============================
-// Ruta de prueba: generar PDF simple (para validar Puppeteer)
+// Prueba Puppeteer
 // =============================
 router.get('/:id/pdf-test', requireAuth, async (req, res) => {
     try {
-        const browser = await puppeteer.launch({
-            headless: 'new',
-            // Si tienes problemas en tu entorno, prueba:
-            // args: ['--no-sandbox', '--disable-setuid-sandbox']
-        });
-
+        const browser = await puppeteer.launch({ headless: 'new' });
         const page = await browser.newPage();
         await page.setContent(`
       <!doctype html><html><body>
@@ -48,10 +51,8 @@ router.get('/:id/pdf-test', requireAuth, async (req, res) => {
         <p>Si ves este PDF, Puppeteer funciona correctamente.</p>
       </body></html>
     `, { waitUntil: 'load' });
-
         const pdfBuffer = await page.pdf({ format: 'A4', printBackground: true });
         await browser.close();
-
         res.setHeader('Content-Type', 'application/pdf');
         res.setHeader('Content-Length', pdfBuffer.length);
         res.setHeader('Content-Disposition', 'inline; filename="test.pdf"');
@@ -61,5 +62,10 @@ router.get('/:id/pdf-test', requireAuth, async (req, res) => {
         res.status(500).send('PDF-TEST falló');
     }
 });
+
+// =============================
+// Ver plan (deja esta al FINAL)
+// =============================
+router.get('/:id', requireAuth, planesController.verVista);
 
 module.exports = router;
