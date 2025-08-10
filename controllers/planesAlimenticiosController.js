@@ -1,9 +1,9 @@
 // controllers/planesAlimenticiosController.js
+const sanitizeHtml = require('sanitize-html');
 const PlanAlimenticio = require('../models/PlanAlimenticio');
 const Paciente = require('../models/Paciente');
 
 // ✅ dynamic import para ESM
-const sanitizeHtml = require('sanitize-html');
 const fs = require('fs');
 const path = require('path');
 const ejs = require('ejs');
@@ -264,6 +264,128 @@ exports.editarVista = async (req, res) => {
         console.error('Error al cargar vista de edición:', error);
         req.flash('error', 'Ocurrió un error');
         res.redirect('/planes-alimenticios');
+    }
+};
+
+exports.nuevoForm = async (req, res) => {
+    try {
+        const pacientes = await Paciente.findAll({
+            order: [['nombre', 'ASC']],
+            attributes: ['id', 'nombre', 'foto']
+        });
+
+        res.render('nuevo-plan', {
+            pacientes,
+            error: req.flash('error'),
+            success: req.flash('success'),
+            formData: {
+                titulo: '',
+                paciente_id: '',
+                objetivo: '',
+                fecha_inicio: '',
+                fecha_fin: '',
+                calorias: '',
+                contenido: ''
+            }
+        });
+    } catch (err) {
+        console.error(err);
+        req.flash('error', 'No se pudo cargar el formulario.');
+        return res.redirect('/planes-alimenticios');
+    }
+};
+
+exports.guardarManual = async (req, res) => {
+    const {
+        titulo,
+        paciente_id,      // FK en tu tabla
+        objetivo,
+        fecha_inicio,
+        fecha_fin,
+        calorias,
+        contenido
+    } = req.body;
+
+    try {
+        if (!titulo || !contenido) {
+            req.flash('error', 'Título y contenido son obligatorios.');
+            const pacientes = await Paciente.findAll({ order: [['nombre', 'ASC']], attributes: ['id', 'nombre', 'foto'] });
+            return res.render('nuevo-plan', {
+                pacientes,
+                error: req.flash('error'),
+                success: null,
+                formData: { titulo, paciente_id, objetivo, fecha_inicio, fecha_fin, calorias, contenido }
+            });
+        }
+
+        const meta = [
+            objetivo ? `Objetivo: ${objetivo}` : null,
+            fecha_inicio ? `Inicio: ${fecha_inicio}` : null,
+            fecha_fin ? `Fin: ${fecha_fin}` : null,
+            calorias ? `Calorías objetivo: ${calorias} kcal` : null
+        ].filter(Boolean).join('\n');
+
+        let contenidoFinal = meta ? `${meta}\n\n${contenido}` : contenido;
+
+        contenidoFinal = sanitizeHtml(contenidoFinal, {
+            allowedTags: ['p', 'b', 'i', 'strong', 'em', 'ul', 'ol', 'li', 'br', 'h1', 'h2', 'h3', 'blockquote', 'span', 'u'],
+            allowedAttributes: { span: ['style'] }
+        });
+
+        // ID del usuario creador (ajusta a tu middleware de auth real)
+        const userId = (req.user && req.user.id) || (req.session?.user && req.session.user.id) || null;
+
+        await PlanAlimenticio.create({
+            titulo,
+            tipo: 'manual',             // coincide con ENUM
+            contenido: contenidoFinal,
+            paciente_id: paciente_id || null,
+            usuario_id: userId
+        });
+
+        req.flash('success', 'Plan manual creado correctamente.');
+        return res.redirect('/planes-alimenticios');
+    } catch (err) {
+        console.error(err);
+        req.flash('error', 'Ocurrió un error al guardar el plan.');
+        const pacientes = await Paciente.findAll({ order: [['nombre', 'ASC']], attributes: ['id', 'nombre', 'foto'] });
+        return res.render('nuevo-plan', {
+            pacientes,
+            error: req.flash('error'),
+            success: null,
+            formData: req.body
+        });
+    }
+};
+
+exports.eliminar = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        // Id de usuario y rol desde tu auth
+        const userId = (req.user && req.user.id) || (req.session?.user?.id) || null;
+        const userRol = (req.user && req.user.rol) || (req.session?.user?.rol) || null;
+
+        // Si no es admin, sólo puede borrar sus propios planes
+        const where = (userRol === 'admin')
+            ? { id }
+            : { id, usuario_id: userId };
+
+        const plan = await PlanAlimenticio.findOne({ where });
+
+        if (!plan) {
+            req.flash('error', 'El plan no existe o no tienes permiso para eliminarlo.');
+            return res.redirect('/planes-alimenticios');
+        }
+
+        await plan.destroy();
+
+        req.flash('success', 'Plan eliminado correctamente.');
+        return res.redirect('/planes-alimenticios');
+    } catch (err) {
+        console.error('[ELIMINAR PLAN] Error:', err);
+        req.flash('error', 'No se pudo eliminar el plan.');
+        return res.redirect('/planes-alimenticios');
     }
 };
 

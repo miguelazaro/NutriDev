@@ -9,9 +9,11 @@
             <p class="text-sm text-gray-500">Historial de planes nutricionales generados o creados manualmente</p>
         </div>
 
-        <a href="/planes-alimenticios/nuevo"
-            class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded shadow text-sm">
-            <i class="fas fa-plus-circle mr-1"></i> Nuevo plan manual
+        <a href="/planes-alimenticios/nuevo" class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700
+          text-white px-4 py-2 rounded shadow text-sm focus:outline-none
+          focus:ring-2 focus:ring-emerald-300">
+            <i class="fas fa-plus-circle"></i>
+            <span>Nuevo plan manual</span>
         </a>
     </div>
 
@@ -60,11 +62,12 @@
                                             <i class="fas fa-edit"></i> Editar
                                         </a>
                                         <form action="/planes-alimenticios/<%= plan.id %>?_method=DELETE" method="POST"
-                                            onsubmit="return confirm('¿Eliminar este plan?')">
+                                            class="js-eliminar-plan" data-titulo="<%= plan.titulo %>">
                                             <button type="submit" class="text-red-600 hover:underline">
                                                 <i class="fas fa-trash-alt"></i> Eliminar
                                             </button>
                                         </form>
+
                                     </div>
                                 </div>
                                 <% }) %>
@@ -75,3 +78,29 @@
                             <% } %>
 
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.js-eliminar-plan').forEach(form => {
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const titulo = form.dataset.titulo || 'este plan';
+
+                Swal.fire({
+                    title: '¿Eliminar plan?',
+                    html: `Vas a eliminar <b>${titulo}</b>. Esta acción no se puede deshacer.`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar',
+                    reverseButtons: true,
+                    confirmButtonColor: '#059669', // emerald-600
+                    cancelButtonColor: '#6b7280'   // gray-500
+                }).then((r) => {
+                    if (r.isConfirmed) form.submit();
+                });
+            });
+        });
+    });
+</script>
