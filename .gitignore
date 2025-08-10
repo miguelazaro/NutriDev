@@ -1,5 +1,6 @@
 # node_modules no debe subirse nunca
 node_modules/
+public/uploads/
 
 # Archivo de variables de entorno
 .env

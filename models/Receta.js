@@ -1,52 +1,76 @@
+// models/Receta.js
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 
 const Receta = sequelize.define('Receta', {
     titulo: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: false,
+        validate: {
+            notEmpty: { msg: 'El título de la receta es requerido' }
+        }
     },
     descripcion: {
-        type: DataTypes.TEXT
+        type: DataTypes.TEXT,
+        defaultValue: ''
     },
+    // --- ESTA ES LA VERSIÓN SIMPLIFICADA Y CORRECTA ---
+    // Sequelize ahora solo leerá y escribirá el texto plano.
     ingredientes: {
-        type: DataTypes.TEXT
-    },
-    calorias: {
-        type: DataTypes.INTEGER
-    },
-    categoria: {
-        type: DataTypes.STRING
+        type: DataTypes.TEXT,
+        defaultValue: ''
     },
     preparacion: {
-        type: DataTypes.TEXT
+        type: DataTypes.TEXT,
+        defaultValue: ''
+    },
+    categoria: {
+        type: DataTypes.STRING,
+        defaultValue: 'general',
+        set(value) {
+            this.setDataValue('categoria', value.toLowerCase());
+        }
+    },
+    etiquetas: {
+        type: DataTypes.TEXT,
+        defaultValue: ''
+    },
+    tiempo_preparacion: {
+        type: DataTypes.INTEGER,
+    },
+    tiempo_coccion: {
+        type: DataTypes.INTEGER,
+    },
+    porciones: {
+        type: DataTypes.INTEGER,
+    },
+    dificultad: {
+        type: DataTypes.ENUM('fácil', 'medio', 'difícil'),
+        defaultValue: 'fácil'
+    },
+    calorias: {
+        type: DataTypes.INTEGER,
+    },
+    proteinas: {
+        type: DataTypes.FLOAT,
+    },
+    carbohidratos: {
+        type: DataTypes.FLOAT,
+    },
+    grasas: {
+        type: DataTypes.FLOAT,
+    },
+    imagen: {
+        type: DataTypes.TEXT,
+        allowNull: true,
     },
     usuario_id: {
-        type: DataTypes.INTEGER
+        type: DataTypes.INTEGER,
+        allowNull: false
     },
     archivada: {
         type: DataTypes.BOOLEAN,
         defaultValue: false
-    },
-     etiquetas: {
-        type: DataTypes.TEXT, // Cambiado de STRING a TEXT
-        allowNull: true
-    },
-    tiempo_preparacion: {
-        type: DataTypes.STRING
-    },
-    dificultad: {
-        type: DataTypes.STRING
-    },
-    porciones: {
-        type: DataTypes.INTEGER
-    },
-imagen: {
-  type: DataTypes.TEXT, // Cambiar de STRING a TEXT si es necesario
-  allowNull: true
-},
-    tamano_porcion: {
-        type: DataTypes.STRING
     },
     equivalentes_simplificados: {
         type: DataTypes.BOOLEAN,
@@ -60,7 +84,7 @@ imagen: {
     tableName: 'recetas',
     timestamps: true,
     createdAt: 'created_at',
-    updatedAt: false
+    updatedAt: false,
 });
 
 module.exports = Receta;

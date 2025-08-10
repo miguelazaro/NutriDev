@@ -1,40 +1,45 @@
+// routes/recetas.js
 const express = require('express');
 const router = express.Router();
-const upload = require('../middlewares/upload');
-const recetasController = require('../controllers/recetaController');
-const { requireAuth } = require('../middlewares/auth'); // Tu middleware de autenticación
-const { requirePlan } = require('../middlewares/checkPlan'); // <-- 1. IMPORTAMOS NUESTRO GUARDIA
 
-// --- RUTAS DEL PLAN BÁSICO (o para todos los usuarios logueados) ---
-// Se necesita iniciar sesión para todas estas acciones.
+const uploadRecetas = require('../middlewares/uploadRecetas'); // <-- middleware específico para recetas
+const recetasController = require('../controllers/recetaController');
+const { requireAuth } = require('../middlewares/auth');
+const { requirePlan } = require('../middlewares/checkPlan');
+
+// --- RUTAS BÁSICAS (usuario logueado) ---
 router.get('/', requireAuth, recetasController.index);
 router.get('/nueva', requireAuth, recetasController.nueva);
-router.post('/guardar', requireAuth, upload.single('imagen'), recetasController.guardar);
-router.get('/ver/:tipo/:id', requireAuth, recetasController.ver);
+
+// subir imagen de receta (usa uploadRecetas)
+router.post('/guardar', requireAuth, uploadRecetas.single('imagen'), recetasController.guardar);
+
+router.get('/ver/:id', requireAuth, recetasController.ver);
 router.post('/importar-api', requireAuth, recetasController.importarDesdeAPI);
 
-
-// --- RUTAS PREMIUM ---
-// A partir de aquí, solo los usuarios con plan 'premium' (o los admins) podrán pasar.
-// Fíjate cómo ponemos a requireAuth primero y luego a requirePlan.
-
+// --- RUTAS PREMIUM (o admin, según tu requirePlan) ---
 router.get('/papelera', requireAuth, requirePlan(['premium']), recetasController.papelera);
+
+// el form en la vista usa ?_method=PATCH, así que soportamos PATCH;
+// si además quieres aceptar POST puro, deja ambas rutas.
+router.patch('/archivar/:id', requireAuth, requirePlan(['premium']), recetasController.archivar);
 router.post('/archivar/:id', requireAuth, requirePlan(['premium']), recetasController.archivar);
+
 router.get('/editar/:id', requireAuth, requirePlan(['premium']), recetasController.editar);
-router.post('/actualizar/:id', requireAuth, upload.single('imagen'), recetasController.actualizar);
+
+// actualizar con imagen (usa uploadRecetas)
+router.post('/actualizar/:id', requireAuth, uploadRecetas.single('imagen'), recetasController.actualizar);
+
 router.post('/restaurar/:id', requireAuth, requirePlan(['premium']), recetasController.restaurar);
 router.post('/eliminar-definitivo/:id', requireAuth, requirePlan(['premium']), recetasController.eliminar);
 
-// La ruta para eliminar normal (mandar a papelera) también debería ser premium.
-// Si la tienes, debería ser así:
-// router.post('/eliminar/:id', requireAuth, requirePlan(['premium']), recetasController.eliminar);
+// Mis recetas (según controller valida premium/admin)
+router.get('/mis-recetas', requireAuth, recetasController.misRecetas);
 
-
-// Ruta para limpiar mensajes flash (no necesita protección de plan)
+// Limpia flash
 router.post('/clear-flash-error', (req, res) => {
   req.flash('error', '');
   res.sendStatus(200);
 });
-
 
 module.exports = router;
