@@ -174,7 +174,7 @@ app.use(methodOverride(function (req, res) {
 }));
 
 /* ======================
-   Vistas / estáticos
+  Vistas / estáticos
 ====================== */
 app.use(expressLayouts);
 app.set('layout', 'layouts/sistema');
@@ -187,7 +187,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 app.use('/css', express.static(path.join(__dirname, 'public/css')));
 
 /* ======================
-   Auth / User
+  Auth / User
 ====================== */
 const { requireAuth, redirectIfAuthenticated } = require('./middlewares/auth');
 const userMiddleware = require('./middlewares/user');
@@ -335,7 +335,7 @@ app.get('/cobros/:id/recibo.pdf', requireAuth, async (req, res) => {
 });
 
 /* ======================
-   Relaciones y BD
+  Relaciones y BD
 ====================== */
 require('./models/associations');
 require('./models/associations_cobros');
@@ -345,7 +345,7 @@ sequelize.sync({ force: false })
   .catch(err => console.error('Error al conectar con la BD:', err));
 
 /* ======================
-   Servidor
+  Servidor
 ====================== */
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
