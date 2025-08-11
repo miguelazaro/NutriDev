@@ -9,6 +9,8 @@ const methodOverride = require('method-override');
 const Stripe = require('stripe');
 const { Op } = require('sequelize');
 const PDFDocument = require('pdfkit'); // 👈 para generar PDF
+const helmet = require('helmet');
+const compression = require('compression');
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
@@ -34,11 +36,24 @@ if (!fs.existsSync(uploadRecetasDir)) fs.mkdirSync(uploadRecetasDir, { recursive
 /* ======================
    Middlewares base
 ====================== */
+// Seguridad y compresión
+app.use(helmet());
+app.use(compression());
+
+// Sesiones endurecidas
 app.use(session({
   secret: process.env.SESSION_SECRET || 'nutridevSecret',
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: false,
+  name: 'sid',
+  cookie: {
+    httpOnly: true,
+    sameSite: 'lax',
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 1000 * 60 * 60 * 8 // 8h
+  }
 }));
+
 app.use(flash());
 
 // Exponer mensajes flash en todas las vistas
@@ -72,34 +87,33 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
 
     switch (event.type) {
       case 'checkout.session.completed': {
-        const session = event.data.object;
-        console.log('🧾 session.id', session.id, 'amount_total', session.amount_total, 'currency', session.currency);
+        const sessionEvt = event.data.object;
 
         const cobro = await Cobro.findOne({
           where: {
             [Op.or]: [
-              { stripe_session_id: session.id },
-              { stripe_checkout_session_id: session.id }
+              { stripe_session_id: sessionEvt.id },
+              { stripe_checkout_session_id: sessionEvt.id }
             ]
           }
         });
 
         if (!cobro) {
-          console.warn('⚠️ No encontré cobro para session.id:', session.id);
+          console.warn('⚠️ No encontré cobro para session.id:', sessionEvt.id);
           break;
         }
 
-        const amountCents = typeof session.amount_total === 'number' ? session.amount_total : 0;
+        const amountCents = typeof sessionEvt.amount_total === 'number' ? sessionEvt.amount_total : 0;
 
         await cobro.update({
           estado: 'pagado',
           monto_centavos: amountCents,
-          moneda: (session.currency || 'mxn').toUpperCase(),
-          fecha: session.created ? new Date(session.created * 1000) : new Date(),
+          moneda: (sessionEvt.currency || 'mxn').toUpperCase(),
+          fecha: sessionEvt.created ? new Date(sessionEvt.created * 1000) : new Date(),
           stripe_payment_intent_id:
-            typeof session.payment_intent === 'string'
-              ? session.payment_intent
-              : session.payment_intent?.id || cobro.stripe_payment_intent_id,
+            typeof sessionEvt.payment_intent === 'string'
+              ? sessionEvt.payment_intent
+              : sessionEvt.payment_intent?.id || cobro.stripe_payment_intent_id,
           stripe_account_id: connectedAccountId || cobro.stripe_account_id
         });
 
@@ -109,7 +123,6 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
 
       case 'payment_intent.succeeded': {
         const pi = event.data.object;
-        console.log('💰 PI succeeded', pi.id, 'amount_received', pi.amount_received, 'currency', pi.currency);
 
         const cobro = await Cobro.findOne({ where: { stripe_payment_intent_id: pi.id } });
         if (!cobro) break;
@@ -128,23 +141,19 @@ app.post('/webhook', express.raw({ type: 'application/json' }), async (req, res)
 
       case 'payment_intent.payment_failed': {
         const pi = event.data.object;
-        console.log('❌ PI failed', pi.id);
-
         const cobro = await Cobro.findOne({ where: { stripe_payment_intent_id: pi.id } });
         if (cobro) await cobro.update({ estado: 'fallido' });
         break;
       }
 
       case 'checkout.session.expired': {
-        const session = event.data.object;
-        console.log('⌛ Session expired', session.id);
-        const cobro = await Cobro.findOne({ where: { stripe_session_id: session.id } });
+        const sessionEvt = event.data.object;
+        const cobro = await Cobro.findOne({ where: { stripe_session_id: sessionEvt.id } });
         if (cobro) await cobro.update({ estado: 'expirado' });
         break;
       }
 
       default:
-        // otros eventos por ahora no los necesitamos
         console.log('ℹ️ Evento ignorado:', event.type);
         break;
     }
