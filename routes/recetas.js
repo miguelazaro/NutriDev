@@ -35,6 +35,8 @@ router.post('/eliminar-definitivo/:id', requireAuth, requirePlan(['premium']), r
 
 // Mis recetas (según controller valida premium/admin)
 router.get('/mis-recetas', requireAuth, recetasController.misRecetas);
+router.post('/:id/agregar-a-plan', requireAuth, recetasController.agregarAPlan);
+router.get('/:id/agregar-a-plan', requireAuth, recetasController.agregarAPlanForm);
 
 // Limpia flash
 router.post('/clear-flash-error', (req, res) => {

@@ -114,6 +114,14 @@
       <a href="/recetas/editar/<%= receta.id %>" class="w-full sm:w-auto bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg inline-flex items-center justify-center">
         <i class="fas fa-edit mr-2"></i> Editar
       </a>
+
+      <!-- Nuevo botón Agregar a Plan -->
+      <% if (user && (user.rol === 'admin' || user.plan === 'premium')) { %>
+        <a href="/recetas/<%= receta.id %>/agregar-a-plan" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-4 rounded-lg inline-flex items-center justify-center">
+          <i class="fas fa-plus mr-2"></i> Agregar a Plan
+        </a>
+      <% } %>
+
       <form action="/recetas/archivar/<%= receta.id %>?_method=PATCH" method="POST" class="w-full sm:w-auto" onsubmit="return confirm('¿Estás seguro de que quieres archivar esta receta?');">
         <button type="submit" class="w-full bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg inline-flex items-center justify-center">
           <i class="fas fa-trash-alt mr-2"></i> Archivar

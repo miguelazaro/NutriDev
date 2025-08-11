@@ -9,23 +9,22 @@
             <p class="text-sm text-gray-500">Historial de planes nutricionales generados o creados manualmente</p>
         </div>
 
-        <a href="/planes-alimenticios/nuevo" class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700
-          text-white px-4 py-2 rounded shadow text-sm focus:outline-none
-          focus:ring-2 focus:ring-emerald-300">
+        <a href="/planes-alimenticios/nuevo"
+            class="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded shadow text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300">
             <i class="fas fa-plus-circle"></i>
             <span>Nuevo plan manual</span>
         </a>
     </div>
 
-    <!-- MENSAJES FLASH -->
-    <% if (success) { %>
+    <!-- MENSAJES FLASH (req.flash devuelve arrays) -->
+    <% if (success && success.length) { %>
         <div class="bg-green-100 text-green-800 p-3 rounded text-sm">
-            <%= success %>
+            <%= success[0] %>
         </div>
         <% } %>
-            <% if (error) { %>
+            <% if (error && error.length) { %>
                 <div class="bg-red-100 text-red-800 p-3 rounded text-sm">
-                    <%= error %>
+                    <%= error[0] %>
                 </div>
                 <% } %>
 
@@ -36,23 +35,35 @@
                                 <div
                                     class="bg-gray-50 shadow p-4 rounded border border-gray-100 flex flex-col justify-between">
                                     <div>
-                                        <h2 class="text-lg font-semibold text-gray-800 mb-1">
-                                            <%= plan.titulo %>
-                                        </h2>
-                                        <p class="text-xs text-gray-500">
-                                            Tipo:
-                                            <span
-                                                class="<%= plan.tipo === 'ia' ? 'text-purple-600' : 'text-green-600' %> font-medium">
+                                        <div class="flex items-start justify-between gap-3">
+                                            <h2 class="text-lg font-semibold text-gray-800">
+                                                <%= plan.titulo %>
+                                            </h2>
+                                        </div>
+
+                                        <div class="mt-1 flex items-center gap-2 text-xs">
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full
+                <%= plan.tipo === 'ia' ? 'bg-purple-100 text-purple-700' : 'bg-emerald-100 text-emerald-700' %>">
+                                                <i
+                                                    class="fas <%= plan.tipo==='ia' ? 'fa-robot' : 'fa-hands' %> mr-1"></i>
                                                 <%= plan.tipo==='ia' ? 'Generado por IA' : 'Manual' %>
                                             </span>
+                                            <% if (plan.paciente && plan.paciente.nombre) { %>
+                                                <span class="text-gray-500">• Paciente:
+                                                    <span class="font-medium text-gray-700">
+                                                        <%= plan.paciente.nombre %>
+                                                    </span>
+                                                </span>
+                                                <% } %>
+                                        </div>
+
+                                        <p class="text-[11px] text-gray-400 mt-1">
+                                            Creado: <%= new Date(plan.createdAt).toLocaleString('es-MX') %>
+                                                · Actualizado: <%= new Date(plan.updatedAt).toLocaleString('es-MX') %>
                                         </p>
-                                        <% if (plan.paciente && plan.paciente.nombre) { %>
-                                            <p class="text-xs text-gray-500">Paciente: <%= plan.paciente.nombre %>
-                                            </p>
-                                            <% } %>
                                     </div>
 
-                                    <div class="mt-4 flex justify-between gap-2 text-sm">
+                                    <div class="mt-4 flex justify-between gap-3 text-sm">
                                         <a href="/planes-alimenticios/<%= plan.id %>"
                                             class="text-blue-600 hover:underline">
                                             <i class="fas fa-eye"></i> Ver
@@ -67,7 +78,6 @@
                                                 <i class="fas fa-trash-alt"></i> Eliminar
                                             </button>
                                         </form>
-
                                     </div>
                                 </div>
                                 <% }) %>
@@ -95,8 +105,8 @@
                     confirmButtonText: 'Sí, eliminar',
                     cancelButtonText: 'Cancelar',
                     reverseButtons: true,
-                    confirmButtonColor: '#059669', // emerald-600
-                    cancelButtonColor: '#6b7280'   // gray-500
+                    confirmButtonColor: '#059669',
+                    cancelButtonColor: '#6b7280'
                 }).then((r) => {
                     if (r.isConfirmed) form.submit();
                 });

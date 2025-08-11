@@ -10,7 +10,7 @@ const puppeteer = require('puppeteer');
 router.get('/', requireAuth, planesController.index);
 
 // =============================
-// NUEVO plan manual (debe ir ANTES de cualquier '/:id')
+// NUEVO plan manual 
 // =============================
 router.get('/nuevo', requireAuth, planesController.nuevoForm);
 router.post('/', requireAuth, planesController.guardarManual);
