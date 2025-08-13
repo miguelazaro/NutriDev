@@ -1,0 +1,185 @@
+<div class="space-y-6">
+
+  <!-- Mensajes flash -->
+  <% if (messages?.success?.length) { %>
+    <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg">
+      <p class="text-green-800">
+        <%= messages.success %>
+      </p>
+    </div>
+    <% } %>
+      <% if (messages?.error?.length) { %>
+        <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg">
+          <p class="text-red-800">
+            <%= messages.error %>
+          </p>
+        </div>
+        <% } %>
+
+          <!-- Encabezado -->
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h1 class="text-3xl font-bold text-gray-800">Gestión de Cobros</h1>
+              <p class="text-gray-500 mt-1">Administra los pagos de tus pacientes y tus ingresos.</p>
+            </div>
+
+            <% const puedeCobrar=stripeCuenta && stripeCuenta.charges_enabled; %>
+              <a href="<%= puedeCobrar ? '/cobros/nuevo' : 'javascript:void(0)' %>"
+                class="inline-flex items-center gap-2 font-semibold py-2 px-4 rounded-lg shadow w-full sm:w-auto
+             <%= puedeCobrar ? 'bg-emerald-600 text-white hover:bg-emerald-700' : 'bg-gray-200 text-gray-500 cursor-not-allowed' %>">
+                <i class="fas fa-plus"></i>
+                Nuevo Cobro
+              </a>
+          </div>
+
+          <!-- Banner Stripe -->
+          <% if (!stripeCuenta) { %>
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg flex items-center">
+              <i class="fab fa-stripe-s text-4xl text-blue-600 flex-shrink-0"></i>
+              <div class="ml-4 flex-grow">
+                <h3 class="font-bold text-blue-900">Recibe pagos en línea</h3>
+                <p class="text-sm text-blue-800 mt-1">Para cobrar con tarjeta, primero vincula tu cuenta de Stripe.</p>
+              </div>
+              <a href="/cobros/stripe/connect"
+                class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700">
+                Vincular Cuenta
+              </a>
+            </div>
+            <% } else if (!stripeCuenta.charges_enabled) { %>
+              <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg flex items-start gap-3">
+                <i class="fas fa-circle-exclamation text-amber-600 mt-1.5"></i>
+                <div class="flex-1">
+                  <h3 class="font-bold text-amber-900">Configura tu cuenta</h3>
+                  <p class="text-sm text-amber-800 mt-1">Completa tu onboarding en Stripe para habilitar cobros.</p>
+                </div>
+                <a href="/cobros/stripe/connect"
+                  class="bg-amber-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-amber-700">
+                  Continuar configuración
+                </a>
+              </div>
+              <% } else { %>
+                <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg flex items-start gap-3">
+                  <i class="fas fa-check-circle text-green-600 mt-1.5"></i>
+                  <div class="flex-1">
+                    <h3 class="font-bold text-green-900">¡Listo para cobrar!</h3>
+                    <p class="text-sm text-green-800 mt-1">Tu cuenta está habilitada para recibir pagos.</p>
+                  </div>
+                  <% if (stripeCuenta.connected_account_id) { %>
+                    <a href="https://dashboard.stripe.com/connect/accounts/<%= stripeCuenta.connected_account_id %>"
+                      target="_blank" rel="noopener"
+                      class="bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700">
+                      Abrir en Stripe
+                    </a>
+                    <% } %>
+                </div>
+                <% } %>
+
+                  <!-- Tabla de cobros -->
+                  <div class="bg-white border rounded-lg shadow-sm overflow-x-auto">
+                    <table class="min-w-full text-sm text-gray-700">
+                      <thead class="bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase">
+                        <tr>
+                          <th class="px-6 py-3">Paciente</th>
+                          <th class="px-6 py-3">Concepto</th>
+                          <th class="px-6 py-3">Monto</th>
+                          <th class="px-6 py-3">Fecha</th>
+                          <th class="px-6 py-3">Estado</th>
+                          <th class="px-6 py-3 text-right">Acciones</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <% if (!cobros?.length) { %>
+                          <tr>
+                            <td colspan="6" class="text-center text-gray-500 py-16">
+                              <div class="flex flex-col items-center">
+                                <i class="fas fa-file-invoice-dollar text-4xl text-gray-300 mb-4"></i>
+                                <p>Aún no has generado ningún cobro.</p>
+                                <p class="text-xs text-gray-400 mt-1">Cuando crees un cobro para un paciente, aparecerá
+                                  aquí.</p>
+                              </div>
+                            </td>
+                          </tr>
+                          <% } else { %>
+                            <% const pill=(estado)=> {
+                              const e = String(estado || '').toLowerCase();
+                              if (['pagado','succeeded','paid'].includes(e)) return 'bg-green-100 text-green-800';
+                              if
+                              (['pendiente','requires_payment_method','requires_confirmation','processing'].includes(e))
+                              return 'bg-amber-100 text-amber-800';
+                              if (['fallido','canceled','failed'].includes(e)) return 'bg-red-100 text-red-800';
+                              if (['expirado','expired'].includes(e)) return 'bg-gray-200 text-gray-700';
+                              return 'bg-gray-100 text-gray-700';
+                              };
+                              const isPaid = (estado) =>
+                              ['pagado','paid','succeeded'].includes(String(estado||'').toLowerCase());
+                              %>
+                              <% cobros.forEach(c=> { %>
+                                <tr class="border-b hover:bg-gray-50">
+                                  <td class="px-6 py-4 font-medium">
+                                    <%= c.Paciente?.nombre || '—' %>
+                                  </td>
+                                  <td class="px-6 py-4">
+                                    <%= c.concepto || '—' %>
+                                  </td>
+                                  <td class="px-6 py-4 font-semibold">
+                                    <% const moneda=(c.moneda || 'MXN' ).toUpperCase(); const montoMostrar=(c.monto
+                                      !=null) ? Number(c.monto) : (c.monto_centavos !=null ? Number(c.monto_centavos) /
+                                      100 : 0); %>
+                                      <%= moneda %>
+                                        <%= montoMostrar.toLocaleString('es-MX', { minimumFractionDigits: 2 }) %>
+                                  </td>
+                                  <td class="px-6 py-4">
+                                    <% const dt=c.fecha || c.createdAt || null; const fechaFmt=dt ? new
+                                      Date(dt).toLocaleString('es-MX', { dateStyle: 'short' }) : '—' ; %>
+                                      <%= fechaFmt %>
+                                  </td>
+                                  <td class="px-6 py-4">
+                                    <span class="px-2.5 py-0.5 rounded-full text-xs font-medium <%= pill(c.estado) %>">
+                                      <%= c.estado || 'pendiente' %>
+                                    </span>
+                                  </td>
+                                  <td class="px-6 py-4 text-right">
+                                    <div class="inline-flex items-center gap-3 text-gray-500">
+                                      <!-- Recibo PDF -->
+                                      <% if (isPaid(c.estado)) { %>
+                                        <a href="/cobros/<%= c.id %>/recibo.pdf" class="hover:text-gray-800"
+                                          title="Imprimir/Descargar recibo (PDF)">
+                                          <i class="fas fa-file-pdf"></i>
+                                        </a>
+                                        <% } else { %>
+                                          <span class="opacity-40 cursor-not-allowed"
+                                            title="Disponible cuando el cobro esté pagado">
+                                            <i class="fas fa-file-pdf"></i>
+                                          </span>
+                                          <% } %>
+
+                                            <!-- (Opcional) recibo nativo de Stripe si lo guardas como c.recibo_url -->
+                                            <% if (c.recibo_url && isPaid(c.estado)) { %>
+                                              <a href="<%= c.recibo_url %>" target="_blank" rel="noopener"
+                                                class="hover:text-gray-800" title="Recibo de Stripe">
+                                                <i class="fas fa-receipt"></i>
+                                              </a>
+                                              <% } %>
+
+                                                <a href="/cobros/<%= c.id %>" class="hover:text-gray-800" title="Ver">
+                                                  <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="/cobros/<%= c.id %>/reenviar" class="hover:text-gray-800"
+                                                  title="Reenviar recibo">
+                                                  <i class="fas fa-paper-plane"></i>
+                                                </a>
+                                                <form action="/cobros/<%= c.id %>?_method=DELETE" method="POST"
+                                                  class="inline" onsubmit="return confirm('¿Eliminar cobro?');">
+                                                  <button class="hover:text-red-600" title="Eliminar">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                  </button>
+                                                </form>
+                                    </div>
+                                  </td>
+                                </tr>
+                                <% }) %>
+                                  <% } %>
+                      </tbody>
+                    </table>
+                  </div>
+</div>

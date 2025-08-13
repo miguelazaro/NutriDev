@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .google-btn {
+    @apply flex items-center justify-center gap-2 bg-white border border-gray-300 rounded-lg py-2 px-4 hover:bg-gray-50 transition;
+  }
+  .divider {
+    @apply relative flex items-center my-6;
+  }
+  .divider-line {
+    @apply flex-grow border-t border-gray-300;
+  }
+  .divider-text {
+    @apply flex-shrink mx-4 text-gray-500;
+  }
+}

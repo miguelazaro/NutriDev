@@ -1,0 +1,101 @@
+<!-- views/login.ejs -->
+<div class="max-w-md mx-auto">
+  <!-- Encabezado con logo para desktop (oculto en móviles) -->
+  <div class="hidden md:block mb-6">
+    <img src="/assets/img/logo_nutridev.png" alt="NutriDev" class="w-32">
+  </div>
+
+  <h1 class="text-2xl font-bold text-gray-800 mb-1">¡Bienvenido de vuelta!</h1>
+  <p class="text-gray-600 mb-6">Inicia sesión en tu cuenta</p>
+
+  <!-- Notificaciones -->
+  <% if (typeof success !== 'undefined' && success.length > 0) { %>
+    <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-lg mb-4 text-sm">
+      <%= success[0] %>
+    </div>
+  <% } %>
+  <% if (typeof error !== 'undefined' && error.length > 0) { %>
+    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm">
+      <%= error[0] %>
+    </div>
+  <% } %>
+
+  <!-- Botones de inicio de sesión externos (no funcionales aún) -->
+  <div class="flex flex-col gap-3 mb-6">
+    <button class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 rounded-lg py-3 px-4 text-gray-700 hover:bg-gray-50 transition">
+      <!-- Google Icon -->
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
+        <path fill="#4285F4" d="M17.6 9.2c0-.6-.1-1.3-.2-1.9H9v3.6h4.8c-.1.9-.7 1.7-1.5 2.2v2h2.4c1.4-1.3 2.2-3.2 2.2-5.4z"/>
+        <path fill="#34A853" d="M9 18c2 0 3.7-.7 4.9-1.8l-2.4-2c-.7.5-1.6.8-2.6.8-2 0-3.7-1.4-4.3-3.3H2.2v2.1C3.4 16.2 6 18 9 18z"/>
+        <path fill="#FBBC05" d="M4.7 10.7c-.2-.6-.3-1.2-.3-1.8s.1-1.2.3-1.8V5H2.2C1.4 6.3.9 7.9.9 9.5s.5 3.2 1.3 4.5l2.5-1.8z"/>
+        <path fill="#EA4335" d="M9 3.6c1.1 0 2.1.4 2.9 1.2L14 2.4C12.7 1.1 10.9.4 9 .4 6 .4 3.4 2.2 2.2 4.5l2.5 1.9c.6-1.9 2.3-3.2 4.3-3.2z"/>
+      </svg>
+      Iniciar sesión con Google
+    </button>
+
+    <button class="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 rounded-lg py-3 px-4 text-gray-700 hover:bg-gray-50 transition">
+      <!-- Microsoft icon -->
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 23 23">
+        <path fill="#f3f3f3" d="M0 0h23v23H0z"/>
+        <path fill="#f1511b" d="M1 1h10v10H1z"/>
+        <path fill="#80cc28" d="M12 1h10v10H12z"/>
+        <path fill="#00adef" d="M1 12h10v10H1z"/>
+        <path fill="#fbbc09" d="M12 12h10v10H12z"/>
+      </svg>
+      Iniciar sesión con Microsoft
+    </button>
+  </div>
+
+  <div class="flex items-center mb-6">
+    <div class="flex-grow border-t border-gray-300"></div>
+    <span class="mx-4 text-gray-500 text-sm">o</span>
+    <div class="flex-grow border-t border-gray-300"></div>
+  </div>
+
+  <form method="POST" action="/login">
+    <div class="mb-4">
+      <label for="email" class="block text-gray-700 text-sm font-medium mb-1">Correo electrónico</label>
+      <input
+        id="email"
+        name="email"
+        type="email"
+        placeholder="tu@email.com"
+        required
+        value="<%= (typeof old_email !== 'undefined' && old_email.length) ? old_email[0] : '' %>"
+        class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+    </div>
+
+    <div class="mb-4">
+      <label for="password" class="block text-gray-700 text-sm font-medium mb-1">Contraseña</label>
+      <input
+        id="password"
+        name="password"
+        type="password"
+        placeholder="••••••••"
+        required
+        class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent">
+    </div>
+
+    <div class="mb-6 flex justify-end">
+      <a href="/forgot-password" class="text-sm text-emerald-600 hover:underline">¿Has olvidado la contraseña?</a>
+    </div>
+
+    <button type="submit"
+      class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 px-4 rounded-lg transition duration-300">
+      Entrar al sistema
+    </button>
+  </form>
+
+  <p class="mt-6 text-center text-gray-600 text-sm">
+    ¿No tienes cuenta?
+    <a href="/register" class="text-emerald-600 font-medium hover:underline">Regístrate ahora</a>
+  </p>
+
+  <div class="md:hidden mt-8 pt-6 border-t border-gray-200 text-center text-xs text-gray-500">
+    <div class="flex flex-wrap justify-center gap-4">
+      <a href="#" class="hover:underline">Configuración de cookies</a>
+      <a href="#" class="hover:underline">Política de Privacidad</a>
+      <a href="#" class="hover:underline">Términos y Condiciones</a>
+    </div>
+  </div>
+</div>

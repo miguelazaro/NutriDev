@@ -1,0 +1,348 @@
+<div class="max-w-5xl mx-auto bg-white p-6 sm:p-8 shadow rounded-lg space-y-6">
+
+    <!-- ENCABEZADO -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <!-- FOTO DE PERFIL + NOMBRE -->
+        <div class="flex items-center gap-4">
+            <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden border-4 border-emerald-300 shadow">
+                <% if (paciente.foto) { %>
+                    <img src="/uploads/pacientes/<%= paciente.foto %>" alt="Foto de perfil"
+                        class="object-cover w-full h-full">
+                    <% } else { %>
+                        <i
+                            class="fas fa-user text-emerald-600 text-2xl flex items-center justify-center w-full h-full bg-emerald-100"></i>
+                        <% } %>
+            </div>
+            <div>
+                <h1 class="text-2xl sm:text-3xl font-bold text-emerald-600">
+                    <%= paciente.nombre %>
+                </h1>
+                <p class="text-sm text-gray-500">Ficha del paciente</p>
+            </div>
+        </div>
+        <div class="mb-4">
+            <a href="/pacientes" class="inline-flex items-center text-sm font-medium text-emerald-600 hover:underline">
+                <i class="fas fa-arrow-left mr-2"></i>
+                Volver a la lista de pacientes
+            </a>
+        </div>
+    </div>
+
+    <!-- INFO GENERAL -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+        <div class="bg-gray-50 p-4 rounded-lg shadow">
+            <p class="text-gray-500">Edad</p>
+            <p class="font-semibold">
+                <% if (paciente.fecha_nacimiento) { const nacimiento=new Date(paciente.fecha_nacimiento); const hoy=new
+                    Date(); let edad=hoy.getFullYear() - nacimiento.getFullYear(); const m=hoy.getMonth() -
+                    nacimiento.getMonth(); if (m < 0 || (m===0 && hoy.getDate() < nacimiento.getDate())) edad--; %>
+                    <%= edad %> años
+                        <% } else { %>
+                            No especificada
+                            <% } %>
+            </p>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg shadow">
+            <p class="text-gray-500">Sexo</p>
+            <p class="font-semibold">
+                <%= paciente.genero || 'No especificado' %>
+            </p>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg shadow">
+            <p class="text-gray-500">Estatura</p>
+            <p class="font-semibold">
+                <%= paciente.estatura || 'No especificado' %>
+            </p>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg shadow">
+            <p class="text-gray-500">Correo</p>
+            <p class="font-semibold">
+                <%= paciente.email || 'No especificado' %>
+            </p>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg shadow">
+            <p class="text-gray-500">Teléfono</p>
+            <p class="font-semibold">
+                <%= paciente.telefono %>
+            </p>
+        </div>
+    </section>
+
+    <!-- HISTORIAL Y NOTAS -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="bg-white border rounded-lg p-4">
+            <h2 class="text-lg font-semibold text-emerald-700 mb-2">📝 Historial Médico</h2>
+            <p class="text-gray-700 italic">
+                <%= paciente.historial || 'No registrado' %>
+            </p>
+        </div>
+        <div class="bg-white border rounded-lg p-4">
+            <h2 class="text-lg font-semibold text-emerald-700 mb-2">📒 Notas del Nutriólogo</h2>
+            <form method="POST" action="/pacientes/<%= paciente.id %>/notas">
+                <textarea name="nota" class="form-textarea w-full" rows="4"
+                    placeholder="Escribe tus notas aquí..."></textarea>
+                <button type="submit"
+                    class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded shadow mt-2">Guardar
+                    nota</button>
+            </form>
+            <% if (paciente.NotaNutriologos && paciente.NotaNutriologos.length> 0) { %>
+                <ul class="mt-4 space-y-2">
+                    <% paciente.NotaNutriologos.forEach(n=> { %>
+                        <li class="bg-gray-100 p-2 rounded shadow text-sm flex justify-between items-center">
+                            <span>
+                                <%= n.nota %>
+                            </span>
+                            <form action="/pacientes/<%= paciente.id %>/notas/<%= n.id %>/eliminar" method="POST"
+                                class="inline">
+                                <button type="submit"
+                                    class="bg-blue-600 hover:bg-red-600 text-white px-4 py-2 rounded shadow mt-2">Eliminar</button>
+                            </form>
+                        </li>
+                        <% }) %>
+                </ul>
+                <% } else { %>
+                    <p class="text-gray-500 text-sm mt-2">No hay notas registradas.</p>
+                    <% } %>
+        </div>
+    </section>
+
+    <!-- VOLVER Y PESTAÑAS -->
+    <div class="mt-8">
+        <div class="flex flex-wrap gap-3 text-sm font-medium">
+            <button
+                class="tab-button bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded-md shadow-sm hover:bg-blue-50 data-[active=true]:bg-blue-100 data-[active=true]:text-blue-700"
+                data-tab="progreso">📈 Progreso</button>
+            <button
+                class="tab-button bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded-md shadow-sm hover:bg-emerald-50 data-[active=true]:bg-emerald-100 data-[active=true]:text-emerald-700"
+                data-tab="archivos">📂 Archivos</button>
+            <button
+                class="tab-button bg-white text-gray-700 border border-gray-300 px-4 py-2 rounded-md shadow-sm hover:bg-indigo-50 data-[active=true]:bg-indigo-100 data-[active=true]:text-indigo-700"
+                data-tab="planes">🤖 Plan Alimenticio (IA)</button>
+        </div>
+    </div>
+
+    <!-- TAB: PROGRESO -->
+    <div class="tab-content mt-6 hidden" id="progreso">
+        <section class="bg-white border rounded-lg p-4">
+            <h2 class="text-lg font-semibold text-blue-700 mb-4">📈 Registrar progreso</h2>
+            <form action="/pacientes/<%= paciente.id %>/progreso" method="POST"
+                class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium">Peso (kg)</label>
+                    <input type="number" step="0.1" name="peso" required class="w-full border rounded p-2">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium">Fecha</label>
+                    <input type="date" name="fecha" class="w-full border rounded p-2">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium">Observaciones</label>
+                    <input type="text" name="observaciones" class="w-full border rounded p-2">
+                </div>
+                <div class="col-span-1 sm:col-span-3">
+                    <button type="submit"
+                        class="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded shadow">
+                        Guardar progreso
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <section class="bg-white border rounded-lg p-4 mt-6">
+            <h2 class="text-lg font-semibold text-blue-700 mb-4">📊 Evolución de peso</h2>
+            <% if (paciente.Progresos && paciente.Progresos.length> 0) { %>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full bg-white">
+                        <thead>
+                            <tr>
+                                <th class="py-2 px-4 border-b">Fecha</th>
+                                <th class="py-2 px-4 border-b">Peso (kg)</th>
+                                <th class="py-2 px-4 border-b">Observaciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% paciente.Progresos.forEach(progreso=> { %>
+                                <tr>
+                                    <td class="py-2 px-4 border-b">
+                                        <%= progreso.fecha %>
+                                    </td>
+                                    <td class="py-2 px-4 border-b">
+                                        <%= progreso.peso %>
+                                    </td>
+                                    <td class="py-2 px-4 border-b">
+                                        <%= progreso.observaciones %>
+                                    </td>
+                                </tr>
+                                <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+
+                <canvas id="graficaProgreso" class="w-full h-64 mt-4"></canvas>
+                <% } else { %>
+                    <p class="text-gray-500 italic">No hay registros de progreso aún.</p>
+                    <% } %>
+        </section>
+    </div>
+
+    <!-- TAB: ARCHIVOS -->
+    <div class="tab-content mt-6" id="archivos">
+        <section class="bg-white border rounded-lg p-4">
+            <h2 class="text-lg font-semibold text-emerald-700 mb-4">📂 Archivos del paciente</h2>
+            <form action="/pacientes/<%= paciente.id %>/subir" method="POST" enctype="multipart/form-data"
+                class="flex flex-col sm:flex-row items-center gap-4">
+                <input type="file" name="archivo" accept="image/*,.pdf" required class="flex-1 border rounded p-2">
+                <button type="submit" class="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded shadow">
+                    Subir
+                </button>
+            </form>
+            <div class="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-4">
+                <% if (paciente.ArchivoPacientes && paciente.ArchivoPacientes.length> 0) { %>
+                    <% paciente.ArchivoPacientes.forEach(a=> { %>
+                        <div class="border rounded p-2 bg-gray-50 text-center text-sm">
+                            <% if (a.tipo==='imagen' ) { %>
+                                <img src="<%= a.ruta %>" alt="archivo" class="w-full h-32 object-cover rounded mb-2">
+                                <% } else if (a.tipo==='pdf' ) { %>
+                                    <i class="fas fa-file-pdf text-red-500 text-4xl mb-2"></i>
+                                    <% } %>
+                                        <a href="<%= a.ruta %>" target="_blank"
+                                            class="text-blue-600 hover:underline block truncate">
+                                            <%= a.nombre_archivo %>
+                                        </a>
+                        </div>
+                        <% }) %>
+                            <% } else { %>
+                                <p class="col-span-2 text-gray-500 italic">No se han subido archivos</p>
+                                <% } %>
+            </div>
+        </section>
+    </div>
+
+    <!-- TAB: PLAN ALIMENTICIO -->
+    <div class="tab-content mt-6 hidden" id="planes">
+        <section class="bg-white border rounded-lg p-4">
+            <h2 class="text-lg font-semibold text-indigo-700 mb-4">🤖 Plan alimenticio sugerido por IA</h2>
+            <p class="text-sm text-gray-600 italic mb-4">
+                Aquí se generará automáticamente un plan basado en los progresos,
+                historial médico y otros factores del paciente.
+            </p>
+
+            <button id="btn-generar-plan" data-id="<%= paciente.id %>"
+                class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
+                Generar Plan IA
+            </button>
+
+            <!-- Resultado generado por la IA -->
+            <div id="resultado-plan" class="mt-4 whitespace-pre-wrap text-gray-800"></div>
+
+            <form id="form-guardar-plan" class="hidden" method="POST" action="/planes-alimenticios/guardar">
+                <input type="hidden" name="contenido" id="input-contenido-plan">
+                <input type="hidden" name="paciente_id" value="<%= paciente.id %>">
+                <input type="hidden" name="tipo" value="ia">
+                <input type="hidden" name="titulo" value="Plan IA generado automáticamente">
+                <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 mt-3">
+                    Guardar plan
+                </button>
+            </form>
+
+
+            <div id="flash" class="mt-3"></div>
+
+    </div>
+    </section>
+</div>
+
+<!-- IA Plan Alimenticio -->
+<script src="/js/iaPlan.js"></script>
+
+<!-- SCRIPT PARA TABS -->
+<script>
+    const tabs = document.querySelectorAll(".tab-button");
+    const contents = document.querySelectorAll(".tab-content");
+
+    tabs.forEach((btn) => {
+        btn.addEventListener("click", () => {
+            const tab = btn.getAttribute("data-tab");
+
+            contents.forEach((c) => c.classList.add("hidden"));
+            tabs.forEach((t) => t.setAttribute("data-active", "false"));
+
+            document.getElementById(tab).classList.remove("hidden");
+            btn.setAttribute("data-active", "true");
+
+            // Si es la pestaña de progreso, renderizar la gráfica
+            if (tab === 'progreso') {
+                renderGraficaProgreso();
+            }
+        });
+    });
+
+    // Activar primera pestaña
+    if (tabs.length > 0) {
+        tabs[0].click();
+    }
+</script>
+
+<!-- Agrega la librería Chart.js aquí -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>z
+<script>
+    function renderGraficaProgreso() {
+        const progresos = <% - JSON.stringify(paciente.Progresos || []) %>;
+        const ctx = document.getElementById('graficaProgreso')?.getContext('2d');
+
+        if (!ctx || !progresos || progresos.length === 0) return;
+
+        // Ordenar progresos por fecha
+        progresos.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+
+        // Destruir gráfica anterior si existe
+        if (window.graficaProgreso) {
+            window.graficaProgreso.destroy();
+        }
+
+        window.graficaProgreso = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: progresos.map(p => p.fecha),
+                datasets: [{
+                    label: 'Peso (kg)',
+                    data: progresos.map(p => Number(p.peso)),
+                    borderColor: 'rgba(37, 99, 235, 1)',
+                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            afterBody: function (context) {
+                                const idx = context[0].dataIndex;
+                                return 'Obs: ' + (progresos[idx].observaciones || 'N/A');
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        title: { display: true, text: 'Peso (kg)' }
+                    },
+                    x: {
+                        title: { display: true, text: 'Fecha' }
+                    }
+                }
+            }
+        });
+    }
+
+    // Renderizar gráfica al cargar la página si estamos en la pestaña de progreso
+    document.addEventListener('DOMContentLoaded', function () {
+        if (!document.getElementById('progreso').classList.contains('hidden')) {
+            renderGraficaProgreso();
+        }
+    });
+</script>

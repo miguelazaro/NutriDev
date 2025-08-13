@@ -1,0 +1,59 @@
+<%- include('partials/flash') %>
+
+<div class="max-w-3xl mx-auto bg-white p-6 sm:p-8 shadow rounded-lg space-y-6">
+
+  <!-- HEADER -->
+  <div class="flex justify-between items-start gap-4">
+    <div>
+      <h1 class="text-2xl sm:text-3xl font-bold text-emerald-600"><%= plan.titulo %></h1>
+
+      <div class="mt-1 flex flex-wrap items-center gap-2 text-sm">
+        <span class="inline-flex items-center px-2 py-0.5 rounded-full
+          <%= plan.tipo === 'ia' ? 'bg-purple-100 text-purple-700' : 'bg-emerald-100 text-emerald-700' %>">
+          <i class="fas <%= plan.tipo==='ia' ? 'fa-robot' : 'fa-hands' %> mr-1"></i>
+          <%= plan.tipo==='ia' ? 'Generado por IA' : 'Manual' %>
+        </span>
+
+        <span class="text-gray-500">• Paciente:
+          <span class="text-gray-700 font-medium"><%= plan.paciente ? plan.paciente.nombre : '—' %></span>
+        </span>
+      </div>
+
+      <p class="text-[11px] text-gray-400 mt-1">
+        Creado: <%= new Date(plan.createdAt).toLocaleString('es-MX') %>
+        · Actualizado: <%= new Date(plan.updatedAt).toLocaleString('es-MX') %>
+      </p>
+    </div>
+
+    <div class="flex flex-col items-end space-y-2">
+      <a href="/planes-alimenticios" class="inline-flex items-center text-sm font-medium text-emerald-600 hover:underline">
+        <i class="fas fa-arrow-left mr-2"></i> Volver a Planes Alimenticios
+      </a>
+
+      <div class="flex flex-wrap gap-2">
+        <% if (plan.tipo === 'manual') { %>
+          <!-- 👇 ahora manda el ID del plan a /recetas -->
+          <a href="/recetas?addToPlan=<%= plan.id %>"
+             class="inline-flex items-center bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-4 py-2 rounded shadow text-sm">
+            <i class="fas fa-utensils mr-2"></i> Agregar receta (desde Recetas)
+          </a>
+        <% } %>
+
+        <a href="/planes-alimenticios/<%= plan.id %>/pdf"
+           class="inline-flex items-center bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded shadow text-sm">
+          <i class="fas fa-file-pdf mr-2"></i> Descargar PDF
+        </a>
+
+        <a href="/planes-alimenticios/<%= plan.id %>/editar"
+           class="inline-flex items-center bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded shadow text-sm">
+          <i class="fas fa-edit mr-2"></i> Editar
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTENIDO (ya viene como HTML seguro desde el controlador) -->
+  <div class="prose max-w-none">
+    <%- contenidoSeguro %>
+  </div>
+</div>
