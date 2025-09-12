@@ -6,7 +6,7 @@ Sistema web diseñado para nutriólogos que permite gestionar pacientes, crear p
 
 - **Node.js + Express** – Backend y servidor web
 - **EJS** – Motor de plantillas para las vistas
-- **HTML5 + CSS3** – Estructura y estilos
+- **HTML5 + TAILWINDCSS** – Estructura y estilos
 - **Font Awesome** – Iconos
 - **JavaScript** – Funciones básicas en frontend
 - **MySQL 
