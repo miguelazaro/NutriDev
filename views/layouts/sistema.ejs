@@ -7,16 +7,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>NutriDev - Sistema</title>
 
-    <!-- Tailwind -->
-    <link rel="stylesheet" href="/css/output.css">
+    <!-- Tailwind compilado local -->
+    <link rel="stylesheet" href="/css/output.css?v=1">
+
+    <!-- (Opcional) Google Fonts y FontAwesome (permitidos por CSP en style-src https:) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- IMPORTANTE: No uses CDN de scripts porque Helmet bloquea script-src externos.
+       Si necesitas Chart.js, súbelo a /public/assets/js/chart.umd.js y descomenta: -->
+    <!-- <script src="/assets/js/chart.umd.js"></script> -->
   </head>
 
   <body class="bg-gray-50 text-gray-800 font-sans">
     <div class="flex min-h-screen">
+      <!-- overlay para el sidebar en mobile -->
       <div id="sidebar-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"></div>
 
       <!-- Sidebar -->
@@ -167,6 +172,7 @@
       </div>
     </div>
 
+    <!-- JS propio (todo local, nada de CDN por CSP) -->
     <script>
       document.addEventListener('DOMContentLoaded', function () {
         const profileMenu = document.getElementById('profile-menu');
@@ -175,26 +181,31 @@
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebar-overlay');
 
-        profileMenu.addEventListener('click', function (e) {
-          e.stopPropagation();
-          dropdown.classList.toggle('hidden');
-        });
+        if (profileMenu) {
+          profileMenu.addEventListener('click', function (e) {
+            e.stopPropagation();
+            dropdown.classList.toggle('hidden');
+          });
+          document.addEventListener('click', function () {
+            dropdown.classList.add('hidden');
+          });
+        }
 
-        document.addEventListener('click', function () {
-          dropdown.classList.add('hidden');
-        });
+        if (sidebarToggle) {
+          sidebarToggle.addEventListener('click', function () {
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+            document.body.classList.toggle('overflow-hidden');
+          });
+        }
 
-        sidebarToggle.addEventListener('click', function () {
-          sidebar.classList.toggle('-translate-x-full');
-          overlay.classList.toggle('hidden');
-          document.body.classList.toggle('overflow-hidden');
-        });
-
-        overlay.addEventListener('click', function () {
-          sidebar.classList.add('-translate-x-full');
-          overlay.classList.add('hidden');
-          document.body.classList.remove('overflow-hidden');
-        });
+        if (overlay) {
+          overlay.addEventListener('click', function () {
+            sidebar.classList.add('-translate-x-full');
+            overlay.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+          });
+        }
 
         document.querySelectorAll('#sidebar a').forEach(link => {
           link.addEventListener('click', function () {

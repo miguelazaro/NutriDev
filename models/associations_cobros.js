@@ -1,9 +1,7 @@
-const Cobro = require('./cobro');
+const Cobro = require('./Cobro');
 const StripeAccount = require('./StripeAccount');
 const Paciente = require('./Paciente');
 
-// Si tienes Usuario.js puedes relacionarlo también,
-// si no, simplemente dejamos usuario_id como entero.
 try {
   const Usuario = require('./Usuario'); // si existe
   Usuario.hasMany(Cobro, { foreignKey: 'usuario_id' });
@@ -15,7 +13,7 @@ try {
   // sin modelo Usuario, no pasa nada
 }
 
-// Relación con Paciente (sí lo tienes)
+// Relación con Paciente 
 Paciente.hasMany(Cobro, { foreignKey: 'paciente_id' });
 Cobro.belongsTo(Paciente, { foreignKey: 'paciente_id' });
 

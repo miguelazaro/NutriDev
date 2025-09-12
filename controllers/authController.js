@@ -2,24 +2,19 @@
 const bcrypt = require('bcryptjs');
 const Usuario = require('../models/Usuario');
 
-const isValidEmail = (email) => {
-  // validación sencilla para evitar depender de librerías nuevas
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-};
+const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
 exports.vistaBienvenida = (req, res) => {
-  res.render('bienvenida', {
-    layout: 'layouts/auth',
-    title: 'Bienvenido a NutriDev'
-  });
+  res.render('bienvenida', { layout: 'layouts/auth', title: 'Bienvenido a NutriDev' });
 };
 
 exports.loginView = (req, res) => {
-  res.render('login', { error: req.flash('error'), success: req.flash('success') });
+  // error/success/old_email ya vienen por res.locals (middleware de app.js)
+  res.render('login', { layout: 'layouts/auth' });
 };
 
 exports.registerView = (req, res) => {
-  res.render('register', { error: req.flash('error'), success: req.flash('success') });
+  res.render('register', { layout: 'layouts/auth' });
 };
 
 exports.registerUser = async (req, res) => {
@@ -60,8 +55,8 @@ exports.registerUser = async (req, res) => {
       nombre,
       email,
       password: hashed,
-      rol: 'nutriologo',    // mantenemos tu rol por defecto
-      plan: 'basico'        // asegura que exista un plan por defecto (puedes quitarlo si tu modelo ya tiene default)
+      rol: 'nutriologo',
+      plan: 'basico'
     });
 
     req.flash('success', '¡Cuenta creada exitosamente! Ahora puedes iniciar sesión.');
@@ -80,19 +75,20 @@ exports.loginUser = async (req, res) => {
 
     if (!email || !password) {
       req.flash('error', 'Correo y contraseña son obligatorios.');
+      req.flash('old_email', email);
       return res.redirect('/login');
     }
 
     const user = await Usuario.findOne({ where: { email } });
-
-    // Comparación segura
     const isValidPassword = user && await bcrypt.compare(password, user.password);
+
     if (!isValidPassword) {
-      req.flash('error', 'Credenciales incorrectas');
+      req.flash('error', 'Credenciales incorrectas. Verifica tu correo o contraseña.');
+      req.flash('old_email', email);
       return res.redirect('/login');
     }
 
-    // Prevención de fijación de sesión
+    // Regenerar sesión para evitar fijación
     req.session.regenerate((err) => {
       if (err) {
         console.error('Error regenerating session:', err);
@@ -100,7 +96,7 @@ exports.loginUser = async (req, res) => {
         return res.redirect('/login');
       }
 
-      // Guardamos solo lo necesario en sesión
+      // Guardar datos mínimos del usuario
       req.session.usuario = {
         id: user.id,
         nombre: user.nombre,
@@ -126,8 +122,7 @@ exports.logout = (req, res) => {
   // Opcional: limpiar datos sensibles antes
   req.session.usuario = null;
   req.session.destroy(() => {
-    // Si configuraste cookie custom (p.ej. name: 'sid'), puedes limpiarla:
-    // res.clearCookie('sid');
+    // si definiste cookie de sesión personalizada, podrías limpiar aquí con res.clearCookie('sid')
     return res.redirect('/login');
   });
 };

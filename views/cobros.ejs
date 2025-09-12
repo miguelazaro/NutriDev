@@ -26,7 +26,7 @@
             <% const puedeCobrar=stripeCuenta && stripeCuenta.charges_enabled; %>
               <a href="<%= puedeCobrar ? '/cobros/nuevo' : 'javascript:void(0)' %>"
                 class="inline-flex items-center gap-2 font-semibold py-2 px-4 rounded-lg shadow w-full sm:w-auto
-             <%= puedeCobrar ? 'bg-emerald-600 text-white hover:bg-emerald-700' : 'bg-gray-200 text-gray-500 cursor-not-allowed' %>">
+            <%= puedeCobrar ? 'bg-emerald-600 text-white hover:bg-emerald-700' : 'bg-gray-200 text-gray-500 cursor-not-allowed' %>">
                 <i class="fas fa-plus"></i>
                 Nuevo Cobro
               </a>
