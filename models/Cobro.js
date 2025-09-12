@@ -17,7 +17,7 @@ const Cobro = sequelize.define(
     // Quién creó el cobro (nutriólogo/usuario dueño de la cuenta conectada)
     usuario_id: { type: DataTypes.INTEGER, allowNull: false },
 
-    // Paciente (opcional)
+    // Paciente 
     paciente_id: { type: DataTypes.INTEGER, allowNull: true },
 
     // Texto corto visible en Checkout / recibos

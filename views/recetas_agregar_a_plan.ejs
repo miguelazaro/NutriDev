@@ -1,95 +1,98 @@
 <%- include('partials/flash') %>
 
-<div class="max-w-2xl mx-auto bg-white rounded-lg shadow-md my-8 overflow-hidden">
-  <!-- Encabezado -->
-  <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
-    <h1 class="text-lg sm:text-xl font-bold text-gray-800">
-      Agregar "<%= receta.titulo %>" a un plan
-    </h1>
+  <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-md my-8 overflow-hidden">
+    <!-- Encabezado -->
+    <div class="flex items-center justify-between px-6 py-4 border-b bg-gray-50">
+      <h1 class="text-lg sm:text-xl font-bold text-gray-800">
+        Agregar "<%= receta.titulo %>" a un plan
+      </h1>
 
-    <% if (plan) { %>
-      <a href="/planes-alimenticios/<%= plan.id %>" class="inline-flex items-center text-sm text-emerald-700 hover:text-emerald-900">
-        <i class="fas fa-arrow-left mr-2"></i> Volver al plan
-      </a>
-    <% } else { %>
-      <a href="/recetas/ver/<%= receta.id %>" class="inline-flex items-center text-sm text-gray-600 hover:text-gray-900">
-        <i class="fas fa-arrow-left mr-2"></i> Volver
-      </a>
-    <% } %>
-  </div>
+      <% if (plan) { %>
+        <a href="/planes-alimenticios/<%= plan.id %>"
+          class="inline-flex items-center text-sm text-emerald-700 hover:text-emerald-900">
+          <i class="fas fa-arrow-left mr-2"></i> Volver al plan
+        </a>
+        <% } else { %>
+          <a href="/recetas/ver/<%= receta.id %>"
+            class="inline-flex items-center text-sm text-gray-600 hover:text-gray-900">
+            <i class="fas fa-arrow-left mr-2"></i> Volver
+          </a>
+          <% } %>
+    </div>
 
-  <!-- Formulario -->
-  <form action="/recetas/<%= receta.id %>/agregar-a-plan" method="POST" class="p-6 space-y-5">
-    <% if (plan) { %>
-      <input type="hidden" name="plan_id" value="<%= plan.id %>">
-    <% } %>
+    <!-- Formulario -->
+    <form action="/recetas/<%= receta.id %>/agregar-a-plan" method="POST" class="p-6 space-y-5">
+      <% if (plan) { %>
+        <input type="hidden" name="plan_id" value="<%= plan.id %>">
+        <% } %>
 
-    <!-- Paciente -->
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-1">Paciente*</label>
-      <select name="paciente_id" required
+          <!-- Paciente -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Paciente*</label>
+            <select name="paciente_id" required
               class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400">
-        <option value="">Selecciona un paciente</option>
-        <% pacientes.forEach(p => { %>
-          <option value="<%= p.id %>" <%= plan && String(plan.paciente_id)===String(p.id) ? 'selected' : '' %>>
-            <%= p.nombre %>
-          </option>
-        <% }) %>
-      </select>
-    </div>
+              <option value="">Selecciona un paciente</option>
+              <% pacientes.forEach(p=> { %>
+                <option value="<%= p.id %>" <%=plan && String(plan.paciente_id)===String(p.id) ? 'selected' : '' %>>
+                  <%= p.nombre %>
+                </option>
+                <% }) %>
+            </select>
+          </div>
 
-    <!-- Fecha y momento -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Fecha*</label>
-        <input type="date" name="fecha" required
-               class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"/>
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Momento*</label>
-        <select name="momento" required
+          <!-- Fecha y momento -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Fecha*</label>
+              <input type="date" name="fecha" required
+                class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Momento*</label>
+              <select name="momento" required
                 class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400">
-          <option value="desayuno">Desayuno</option>
-          <option value="comida">Comida</option>
-          <option value="cena">Cena</option>
-          <option value="colación">Colación</option>
-        </select>
-      </div>
-    </div>
+                <option value="desayuno">Desayuno</option>
+                <option value="comida">Comida</option>
+                <option value="cena">Cena</option>
+                <option value="colación">Colación</option>
+              </select>
+            </div>
+          </div>
 
-    <!-- Plan existente (solo si NO venimos con plan en query) -->
-    <% if (!plan) { %>
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Plan existente (opcional)</label>
-        <select name="plan_id"
+          <!-- Plan existente (solo si NO venimos con plan en query) -->
+          <% if (!plan) { %>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Plan existente (opcional)</label>
+              <select name="plan_id"
                 class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400">
-          <option value="">Crear un plan manual nuevo</option>
-        </select>
-        <p class="text-xs text-gray-500 mt-1">Si lo dejas vacío, se creará “Plan manual • [fecha]”.</p>
-      </div>
-    <% } %>
+                <option value="">Crear un plan manual nuevo</option>
+              </select>
+              <p class="text-xs text-gray-500 mt-1">Si lo dejas vacío, se creará “Plan manual • [fecha]”.</p>
+            </div>
+            <% } %>
 
-    <!-- Porciones / Notas -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Porciones</label>
-        <input type="number" min="1" name="porciones" value="1"
-               class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"/>
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Notas</label>
-        <input type="text" name="notas" placeholder="Opcional"
-               class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400"/>
-      </div>
-    </div>
+              <!-- Porciones / Notas -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Porciones</label>
+                  <input type="number" min="1" name="porciones" value="1"
+                    class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Notas</label>
+                  <input type="text" name="notas" placeholder="Opcional"
+                    class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400" />
+                </div>
+              </div>
 
-    <!-- Botones -->
-    <div class="flex justify-end gap-3 pt-2">
-      <a href="<%= plan ? ('/planes-alimenticios/' + plan.id) : '/recetas' %>"
-         class="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-100 transition">Cancelar</a>
-      <button type="submit" class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">
-        <i class="fas fa-plus mr-2"></i> Agregar
-      </button>
-    </div>
-  </form>
-</div>
+              <!-- Botones -->
+              <div class="flex justify-end gap-3 pt-2">
+                <a href="<%= plan ? ('/planes-alimenticios/' + plan.id) : '/recetas' %>"
+                  class="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-100 transition">Cancelar</a>
+                <button type="submit"
+                  class="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition">
+                  <i class="fas fa-plus mr-2"></i> Agregar
+                </button>
+              </div>
+    </form>
+  </div>

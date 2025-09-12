@@ -28,4 +28,5 @@ Sistema web diseñado para nutriólogos que permite gestionar pacientes, crear p
 
 - Abre tu navegador y visita:
 
-http://localhost:3000
+http://localhost:3001 
+- cambia de puerto si es necesario

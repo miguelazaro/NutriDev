@@ -5,10 +5,10 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const { Cobro, StripeAccount } = require('../models/associations_cobros'); // Cobro + StripeAccount
 const { Paciente } = require('../models/associations');                    // Paciente REAL
 
-const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
+const BASE_URL = process.env.BASE_URL || 'http://localhost:3001';
 
 /* =========================
-   Helpers
+  Helpers
 ========================= */
 async function getStripeAccountForUser(usuarioId) {
   const acc = await StripeAccount.findOne({ where: { usuario_id: usuarioId } });
@@ -33,7 +33,7 @@ async function getStripeAccountForUser(usuarioId) {
 }
 
 /* =========================
-   Vista principal /cobros
+  Vista principal /cobros
 ========================= */
 exports.vistaPrincipal = async (req, res) => {
   const user = req.session?.usuario;
@@ -45,8 +45,8 @@ exports.vistaPrincipal = async (req, res) => {
   try {
     cobros = await Cobro.findAll({
       where: { usuario_id: user.id },
-      include: [{ model: Paciente, attributes: ['nombre'] }], // requiere la asociación Cobro.belongsTo(Paciente)
-      order: [['createdAt', 'DESC']] // <- usar createdAt; no existe 'fecha'
+      include: [{ model: Paciente, attributes: ['nombre'] }],
+      order: [['createdAt', 'DESC']]
     });
   } catch (e) {
     console.error('Error consultando cobros:', e);
@@ -57,13 +57,12 @@ exports.vistaPrincipal = async (req, res) => {
     user,
     cobros,
     stripeCuenta,
-    active: 'cobros',
-    messages: req.flash()
+    active: 'cobros'
   });
 };
 
 /* =========================
-   Stripe Connect onboarding
+  Stripe Connect onboarding
 ========================= */
 exports.stripeConnectStart = async (req, res) => {
   const user = req.session?.usuario;
@@ -73,8 +72,8 @@ exports.stripeConnectStart = async (req, res) => {
 
   if (!acc) {
     const created = await stripe.accounts.create({
-      type: 'standard',               // Connect Standard
-      email: user.email || undefined, // ayuda a Stripe a precargar
+      type: 'standard',
+      email: user.email || undefined,
       business_type: 'individual'
     });
 
@@ -111,7 +110,7 @@ exports.stripeReturn = async (req, res) => {
 };
 
 /* =========================
-   Nuevo cobro vía Checkout
+  Nuevo cobro vía Checkout
 ========================= */
 exports.formNuevoCobro = async (req, res) => {
   const user = req.session?.usuario;
@@ -128,8 +127,7 @@ exports.formNuevoCobro = async (req, res) => {
   res.render('cobros_nuevo', {
     pacientes,
     active: 'cobros',
-    user,
-    messages: req.flash()
+    user
   });
 };
 
@@ -169,26 +167,27 @@ exports.crearCobroCheckout = async (req, res) => {
             }
           }
         ],
-        success_url: `${BASE_URL}/cobros?ok=1`,
+        // IMPORTANTE: include session_id para confirmar al volver
+        success_url: `${BASE_URL}/cobros/confirm?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${BASE_URL}/cobros?cancel=1`
-        // application_fee_amount: Math.round(amount * 0.05), // si cobras comisión (Connect)
       },
       {
         stripeAccount: stripeCuenta.connected_account_id // cobra en la cuenta del nutriólogo
       }
     );
 
-    // Guarda pre‑cobro local como "pendiente"
+    // Guarda pre-cobro local como "pendiente"
     await Cobro.create({
       usuario_id: user.id,
       paciente_id,
       concepto,
-      monto_centavos: amount,                 // INTEGER en centavos
+      monto_centavos: amount,
       moneda: 'MXN',
       estado: 'pendiente',
-      stripe_checkout_session_id: session.id, // nombres alineados con tu modelo
-      stripe_account_id: stripeCuenta.connected_account_id
-      // NO 'fecha': usamos createdAt automático
+      stripe_checkout_session_id: session.id, // compat
+      stripe_session_id: session.id,         // preferido
+      stripe_account_id: stripeCuenta.connected_account_id,
+      url_cobro: session.url
     });
 
     return res.redirect(303, session.url);
@@ -200,7 +199,58 @@ exports.crearCobroCheckout = async (req, res) => {
 };
 
 /* =========================
-   Extras (placeholders)
+  Confirmación al volver del Checkout (fallback si el webhook tarda)
+========================= */
+exports.confirmarDesdeSession = async (req, res) => {
+  const user = req.session?.usuario;
+  if (!user) return res.redirect('/login');
+
+  const sessionId = req.query.session_id;
+  if (!sessionId) return res.redirect('/cobros');
+
+  try {
+    // Busca el cobro para conocer la cuenta conectada
+    const cobro = await Cobro.findOne({
+      where: { stripe_checkout_session_id: sessionId, usuario_id: user.id }
+    });
+
+    if (!cobro) {
+      req.flash('error', 'No se encontró el cobro de esta sesión.');
+      return res.redirect('/cobros');
+    }
+
+    // Recupera la sesión desde la cuenta conectada
+    const s = await stripe.checkout.sessions.retrieve(sessionId, {
+      stripeAccount: cobro.stripe_account_id || undefined
+    });
+
+    // Si está pagado, actualiza
+    const paid = (s.payment_status === 'paid') || (s.status === 'complete');
+    if (paid && cobro.estado !== 'pagado') {
+      await cobro.update({
+        estado: 'pagado',
+        moneda: (s.currency || cobro.moneda || 'mxn').toUpperCase(),
+        monto_centavos: Number(s.amount_total || cobro.monto_centavos || 0),
+        fecha: s.created ? new Date(s.created * 1000) : new Date(),
+        stripe_payment_intent_id: typeof s.payment_intent === 'string'
+          ? s.payment_intent
+          : s.payment_intent?.id || cobro.stripe_payment_intent_id
+      });
+      req.flash('success', 'Pago confirmado.');
+    } else if (!paid) {
+      req.flash('error', 'El pago no se completó.');
+    }
+
+    return res.redirect('/cobros');
+  } catch (e) {
+    console.error('Error confirmando sesión:', e);
+    req.flash('error', 'No se pudo confirmar el pago.');
+    return res.redirect('/cobros');
+  }
+};
+
+/* =========================
+  Extras (placeholders)
 ========================= */
 exports.verCobro = async (req, res) => {
   req.flash('error', 'Vista de detalle no implementada aún.');

@@ -1,4 +1,3 @@
-// controllers/recetaController.js
 const { Op } = require('sequelize');
 const Receta = require('../models/Receta');
 const PlanAlimenticio = require('../models/PlanAlimenticio');
@@ -10,7 +9,6 @@ const PUBLIC_OWNER_ID = parseInt(process.env.RECETAS_PUBLIC_USER_ID || '2', 10);
 /* =========================
   Helpers
 ========================= */
-
 const normalizeImagen = (img) => {
   if (!img) return null;
   const val = String(img).trim();
@@ -56,7 +54,7 @@ const normEnumDificultad = (v) => {
 };
 
 /* =========================
-  INDEX (Listado general)
+  INDEX
 ========================= */
 const index = async (req, res) => {
   const { q: busqueda, categoria, etiqueta, page = 1 } = req.query;
@@ -87,10 +85,7 @@ const index = async (req, res) => {
     }
 
     const { count: totalItems, rows } = await Receta.findAndCountAll({
-      where,
-      limit,
-      offset,
-      order: [['titulo', 'ASC']]
+      where, limit, offset, order: [['titulo', 'ASC']]
     });
 
     const recetas = rows.map(r => {
@@ -124,10 +119,9 @@ const index = async (req, res) => {
       active: 'recetas',
       user,
       messages: req.flash(),
-      // 👇 props para el EJS
+      // props para el EJS
       addToPlanId,
       backToPlanURL,
-      // por si lo necesitas en otros lugares
       query: req.query
     });
   } catch (error) {
@@ -175,11 +169,7 @@ const ver = async (req, res) => {
 
 const importarDesdeAPI = async (req, res) => {
   const user = req.session?.usuario || {};
-
-  if (!user.id) {
-    req.flash('error', 'Debes iniciar sesión para importar recetas.');
-    return res.redirect('/login');
-  }
+  if (!user.id) { req.flash('error', 'Debes iniciar sesión para importar recetas.'); return res.redirect('/login'); }
 
   try {
     const { titulo, categoria, dataAPI } = req.body;
@@ -247,14 +237,9 @@ const papelera = async (req, res) => {
       if (!user.id) {
         return res.render('papelera', {
           layout: 'layouts/sistema',
-          recetas: [],
-          categorias: [],
-          etiquetas: [],
-          busquedaNombre: '',
-          busquedaCategoria: '',
-          busquedaEtiqueta: '',
-          user,
-          messages: req.flash()
+          recetas: [], categorias: [], etiquetas: [],
+          busquedaNombre: '', busquedaCategoria: '', busquedaEtiqueta: '',
+          user, messages: req.flash()
         });
       }
       where.usuario_id = user.id;
@@ -279,14 +264,9 @@ const papelera = async (req, res) => {
 
     res.render('papelera', {
       layout: 'layouts/sistema',
-      recetas,
-      categorias,
-      etiquetas,
-      busquedaNombre,
-      busquedaCategoria,
-      busquedaEtiqueta,
-      user,
-      messages: req.flash()
+      recetas, categorias, etiquetas,
+      busquedaNombre, busquedaCategoria, busquedaEtiqueta,
+      user, messages: req.flash()
     });
   } catch (error) {
     console.error('Error al cargar la papelera:', error);
@@ -294,12 +274,16 @@ const papelera = async (req, res) => {
   }
 };
 
+// Archivar receta
 const archivar = async (req, res) => {
   const user = req.session?.usuario || {};
   try {
     const receta = await Receta.findByPk(req.params.id);
-    if (!receta || !isOwnerOrAdmin(user, receta)) {
-      return res.status(403).send('No autorizado');
+    if (!receta) { req.flash('error', 'Receta no encontrada'); return res.redirect('/recetas'); }
+    const esDuenio = user.id && receta.usuario_id === user.id;
+    if (user.rol !== 'admin' && !esDuenio) {
+      req.flash('error', 'No autorizado');
+      return res.redirect('/recetas');
     }
     receta.archivada = true;
     await receta.save();
@@ -312,8 +296,16 @@ const archivar = async (req, res) => {
   }
 };
 
+// Nueva (formulario)
 const nueva = (req, res) => {
-  res.render('recetas_form', { layout: 'layouts/sistema', receta: null, active: 'recetas', messages: req.flash() });
+  const user = req.session?.usuario || {};
+  if (!user.id) return res.redirect('/login');
+  res.render('recetas_form', {
+    layout: 'layouts/sistema',
+    receta: null,
+    active: 'recetas',
+    messages: req.flash()
+  });
 };
 
 const guardar = async (req, res) => {
@@ -344,9 +336,7 @@ const guardar = async (req, res) => {
       archivada:          false
     };
 
-    if (req.file) {
-      dataToCreate.imagen = `/uploads/recetas/${req.file.filename}`;
-    }
+    if (req.file) dataToCreate.imagen = `/uploads/recetas/${req.file.filename}`;
 
     await Receta.create(dataToCreate);
 
@@ -362,19 +352,21 @@ const guardar = async (req, res) => {
 const editar = async (req, res) => {
   const user = req.session?.usuario || {};
   const receta = await Receta.findByPk(req.params.id);
-  if (!receta || !isOwnerOrAdmin(user, receta)) {
-    return res.status(403).send('No autorizado');
-  }
-  res.render('recetas_form', { layout: 'layouts/sistema', receta: receta.get({ plain: true }), active: 'recetas', messages: req.flash() });
+  if (!receta || !isOwnerOrAdmin(user, receta)) return res.status(403).send('No autorizado');
+
+  res.render('recetas_form', {
+    layout: 'layouts/sistema',
+    receta: receta.get({ plain: true }),
+    active: 'recetas',
+    messages: req.flash()
+  });
 };
 
 const actualizar = async (req, res) => {
   const user = req.session?.usuario || {};
   try {
     const receta = await Receta.findByPk(req.params.id);
-    if (!receta || !isOwnerOrAdmin(user, receta)) {
-      return res.status(403).send('No autorizado');
-    }
+    if (!receta || !isOwnerOrAdmin(user, receta)) return res.status(403).send('No autorizado');
 
     const dataToUpdate = {
       titulo: req.body.titulo,
@@ -393,9 +385,7 @@ const actualizar = async (req, res) => {
       grasas:             toFloat(req.body.grasas)
     };
 
-    if (req.file) {
-      dataToUpdate.imagen = `/uploads/recetas/${req.file.filename}`;
-    }
+    if (req.file) dataToUpdate.imagen = `/uploads/recetas/${req.file.filename}`;
 
     await receta.update(dataToUpdate);
     req.flash('success', 'Receta actualizada correctamente.');
@@ -411,9 +401,8 @@ const eliminar = async (req, res) => {
   const user = req.session?.usuario || {};
   try {
     const receta = await Receta.findByPk(req.params.id);
-    if (!receta || !isOwnerOrAdmin(user, receta)) {
-      return res.status(403).send('No autorizado');
-    }
+    if (!receta || !isOwnerOrAdmin(user, receta)) return res.status(403).send('No autorizado');
+
     await receta.destroy();
     req.flash('success', 'Receta eliminada permanentemente.');
     res.redirect('/recetas/papelera');
@@ -428,9 +417,8 @@ const restaurar = async (req, res) => {
   const user = req.session?.usuario || {};
   try {
     const receta = await Receta.findByPk(req.params.id);
-    if (!receta || !isOwnerOrAdmin(user, receta)) {
-      return res.status(403).send('No autorizado');
-    }
+    if (!receta || !isOwnerOrAdmin(user, receta)) return res.status(403).send('No autorizado');
+
     receta.archivada = false;
     await receta.save();
     req.flash('success', 'Receta restaurada correctamente.');
@@ -442,69 +430,9 @@ const restaurar = async (req, res) => {
   }
 };
 
-const misRecetas = async (req, res) => {
-  const { q: busqueda, page = 1 } = req.query;
-  const user = req.session?.usuario || {};
-  if (!user.id) return res.redirect('/login');
-
-  if (!canSeeMisRecetas(user)) {
-    req.flash('error', 'Necesitas plan Premium para acceder a Mis Recetas.');
-    return res.redirect('/recetas');
-  }
-
-  const limit = 12;
-  const offset = (page - 1) * limit;
-
-  // soporta ?addToPlan=, ?planId= o ?plan_id=
-  const addToPlanId = req.query.addToPlan || req.query.planId || req.query.plan_id || null;
-  const backToPlanURL = addToPlanId ? `/planes-alimenticios/${addToPlanId}` : null;
-
-  try {
-    const where = { archivada: false, usuario_id: user.id };
-    if (busqueda) where.titulo = { [Op.like]: `%${busqueda}%` };
-
-    const { count: totalItems, rows } = await Receta.findAndCountAll({
-      where,
-      limit,
-      offset,
-      order: [['titulo', 'ASC']]
-    });
-
-    const recetas = rows.map(r => {
-      const plain = r.get({ plain: true });
-      plain.imagen = normalizeImagen(plain.imagen);
-      return plain;
-    });
-
-    const totalPages = Math.max(1, Math.ceil(totalItems / limit));
-    const currentPage = Math.max(1, Math.min(parseInt(page, 10) || 1, totalPages));
-
-    res.render('recetas', {
-      layout: 'layouts/sistema',
-      recetas,
-      categorias: [],
-      etiquetas: [],
-      busqueda,
-      categoriaSeleccionada: null,
-      etiquetaSeleccionada: null,
-      pagination: { totalItems, totalPages, currentPage, limit, offset },
-      active: 'recetas',
-      user,
-      messages: req.flash(),
-      tituloPagina: 'Mis Recetas',
-      // 👇 props para el EJS
-      addToPlanId,
-      backToPlanURL,
-      query: req.query
-    });
-  } catch (error) {
-    console.error('Error en misRecetas:', error);
-    req.flash('error', 'Error al cargar tus recetas');
-    res.redirect('/');
-  }
-};
-
-// helpers markdown
+/* =========================
+  Helpers para agregar a Plan
+========================= */
 const DIAS_ES = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
 const MEAL_MAP = {
   'desayuno': 'Desayuno',
@@ -570,10 +498,7 @@ const agregarAPlanForm = async (req, res) => {
     }
 
     const receta = await Receta.findByPk(recetaId);
-    if (!receta) {
-      req.flash('error', 'Receta no encontrada.');
-      return res.redirect('/recetas');
-    }
+    if (!receta) { req.flash('error', 'Receta no encontrada.'); return res.redirect('/recetas'); }
 
     // Acepta plan_id, planId o addToPlan
     const prePlanId = req.query.plan_id || req.query.planId || req.query.addToPlan || null;
@@ -629,7 +554,7 @@ const agregarAPlan = async (req, res) => {
       return backToFormWithPlan(plan_id);
     }
 
-    // Normaliza fecha (el input date envía YYYY-MM-DD; si llegara en otro formato, intentamos parsear)
+    // Normaliza fecha
     const tryDate = new Date(fecha);
     if (Number.isNaN(tryDate.getTime())) {
       await t.rollback();
@@ -638,8 +563,8 @@ const agregarAPlan = async (req, res) => {
     }
 
     // Normaliza / mapea el momento
-    const mealHdr = (MEAL_MAP[String(momento).toLowerCase()] || 'Comida') + ':'; // "Desayuno:" / "Comida:" ...
-    const dayHdr  = dayHeader(fecha);                                            // "Lunes:"
+    const mealHdr = (MEAL_MAP[String(momento).toLowerCase()] || 'Comida') + ':';
+    const dayHdr  = dayHeader(fecha);
     const bullet  = buildBullet(receta, toInt(porciones) || 1, (notas || '').trim());
 
     let planDestino = null;
@@ -651,7 +576,6 @@ const agregarAPlan = async (req, res) => {
         req.flash('error', 'El plan seleccionado no existe.');
         return backToFormWithPlan(plan_id);
       }
-      // (opcional) si el plan ya tiene paciente y no coincide, no bloqueamos, pero podrías validar aquí.
     } else {
       // Crea plan manual vacío si no enviaron plan_id
       planDestino = await PlanAlimenticio.create({
