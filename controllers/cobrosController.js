@@ -5,7 +5,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const { Cobro, StripeAccount } = require('../models/associations_cobros'); // Cobro + StripeAccount
 const { Paciente } = require('../models/associations');                    // Paciente REAL
 
-const BASE_URL = process.env.BASE_URL || 'http://localhost:3001';
+const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
 
 /* =========================
   Helpers
