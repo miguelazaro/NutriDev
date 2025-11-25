@@ -1,4 +1,3 @@
-// models/Paciente.js
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 
@@ -87,9 +86,9 @@ const Paciente = sequelize.define('Paciente', {
     }
 });
 
-const Cita = require('./Cita');
-Paciente.hasMany(Cita, { foreignKey: 'paciente_id', as: 'citas' });
-Cita.belongsTo(Paciente, { foreignKey: 'paciente_id', as: 'paciente' });
+//const Cita = require('./Cita');
+//Paciente.hasMany(Cita, { foreignKey: 'paciente_id', as: 'citas' });
+//Cita.belongsTo(Paciente, { foreignKey: 'paciente_id', as: 'paciente' });
 
 
 module.exports = Paciente;

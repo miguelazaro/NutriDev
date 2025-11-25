@@ -1,126 +1,141 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
   <!-- NOTIFICACIONES -->
-  <% if (messages.success && messages.success.length > 0) { %>
+  <% if (messages.success && messages.success.length> 0) { %>
     <div id="flash-message"
       class="fixed top-6 left-1/2 -translate-x-1/2 bg-green-100 border border-green-400 text-green-800 text-sm px-4 py-2 rounded shadow z-50 transition-all duration-500">
       <%= messages.success[0] %>
     </div>
-  <% } %>
+    <% } %>
 
-  <% if (messages.error && messages.error.length > 0) { %>
-    <div id="flash-message"
-      class="fixed top-6 left-1/2 -translate-x-1/2 bg-red-100 border border-red-400 text-red-800 text-sm px-4 py-2 rounded shadow z-50 transition-all duration-500">
-      <%= messages.error[0] %>
-    </div>
-  <% } %>
-
-  <!-- ENCABEZADO -->
-  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-    <div>
-      <h1 class="text-3xl font-bold text-emerald-700">Gestión de citas</h1>
-      <p class="text-sm text-gray-500">Administra las citas médicas de tus pacientes.</p>
-    </div>
-    <a href="/citas/nueva"
-      class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold px-4 py-2 rounded-lg shadow transition-all duration-300">
-      <i class="fas fa-calendar-plus"></i>
-      Nueva cita
-    </a>
-  </div>
-
-  <div class="flex flex-col lg:flex-row gap-6">
-    <!-- LISTADO PRINCIPAL -->
-    <div class="w-full lg:w-2/3 space-y-4">
-
-      <!-- FILTROS Y BÚSQUEDA -->
-      <div class="bg-white rounded-lg shadow p-4 flex flex-col sm:flex-row gap-4 sm:items-end">
-        <div class="flex-1">
-          <label class="block text-sm font-medium text-gray-700 mb-1">Buscar cita</label>
-          <input id="searchInput" type="text" placeholder="Paciente, fecha, estado..."
-            class="w-full border border-gray-300 rounded p-2 focus:ring-emerald-500 focus:border-emerald-500" />
+      <% if (messages.error && messages.error.length> 0) { %>
+        <div id="flash-message"
+          class="fixed top-6 left-1/2 -translate-x-1/2 bg-red-100 border border-red-400 text-red-800 text-sm px-4 py-2 rounded shadow z-50 transition-all duration-500">
+          <%= messages.error[0] %>
         </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Filtrar</label>
-          <select id="filter" class="border border-gray-300 rounded p-2 w-full focus:ring-emerald-500 focus:border-emerald-500">
-            <option>Todos</option>
-            <option>Pendientes</option>
-            <option>Completadas</option>
-            <option>Canceladas</option>
-          </select>
-        </div>
-      </div>
+        <% } %>
 
-      <!-- LISTADO DE CITAS -->
-      <div id="citasList" class="space-y-4">
-        <% if (citas.length === 0) { %>
-          <div class="bg-white p-6 rounded-lg shadow text-center text-gray-500">
-            <i class="fas fa-calendar-times text-4xl mb-3 text-gray-300"></i>
-            <p>No hay citas registradas.</p>
+          <!-- ENCABEZADO -->
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h1 class="text-3xl font-bold text-emerald-700">Gestión de citas</h1>
+              <p class="text-sm text-gray-500">Administra las citas médicas de tus pacientes.</p>
+            </div>
+            <a href="/citas/nueva"
+              class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold px-4 py-2 rounded-lg shadow transition-all duration-300">
+              <i class="fas fa-calendar-plus"></i>
+              Nueva cita
+            </a>
           </div>
-        <% } else { %>
-          <% citas.forEach(c => { %>
-            <div class="bg-white p-4 rounded-lg shadow flex flex-col md:flex-row justify-between items-start md:items-center gap-4 cita"
-              data-paciente="<%= c.paciente.toLowerCase() %>"
-              data-fecha="<%= c.fecha %>"
-              data-estado="<%= c.estado.toLowerCase() %>">
 
-              <div class="space-y-1">
-                <h3 class="text-lg font-semibold text-gray-800"><%= c.paciente %></h3>
-                <p class="text-sm text-gray-600">Fecha: <%= new Date(c.fecha).toLocaleString('es-MX') %></p>
-                <p class="text-sm text-gray-500">Motivo: <%= c.motivo || 'Sin especificar' %></p>
-                <p class="text-sm">
-                  Estado:
-                  <span class="font-semibold <%= c.estado === 'Pendiente' ? 'text-yellow-600' : c.estado === 'Completada' ? 'text-green-600' : 'text-red-600' %>">
-                    <%= c.estado %>
-                  </span>
-                </p>
+          <div class="flex flex-col lg:flex-row gap-6">
+            <!-- LISTADO PRINCIPAL -->
+            <div class="w-full lg:w-2/3 space-y-4">
+
+              <!-- FILTROS Y BÚSQUEDA -->
+              <div class="bg-white rounded-lg shadow p-4 flex flex-col sm:flex-row gap-4 sm:items-end">
+                <div class="flex-1">
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Buscar cita</label>
+                  <input id="searchInput" type="text" placeholder="Paciente, fecha, hora, motivo..."
+                    class="w-full border border-gray-300 rounded p-2 focus:ring-emerald-500 focus:border-emerald-500" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Filtrar</label>
+                  <select id="filter"
+                    class="border border-gray-300 rounded p-2 w-full focus:ring-emerald-500 focus:border-emerald-500">
+                    <option>Todos</option>
+                    <option>Pendientes</option>
+                    <option>Confirmadas</option>
+                    <option>Canceladas</option>
+                    <option>Completadas</option>
+                  </select>
+                </div>
               </div>
 
-              <div class="flex gap-2 self-start md:self-center">
-                <a href="/citas/<%= c.id %>" class="btn-icon bg-emerald-100 text-emerald-600 hover:bg-emerald-200" title="Ver detalles">
-                  <i class="fas fa-eye"></i>
-                </a>
-                <a href="/citas/editar/<%= c.id %>" class="btn-icon bg-blue-100 text-blue-600 hover:bg-blue-200" title="Editar">
-                  <i class="fas fa-pen"></i>
-                </a>
-                <form action="/citas/eliminar/<%= c.id %>" method="POST" onsubmit="return confirm('¿Eliminar esta cita?')">
-                  <button type="submit" class="btn-icon bg-red-100 text-red-600 hover:bg-red-200" title="Eliminar">
-                    <i class="fas fa-trash"></i>
-                  </button>
-                </form>
+              <!-- LISTADO DE CITAS -->
+              <div id="citasList" class="space-y-4">
+                <% if (citas.length===0) { %>
+                  <div class="bg-white p-6 rounded-lg shadow text-center text-gray-500">
+                    <i class="fas fa-calendar-times text-4xl mb-3 text-gray-300"></i>
+                    <p>No hay citas registradas.</p>
+                  </div>
+                  <% } else { %>
+                    <% citas.forEach(c=> { %>
+                      <div
+                        class="bg-white p-4 rounded-lg shadow flex flex-col md:flex-row justify-between items-start md:items-center gap-4 cita"
+                        data-paciente="<%= c.paciente.toLowerCase() %>" data-fecha="<%= c.fecha %>"
+                        data-hora="<%= c.hora ? c.hora.toLowerCase() : '' %>"
+                        data-estado="<%= c.estado.toLowerCase() %>"
+                        data-motivo="<%= c.motivo ? c.motivo.toLowerCase() : '' %>">
+
+                        <div class="space-y-1">
+                          <h3 class="text-lg font-semibold text-gray-800">
+                            <%= c.paciente %>
+                          </h3>
+                          <p class="text-sm text-gray-600">Fecha: <%= c.fecha %> — <%= c.hora %>
+                          </p>
+                          <p class="text-sm text-gray-500">Motivo: <%= c.motivo || 'Sin especificar' %>
+                          </p>
+                          <p class="text-sm">Estado:
+                            <span
+                              class="font-semibold <%= c.estado === 'Pendiente' ? 'text-yellow-600' : c.estado === 'Completada' ? 'text-green-600' : c.estado === 'Confirmada' ? 'text-blue-600' : 'text-red-600' %>">
+                              <%= c.estado %>
+                            </span>
+                          </p>
+                        </div>
+
+                        <div class="flex gap-2 self-start md:self-center">
+                          <a href="/citas/<%= c.id %>"
+                            class="btn-icon bg-emerald-100 text-emerald-600 hover:bg-emerald-200" title="Ver detalles">
+                            <i class="fas fa-eye"></i>
+                          </a>
+                          <a href="/citas/editar/<%= c.id %>"
+                            class="btn-icon bg-blue-100 text-blue-600 hover:bg-blue-200" title="Editar">
+                            <i class="fas fa-pen"></i>
+                          </a>
+                          <form action="/citas/eliminar/<%= c.id %>" method="POST"
+                            onsubmit="return confirm('¿Eliminar esta cita?')">
+                            <button type="submit" class="btn-icon bg-red-100 text-red-600 hover:bg-red-200"
+                              title="Eliminar">
+                              <i class="fas fa-trash"></i>
+                            </button>
+                          </form>
+                        </div>
+                      </div>
+                      <% }) %>
+                        <% } %>
               </div>
             </div>
-          <% }) %>
-        <% } %>
-      </div>
-    </div>
 
-    <!-- ESTADÍSTICAS -->
-    <div class="w-full lg:w-1/3">
-      <div class="bg-white shadow rounded-lg p-4 space-y-6">
-        <h2 class="text-lg font-semibold text-gray-800">Estadísticas</h2>
+            <!-- ESTADÍSTICAS -->
+            <div class="w-full lg:w-1/3">
+              <div class="bg-white shadow rounded-lg p-4 space-y-6">
+                <h2 class="text-lg font-semibold text-gray-800">Estadísticas</h2>
+                <div class="space-y-4">
+                  <div>
+                    <p class="text-sm text-gray-500">Total de citas</p>
+                    <p id="totalCitas" class="text-2xl font-bold text-gray-800">
+                      <%= citas.length %>
+                    </p>
+                  </div>
+                  <div>
+                    <p class="text-sm text-gray-500">Nuevas este mes</p>
+                    <p class="text-2xl font-bold text-gray-800">
+                      <%= nuevasEsteMes %>
+                    </p>
+                  </div>
+                </div>
+              </div>
 
-        <div class="space-y-4">
-          <div>
-            <p class="text-sm text-gray-500">Total de citas</p>
-            <p id="totalCitas" class="text-2xl font-bold text-gray-800"><%= citas.length %></p>
+              <!-- GRÁFICO -->
+              <div class="bg-white shadow rounded-lg p-4 mt-6">
+                <h3 class="text-sm font-semibold text-gray-700 mb-2">Distribución por estado</h3>
+                <div class="relative w-full" style="height: 180px;">
+                  <canvas id="estadoChart"></canvas>
+                </div>
+              </div>
+            </div>
           </div>
-          <div>
-            <p class="text-sm text-gray-500">Nuevas este mes</p>
-            <p class="text-2xl font-bold text-gray-800"><%= nuevasEsteMes %></p>
-          </div>
-        </div>
-      </div>
-
-      <!-- GRÁFICO -->
-      <div class="bg-white shadow rounded-lg p-4 mt-6">
-        <h3 class="text-sm font-semibold text-gray-700 mb-2">Distribución por estado</h3>
-        <div class="relative w-full" style="height: 180px;">
-          <canvas id="estadoChart"></canvas>
-        </div>
-      </div>
-    </div>
-  </div>
 </div>
 
 <style>
@@ -139,7 +154,6 @@
 <script>
   document.addEventListener('DOMContentLoaded', function () {
     const distribucionEstados = JSON.parse('<%- JSON.stringify(distribucionEstados) %>');
-
     const ctx = document.getElementById('estadoChart').getContext('2d');
     new Chart(ctx, {
       type: 'doughnut',
@@ -147,7 +161,7 @@
         labels: Object.keys(distribucionEstados),
         datasets: [{
           data: Object.values(distribucionEstados),
-          backgroundColor: ['#fbbf24', '#10b981', '#ef4444'],
+          backgroundColor: ['#fbbf24', '#10b981', '#3b82f6', '#ef4444'],
         }]
       },
       options: {
@@ -156,46 +170,70 @@
       }
     });
 
-    // Búsqueda en vivo
     const searchInput = document.getElementById('searchInput');
+    const filterSelect = document.getElementById('filter');
     const citas = document.querySelectorAll('.cita');
     const totalCitas = document.getElementById('totalCitas');
     const citasList = document.getElementById('citasList');
 
+    function normalizarEstado(estado) {
+      estado = estado.toLowerCase();
+      if (estado === 'pendientes') return 'pendiente';
+      if (estado === 'completadas') return 'completada';
+      if (estado === 'confirmadas') return 'confirmada';
+      if (estado === 'canceladas') return 'cancelada';
+      // ya está en singular
+      return estado;
+    }
+
     function filtrarCitas() {
       const term = searchInput.value.toLowerCase().trim();
+      const filtroEstado = normalizarEstado(filterSelect.value);
       let visible = 0;
 
       citas.forEach(cita => {
-        const paciente = cita.dataset.paciente;
-        const fecha = cita.dataset.fecha;
-        const estado = cita.dataset.estado;
-        const matches = paciente.includes(term) || fecha.includes(term) || estado.includes(term);
+        const paciente = cita.dataset.paciente.toLowerCase();
+        const fecha = cita.dataset.fecha.toLowerCase();
+        const hora = cita.dataset.hora ? cita.dataset.hora.toLowerCase() : '';
+        const estado = normalizarEstado(cita.dataset.estado);
+        const motivo = cita.dataset.motivo ? cita.dataset.motivo.toLowerCase() : '';
 
-        cita.style.display = matches || term === '' ? '' : 'none';
-        if (matches || term === '') visible++;
+        const coincideBusqueda = paciente.includes(term) || fecha.includes(term) || hora.includes(term) || motivo.includes(term);
+        const coincideEstado = filtroEstado === 'todos' || estado === filtroEstado;
+
+        if (coincideBusqueda && coincideEstado) {
+          cita.style.display = '';
+          visible++;
+        } else {
+          cita.style.display = 'none';
+        }
       });
 
       totalCitas.textContent = visible;
-      if (visible === 0) {
-        citasList.innerHTML = `
-          <div class="bg-white p-6 rounded-lg shadow text-center text-gray-500">
-            <i class="fas fa-search text-4xl mb-3 text-gray-300"></i>
-            <p>No se encontraron citas.</p>
-          </div>`;
+
+      // mensaje de "no se encontraron citas"
+      let mensaje = document.getElementById('mensaje-no-citas');
+      if (!mensaje) {
+        mensaje = document.createElement('div');
+        mensaje.id = 'mensaje-no-citas';
+        mensaje.className = 'bg-white p-6 rounded-lg shadow text-center text-gray-500';
+        mensaje.innerHTML = `<i class="fas fa-search text-4xl mb-3 text-gray-300"></i><p>No se encontraron citas.</p>`;
+        citasList.parentNode.appendChild(mensaje);
       }
+      mensaje.style.display = visible === 0 ? 'block' : 'none';
     }
+
 
     searchInput.addEventListener('input', filtrarCitas);
-  });
-</script>
+    filterSelect.addEventListener('change', filtrarCitas);
 
-<script>
-  setTimeout(() => {
-    const flash = document.getElementById('flash-message');
-    if (flash) {
-      flash.style.opacity = '0';
-      setTimeout(() => flash.remove(), 500);
-    }
-  }, 5000);
+    // Mensaje flash desaparece automáticamente
+    setTimeout(() => {
+      const flash = document.getElementById('flash-message');
+      if (flash) {
+        flash.style.opacity = '0';
+        setTimeout(() => flash.remove(), 500);
+      }
+    }, 5000);
+  });
 </script>
