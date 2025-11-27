@@ -1,0 +1,128 @@
+<div class="max-w-3xl mx-auto px-4 py-6">
+
+  <!-- ENCABEZADO -->
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold text-emerald-700 flex items-center gap-2">
+      <i class="fas fa-edit"></i> Editar Cita
+    </h1>
+    <a href="/citas"
+      class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg shadow transition">
+      Volver
+    </a>
+  </div>
+
+  <!-- NOTIFICACIONES -->
+  <% if (messages.error && messages.error.length > 0) { %>
+    <div class="bg-red-100 border border-red-300 text-red-800 p-3 mb-4 rounded-lg shadow">
+      <% messages.error.forEach(msg => { %>
+        <p><%= msg %></p>
+      <% }) %>
+    </div>
+  <% } %>
+
+  <% if (messages.success && messages.success.length > 0) { %>
+    <div class="bg-green-100 border border-green-300 text-green-800 p-3 mb-4 rounded-lg shadow">
+      <% messages.success.forEach(msg => { %>
+        <p><%= msg %></p>
+      <% }) %>
+    </div>
+  <% } %>
+
+  <!-- FORMULARIO -->
+  <div class="bg-white rounded-xl shadow-lg p-6 space-y-6">
+
+    <form action="/citas/actualizar/<%= cita.id %>" method="POST" class="space-y-5">
+
+      <!-- PACIENTE -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-1">Paciente</label>
+        <select name="paciente" id="paciente"
+          class="border border-gray-300 rounded-lg p-2 w-full focus:ring-emerald-500 focus:border-emerald-500 transition"
+          required>
+          <% pacientes.forEach(p => { %>
+            <option value="<%= p.id %>" <%= p.id === cita.paciente_id ? 'selected' : '' %>>
+              <%= p.nombre %>
+            </option>
+          <% }) %>
+        </select>
+      </div>
+
+      <!-- FILA: FECHA Y HORA -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <!-- Fecha -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">Fecha</label>
+          <input type="date" name="fecha" id="fecha"
+            class="border border-gray-300 rounded-lg p-2 w-full focus:ring-emerald-500 focus:border-emerald-500 transition"
+            value="<%= new Date(cita.fecha).toISOString().split('T')[0] %>"
+            required>
+        </div>
+
+        <!-- Hora -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">Hora</label>
+          <input type="time" name="hora" id="hora"
+            class="border border-gray-300 rounded-lg p-2 w-full focus:ring-emerald-500 focus:border-emerald-500 transition"
+            value="<%= cita.hora %>"
+            required>
+        </div>
+      </div>
+
+      <!-- MOTIVO -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-1">Motivo</label>
+        <input type="text" name="motivo" id="motivo"
+          class="border border-gray-300 rounded-lg p-2 w-full focus:ring-emerald-500 focus:border-emerald-500 transition"
+          value="<%= cita.motivo %>"
+          required>
+      </div>
+
+      <!-- OBSERVACIONES -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-1">Observaciones</label>
+        <textarea name="observaciones" id="observaciones"
+          class="border border-gray-300 rounded-lg p-2 w-full focus:ring-emerald-500 focus:border-emerald-500 transition"
+          rows="4"
+          placeholder="Comentarios adicionales (opcional)"><%= cita.observaciones || '' %></textarea>
+      </div>
+
+      <!-- ESTADO -->
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-1">Estado</label>
+        <select name="estado" id="estado"
+          class="border border-gray-300 rounded-lg p-2 w-full focus:ring-emerald-500 focus:border-emerald-500 transition">
+          <option value="Pendiente"  <%= cita.estado === 'Pendiente'  ? 'selected' : '' %>>Pendiente</option>
+          <option value="Confirmada" <%= cita.estado === 'Confirmada' ? 'selected' : '' %>>Confirmada</option>
+          <option value="Cancelada"  <%= cita.estado === 'Cancelada'  ? 'selected' : '' %>>Cancelada</option>
+          <option value="Completada"<%= cita.estado === 'Completada'? 'selected' : '' %>>Completada</option>
+        </select>
+      </div>
+
+      <!-- BOTONES -->
+      <div class="flex gap-3 pt-4">
+        <button type="submit"
+          class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-semibold shadow transition">
+          Guardar Cambios
+        </button>
+
+        <a href="/citas"
+          class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-5 py-2 rounded-lg font-semibold shadow transition">
+          Cancelar
+        </a>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+
+<style>
+  /* Animación suave de entrada */
+  .fade-in {
+    animation: fadeIn 0.4s ease-in-out;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>

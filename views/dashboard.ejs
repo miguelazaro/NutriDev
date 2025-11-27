@@ -36,6 +36,37 @@
                 $<%= (Number(ultimoIngreso) || 0).toLocaleString('es-MX', { minimumFractionDigits: 0 }) %> MXN
             </span>
         </div>
+        
+        <!-- Citas registradas -->
+        <div class="bg-white p-5 rounded-xl shadow-md text-center hover:shadow-lg transition">
+            <i class="fas fa-calendar-alt text-3xl text-red-500 mb-2"></i>
+            <p class="text-gray-600 text-sm">Citas registradas</p>
+            <h2 class="text-2xl font-bold text-gray-800 mt-1">
+                <%= Number(totalCitasDashboard || 0) %>
+            </h2>
+        </div>
 
     </div>
 </main>
+
+<script>
+  // Animación de conteo simple para todas las tarjetas
+  document.addEventListener('DOMContentLoaded', () => {
+    const counters = document.querySelectorAll('h2.text-2xl');
+    counters.forEach(counter => {
+      const target = Number(counter.textContent);
+      counter.textContent = 0;
+      let count = 0;
+      const step = Math.ceil(target / 50);
+      const interval = setInterval(() => {
+        count += step;
+        if(count >= target) {
+          counter.textContent = target;
+          clearInterval(interval);
+        } else {
+          counter.textContent = count;
+        }
+      }, 15);
+    });
+  });
+</script>

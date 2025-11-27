@@ -1,6 +1,6 @@
-// models/associations.js
 const Usuario          = require('./Usuario');
 const Paciente         = require('./Paciente');
+const Cita             = require('./Cita');  
 const NotaNutriologo   = require('./NotaNutriologo');
 const Progreso         = require('./Progreso');
 const ArchivoPaciente  = require('./ArchivoPaciente');
@@ -67,9 +67,22 @@ PlanAlimenticio.belongsTo(Paciente, {
   as: 'paciente',
 });
 
+// Un paciente puede tener muchas citas
+Paciente.hasMany(Cita, {
+  foreignKey: 'paciente_id',
+  as: 'citas'
+});
+
+// Una cita pertenece a un paciente
+Cita.belongsTo(Paciente, {
+  foreignKey: 'paciente_id',
+  as: 'paciente'
+});
+
 module.exports = {
   Usuario,
   Paciente,
+  Cita,
   NotaNutriologo,
   Progreso,
   ArchivoPaciente,

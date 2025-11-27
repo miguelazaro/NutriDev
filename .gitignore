@@ -1,6 +1,7 @@
 # node_modules no debe subirse nunca
 node_modules/
 public/uploads/
+public/storage/
 
 # Archivo de variables de entorno
 .env
@@ -16,3 +17,7 @@ Thumbs.db
 tailwindcss.exe.exe
 "*.exe" 
 "*.exe~" 
+
+#Tailwind CSS estilos generados
+public/css/output.css
+public/css/*.css

@@ -230,6 +230,10 @@ app.use('/ia', require('./routes/ia'));
 const pacientesRouter = require('./routes/pacientes');
 app.use('/pacientes', requireAuth, (req, res, next) => { res.locals.active = 'pacientes'; next(); }, pacientesRouter);
 
+// Citas
+const citasRouter = require('./routes/citas');
+app.use('/citas', requireAuth, (req, res, next) => { res.locals.active = 'citas'; next(); }, citasRouter);
+
 // Recetas
 const recetasRouter = require('./routes/recetas');
 app.use('/recetas', requireAuth, (req, res, next) => { res.locals.active = 'recetas'; next(); }, recetasRouter);
