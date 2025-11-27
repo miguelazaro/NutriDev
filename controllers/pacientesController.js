@@ -90,7 +90,8 @@ exports.guardar = async (req, res) => {
     const {
       nombre, genero, fecha_nacimiento, pais_residencia, telefono,
       enviar_cuestionario, email, historial,
-      estatura, actividad, objetivo, comidas_dia, preferencias
+      estatura, actividad, objetivo, comidas_dia, preferencias,
+      peso
     } = req.body;
 
     const foto = req.files?.foto?.[0]?.filename || null;
@@ -112,6 +113,7 @@ exports.guardar = async (req, res) => {
       objetivo,
       comidas_dia: comidas_dia ? parseInt(comidas_dia) : null,
       preferencias,
+      peso: peso ? parseFloat(peso) : null,
       usuario_id: userId
     });
 
@@ -153,7 +155,8 @@ exports.actualizar = async (req, res) => {
       nombre, genero, fecha_nacimiento, pais,
       telefono, email, historial,
       estatura, actividad, objetivo, comidas_dia, preferencias,
-      enviar_anamnesis
+      enviar_anamnesis,
+      peso
     } = req.body;
 
     const foto = req.files?.foto?.[0]?.filename || paciente.foto;
@@ -173,6 +176,7 @@ exports.actualizar = async (req, res) => {
       email: email?.trim() || null,
       historial,
       preferencias,
+      peso: peso ? parseFloat(peso) : paciente.peso,
       foto,
       archivo,
       fecha_actualizacion: new Date()
@@ -225,13 +229,63 @@ exports.detalle = async (req, res) => {
       return res.redirect('/pacientes');
     }
 
-    res.render('pacientes/detalle', { paciente: paciente.get({ plain: true }) });
-  } catch (error) {
-    console.error(error);
-    req.flash('error', 'Error al cargar paciente');
-    res.redirect('/pacientes');
-  }
-};
+      // ---------- Cálculo de edad ----------
+      function calcularEdad(fecha) {
+        if (!fecha) return null;
+        const nac = new Date(fecha);
+        const hoy = new Date();
+        let edad = hoy.getFullYear() - nac.getFullYear();
+        const m = hoy.getMonth() - nac.getMonth();
+        if (m < 0 || (m === 0 && hoy.getDate() < nac.getDate())) edad--;
+        return edad;
+      }
+
+      const edad = calcularEdad(paciente.fecha_nacimiento);
+
+      // ---------- Cálculo de TMB ----------
+      let TMB = null;
+
+      if (paciente.peso && paciente.estatura && edad) {
+        if (paciente.genero === 'Masculino') {
+          TMB = 88.362 + (13.397 * paciente.peso) + (4.799 * paciente.estatura) - (5.677 * edad);
+        } else if (paciente.genero === 'Femenino') {
+          TMB = 447.593 + (9.247 * paciente.peso) + (3.098 * paciente.estatura) - (4.330 * edad);
+        }
+      }
+
+      // ---------- Cálculo TDEE ----------
+      let factorActividad = {
+        sedentario: 1.2,
+        ligero: 1.375,
+        moderado: 1.55,
+        intenso: 1.725,
+        muy_intenso: 1.9
+      }[paciente.actividad] || 1.2;
+
+      let TDEE = TMB ? TMB * factorActividad : null;
+
+      // Calorías objetivo según meta
+      let caloriasObjetivo = null;
+      if (TDEE) {
+          if (paciente.objetivo === 'bajar_peso') caloriasObjetivo = TDEE - 450;
+          else if (paciente.objetivo === 'ganar_musculo') caloriasObjetivo = TDEE + 300;
+          else caloriasObjetivo = TDEE; // mantener peso
+      }
+
+      // Enviar a la vista
+      res.render('pacientes/detalle', {
+        paciente: paciente.get({ plain: true }),
+        edad,
+        TMB: TMB ? Math.round(TMB) : null,
+        TDEE: TDEE ? Math.round(TDEE) : null,
+        caloriasObjetivo: caloriasObjetivo ? Math.round(caloriasObjetivo) : null
+      });
+        } catch (error) {
+          console.error(error);
+          req.flash('error', 'Error al cargar paciente');
+          res.redirect('/pacientes');
+        }
+      };
 
 // Subir archivo
 exports.subirArchivo = async (req, res) => {

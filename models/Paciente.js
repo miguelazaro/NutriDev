@@ -40,6 +40,13 @@ const Paciente = sequelize.define('Paciente', {
         allowNull: true,
         validate: { min: 50, max: 250 }
     },
+
+    peso: {
+        type: DataTypes.FLOAT,
+        allowNull: true,
+        validate: { min: 20, max: 400 }
+    },
+    
     actividad: { type: DataTypes.STRING, allowNull: true },
     objetivo: { type: DataTypes.STRING, allowNull: true },
     comidas_dia: {
