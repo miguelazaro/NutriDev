@@ -88,32 +88,125 @@ exports.guardar = async (req, res) => {
 
   try {
     const {
-      nombre, genero, fecha_nacimiento, pais_residencia, telefono,
-      enviar_cuestionario, email, historial,
-      estatura, actividad, objetivo, comidas_dia, preferencias,
-      peso
+      // INFO BÁSICA
+      nombre,
+      genero,
+      fecha_nacimiento,
+      pais,              // select del formulario
+      telefono,
+      email,
+      ocupacion,
+
+      // MOTIVO DE CONSULTA
+      objetivo,
+      meta_especifica,
+      prioridad_objetivo,
+
+      // INFO MÉDICA
+      diabetes,
+      hipertension,
+      higado_graso,
+      gastritis,
+      otras_enfermedades,
+      diabetes_familiar,
+      hipertension_familiar,
+      obesidad_familiar,
+      cancer_familiar,
+      otros_antecedentes,
+      alergias,
+      medicacion_actual,
+      cirugias_previas,
+
+      // MEDICIÓN FÍSICA
+      peso,
+      estatura,
+      porcentaje_grasa,
+      circunferencia_cintura,
+      presion_arterial,
+
+      // ESTILO DE VIDA
+      actividad,
+      frecuencia_ejercicio,
+      tipo_ejercicio,
+      horas_sueno,
+      calidad_sueno,
+      estres,
+
+      // HÁBITOS ALIMENTICIOS
+      comidas_dia,
+      preferencia_alimentaria,
+      consumo_agua,
+      apetito,
+
+      // HISTORIAL
+      historial
     } = req.body;
 
     const foto = req.files?.foto?.[0]?.filename || null;
     const archivo = req.files?.archivo?.[0]?.filename || null;
 
+    console.log('BODY:', req.body);
+console.log('FILES:', req.files);
+
+
     await Paciente.create({
+      // INFO BÁSICA
       nombre,
       genero,
-      fecha_nacimiento,
-      pais_residencia,
+      fecha_nacimiento: fecha_nacimiento || null,
+      pais_residencia: pais || 'México',
       telefono,
-      enviar_cuestionario: enviar_cuestionario === 'on',
       email: email?.trim() || null,
-      historial,
+      ocupacion: ocupacion || null,
+
+      // MOTIVO DE CONSULTA
+      objetivo,
+      meta_especifica: meta_especifica || null,
+      prioridad_objetivo: prioridad_objetivo || null,
+
+      // INFO MÉDICA (checkbox -> boolean)
+      diabetes: !!diabetes,
+      hipertension: !!hipertension,
+      higado_graso: !!higado_graso,
+      gastritis: !!gastritis,
+      otras_enfermedades: otras_enfermedades || null,
+      diabetes_familiar: !!diabetes_familiar,
+      hipertension_familiar: !!hipertension_familiar,
+      obesidad_familiar: !!obesidad_familiar,
+      cancer_familiar: !!cancer_familiar,
+      otros_antecedentes: otros_antecedentes || null,
+      alergias: alergias || null,
+      medicacion_actual: medicacion_actual || null,
+      cirugias_previas: cirugias_previas || null,
+
+      // MEDICIÓN FÍSICA
+      peso: peso ? Number(peso) : null,
+      estatura: estatura ? Number(estatura) : null,
+      porcentaje_grasa: porcentaje_grasa ? Number(porcentaje_grasa) : null,
+      circunferencia_cintura: circunferencia_cintura ? Number(circunferencia_cintura) : null,
+      presion_arterial: presion_arterial || null,
+
+      // ESTILO DE VIDA
+      actividad,
+      frecuencia_ejercicio: frecuencia_ejercicio || null,
+      tipo_ejercicio: tipo_ejercicio || null,
+      horas_sueno: horas_sueno ? Number(horas_sueno) : null,
+      calidad_sueno: calidad_sueno || null,
+      estres: estres || null,
+
+      // HÁBITOS ALIMENTICIOS
+      comidas_dia: comidas_dia ? Number(comidas_dia) : null,
+      preferencia_alimentaria: preferencia_alimentaria || null,
+      consumo_agua: consumo_agua ? Number(consumo_agua) : null,
+      apetito: apetito || null,
+
+      // HISTORIAL
+      historial: historial || null,
+
+      // ARCHIVOS Y USER
       foto,
       archivo,
-      estatura: estatura ? parseInt(estatura) : null,
-      actividad,
-      objetivo,
-      comidas_dia: comidas_dia ? parseInt(comidas_dia) : null,
-      preferencias,
-      peso: peso ? parseFloat(peso) : null,
+      enviar_cuestionario: 0,       // ya no tienes checkbox, lo dejamos en 0
       usuario_id: userId
     });
 
@@ -124,6 +217,7 @@ exports.guardar = async (req, res) => {
     res.status(500).send('Error al guardar paciente');
   }
 };
+
 
 // Obtener un paciente propio (helper)
 async function getPacientePropio(req) {
@@ -152,31 +246,119 @@ exports.actualizar = async (req, res) => {
     if (!paciente) return res.status(404).send('Paciente no encontrado');
 
     const {
-      nombre, genero, fecha_nacimiento, pais,
-      telefono, email, historial,
-      estatura, actividad, objetivo, comidas_dia, preferencias,
-      enviar_anamnesis,
-      peso
+      // INFO BÁSICA
+      nombre,
+      genero,
+      fecha_nacimiento,
+      pais,
+      telefono,
+      email,
+      ocupacion,
+
+      // MOTIVO DE CONSULTA
+      objetivo,
+      meta_especifica,
+      prioridad_objetivo,
+
+      // INFO MÉDICA
+      diabetes,
+      hipertension,
+      higado_graso,
+      gastritis,
+      otras_enfermedades,
+      diabetes_familiar,
+      hipertension_familiar,
+      obesidad_familiar,
+      cancer_familiar,
+      otros_antecedentes,
+      alergias,
+      medicacion_actual,
+      cirugias_previas,
+
+      // MEDICIÓN FÍSICA
+      peso,
+      estatura,
+      porcentaje_grasa,
+      circunferencia_cintura,
+      presion_arterial,
+
+      // ESTILO DE VIDA
+      actividad,
+      frecuencia_ejercicio,
+      tipo_ejercicio,
+      horas_sueno,
+      calidad_sueno,
+      estres,
+
+      // HÁBITOS ALIMENTICIOS
+      comidas_dia,
+      preferencia_alimentaria,
+      consumo_agua,
+      apetito,
+
+      // HISTORIAL + checkbox antiguo
+      historial,
+      enviar_anamnesis
     } = req.body;
 
     const foto = req.files?.foto?.[0]?.filename || paciente.foto;
     const archivo = req.files?.archivo?.[0]?.filename || paciente.archivo;
 
     await paciente.update({
+      // INFO BÁSICA
       nombre,
       genero,
       fecha_nacimiento: fecha_nacimiento || null,
-      estatura: estatura ? parseInt(estatura) : null,
-      actividad,
-      objetivo,
-      comidas_dia: comidas_dia ? parseInt(comidas_dia) : null,
       pais_residencia: pais || 'México',
       telefono,
-      enviar_cuestionario: enviar_anamnesis === '1' ? 1 : 0,
       email: email?.trim() || null,
+      ocupacion: ocupacion || null,
+
+      // MOTIVO DE CONSULTA
+      objetivo,
+      meta_especifica: meta_especifica || null,
+      prioridad_objetivo: prioridad_objetivo || null,
+
+      // INFO MÉDICA
+      diabetes: !!diabetes,
+      hipertension: !!hipertension,
+      higado_graso: !!higado_graso,
+      gastritis: !!gastritis,
+      otras_enfermedades: otras_enfermedades || null,
+      diabetes_familiar: !!diabetes_familiar,
+      hipertension_familiar: !!hipertension_familiar,
+      obesidad_familiar: !!obesidad_familiar,
+      cancer_familiar: !!cancer_familiar,
+      otros_antecedentes: otros_antecedentes || null,
+      alergias: alergias || null,
+      medicacion_actual: medicacion_actual || null,
+      cirugias_previas: cirugias_previas || null,
+
+      // MEDICIÓN FÍSICA
+      peso: peso ? Number(peso) : null,
+      estatura: estatura ? Number(estatura) : null,
+      porcentaje_grasa: porcentaje_grasa ? Number(porcentaje_grasa) : null,
+      circunferencia_cintura: circunferencia_cintura ? Number(circunferencia_cintura) : null,
+      presion_arterial: presion_arterial || null,
+
+      // ESTILO DE VIDA
+      actividad,
+      frecuencia_ejercicio: frecuencia_ejercicio || null,
+      tipo_ejercicio: tipo_ejercicio || null,
+      horas_sueno: horas_sueno ? Number(horas_sueno) : null,
+      calidad_sueno: calidad_sueno || null,
+      estres: estres || null,
+
+      // HÁBITOS ALIMENTICIOS
+      comidas_dia: comidas_dia ? Number(comidas_dia) : null,
+      preferencia_alimentaria: preferencia_alimentaria || null,
+      consumo_agua: consumo_agua ? Number(consumo_agua) : null,
+      apetito: apetito || null,
+
+      // HISTORIAL
       historial,
-      preferencias,
-      peso: peso ? parseFloat(peso) : paciente.peso,
+      enviar_cuestionario: enviar_anamnesis === '1' ? 1 : 0,
+
       foto,
       archivo,
       fecha_actualizacion: new Date()
