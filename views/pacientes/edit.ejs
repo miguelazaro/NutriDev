@@ -1,196 +1,390 @@
 <form action="/pacientes/actualizar/<%= paciente.id %>" method="POST" enctype="multipart/form-data"
-    class="max-w-5xl mx-auto px-4 py-6 space-y-8">
-    <h1 class="text-2xl font-bold text-gray-800">Editar paciente</h1>
+  class="max-w-5xl mx-auto px-4 py-6 space-y-8">
+  <h1 class="text-2xl font-bold text-gray-800">Editar paciente</h1>
 
-    <!-- Información Básica -->
-    <div class="bg-white shadow rounded-lg p-6 space-y-4">
-        <h2 class="text-lg font-semibold text-gray-700">Información básica</h2>
+  <!-- Información Básica -->
+  <div class="bg-white shadow rounded-lg p-6 space-y-4">
+    <h2 class="text-lg font-semibold text-gray-700">Información básica</h2>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-                <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre completo</label>
-                <input type="text" name="nombre" id="nombre" value="<%= paciente.nombre %>" required
-                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500" />
-            </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre completo</label>
+        <input type="text" name="nombre" id="nombre" value="<%= paciente.nombre %>" required
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500" />
+      </div>
 
-            <div>
-                <label class="block text-sm font-medium text-gray-700">Género</label>
-                <div class="mt-1 flex gap-4">
-                    <label><input type="radio" name="genero" value="Masculino" <%=paciente.genero==='Masculino'
-                            ? 'checked' : '' %> required /> Masculino</label>
-                    <label><input type="radio" name="genero" value="Femenino" <%=paciente.genero==='Femenino'
-                            ? 'checked' : '' %> /> Femenino</label>
-                    <label><input type="radio" name="genero" value="Otro" <%=paciente.genero==='Otro' ? 'checked' : ''
-                            %> /> Otro</label>
-                </div>
-            </div>
-
-            <div>
-                <label for="fecha_nacimiento" class="block text-sm font-medium text-gray-700">Fecha de
-                    nacimiento</label>
-                <input type="date" name="fecha_nacimiento" id="fecha_nacimiento"
-                    value="<%= paciente.fecha_nacimiento ? new Date(paciente.fecha_nacimiento).toISOString().split('T')[0] : '' %>"
-                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500" />
-            </div>
-
-            <div>
-                <label for="pais" class="block text-sm font-medium text-gray-700">País de residencia</label>
-                <select name="pais" id="pais"
-                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500">
-                    <option value="México" <%=paciente.pais==='México' ? 'selected' : '' %>>México</option>
-                    <option value="Otro" <%=paciente.pais==='Otro' ? 'selected' : '' %>>Otro</option>
-                </select>
-            </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Género</label>
+        <div class="mt-1 flex gap-4">
+          <label>
+            <input type="radio" name="genero" value="Masculino"
+              <%= paciente.genero==='Masculino' ? 'checked' : '' %> required /> Masculino
+          </label>
+          <label>
+            <input type="radio" name="genero" value="Femenino"
+              <%= paciente.genero==='Femenino' ? 'checked' : '' %> /> Femenino
+          </label>
+          <label>
+            <input type="radio" name="genero" value="Otro"
+              <%= paciente.genero==='Otro' ? 'checked' : '' %> /> Otro
+          </label>
         </div>
+      </div>
+
+      <div>
+        <label for="fecha_nacimiento" class="block text-sm font-medium text-gray-700">Fecha de nacimiento</label>
+        <input type="date" name="fecha_nacimiento" id="fecha_nacimiento"
+          value="<%= paciente.fecha_nacimiento ? new Date(paciente.fecha_nacimiento).toISOString().split('T')[0] : '' %>"
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500" />
+      </div>
+
+      <div>
+        <label for="pais" class="block text-sm font-medium text-gray-700">País de residencia</label>
+        <select name="pais" id="pais"
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500">
+          <option value="México"
+            <%= paciente.pais_residencia === 'México' || !paciente.pais_residencia ? 'selected' : '' %>>
+            México
+          </option>
+          <option value="Otro" <%= paciente.pais_residencia === 'Otro' ? 'selected' : '' %>>Otro</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="telefono" class="block text-sm font-medium text-gray-700">Número de teléfono móvil</label>
+        <input type="text" name="telefono" id="telefono" value="<%= paciente.telefono || '' %>"
+          placeholder="Ej: 5512345678"
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500" />
+      </div>
+
+      <div>
+        <label for="email" class="block text-sm font-medium text-gray-700">Correo electrónico</label>
+        <input type="email" name="email" id="email" value="<%= paciente.email || '' %>"
+          placeholder="correo@ejemplo.com"
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500" />
+      </div>
+
+      <div>
+        <label for="ocupacion" class="block text-sm font-medium text-gray-700">Ocupación</label>
+        <input type="text" name="ocupacion" id="ocupacion" value="<%= paciente.ocupacion || '' %>"
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500" />
+      </div>
     </div>
+  </div>
 
-    <!-- Información nutricional adicional -->
-    <div class="bg-white shadow rounded-lg p-6 space-y-4">
-        <h2 class="text-lg font-semibold text-gray-700">Datos para plan alimenticio (IA)</h2>
+  <!-- Motivo de consulta -->
+  <div class="bg-white shadow rounded-lg p-6 space-y-4">
+    <h2 class="text-lg font-semibold text-gray-700">Motivo de consulta</h2>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-                <label for="estatura" class="block text-sm font-medium text-gray-700">Estatura (en cm)</label>
-                <input type="number" name="estatura" id="estatura" min="50" max="250" step="1"
-                    value="<%= paciente.estatura || '' %>" required
-                    class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-emerald-500 focus:border-emerald-500" />
-            </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div>
+        <label for="objetivo" class="block text-sm font-medium text-gray-700">Objetivo principal</label>
+        <select name="objetivo" id="objetivo" required
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500">
+          <option value="bajar_peso" <%= paciente.objetivo==='bajar_peso' ? 'selected' : '' %>>Bajar de peso</option>
+          <option value="mantener_peso" <%= paciente.objetivo==='mantener_peso' ? 'selected' : '' %>>Mantener peso
+          </option>
+          <option value="ganar_musculo" <%= paciente.objetivo==='ganar_musculo' ? 'selected' : '' %>>Ganar masa
+            muscular</option>
+          <option value="control_enfermedad" <%= paciente.objetivo==='control_enfermedad' ? 'selected' : '' %>>
+            Control de enfermedad
+          </option>
+        </select>
+      </div>
 
-            <div>
-                <label for="peso" class="block text-sm font-medium text-gray-700">Peso (kg)</label>
-                <input type="number" name="peso" id="peso" min="1" max="500" step="0.1"
-                    value="<%= paciente.peso || '' %>"
-                    class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-emerald-500 focus:border-emerald-500" />
-            </div>
+      <div>
+        <label for="meta_especifica" class="block text-sm font-medium text-gray-700">Meta específica</label>
+        <input type="text" name="meta_especifica" id="meta_especifica"
+          value="<%= paciente.meta_especifica || '' %>"
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500" />
+      </div>
 
-            <div>
-                <label for="actividad" class="block text-sm font-medium text-gray-700">Nivel de actividad física</label>
-                <select name="actividad" id="actividad" required
-                    class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-emerald-500 focus:border-emerald-500">
-                    <option value="sedentario" <%=paciente.actividad==='sedentario' ? 'selected' : '' %>>Sedentario
-                    </option>
-                    <option value="ligero" <%=paciente.actividad==='ligero' ? 'selected' : '' %>>Ligero (1-3
-                        días/semana)</option>
-                    <option value="moderado" <%=paciente.actividad==='moderado' ? 'selected' : '' %>>Moderado (3-5
-                        días/semana)</option>
-                    <option value="intenso" <%=paciente.actividad==='intenso' ? 'selected' : '' %>>Intenso (6-7
-                        días/semana)</option>
-                    <option value="muy_intenso" <%=paciente.actividad==='muy_intenso' ? 'selected' : '' %>>Muy intenso
-                        (2x por día o entrenamientos pesados)</option>
-                </select>
-            </div>
-
-            <div>
-                <label for="objetivo" class="block text-sm font-medium text-gray-700">Objetivo principal</label>
-                <select name="objetivo" id="objetivo" required
-                    class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-emerald-500 focus:border-emerald-500">
-                    <option value="bajar_peso" <%=paciente.objetivo==='bajar_peso' ? 'selected' : '' %>>Bajar de peso
-                    </option>
-                    <option value="mantener_peso" <%=paciente.objetivo==='mantener_peso' ? 'selected' : '' %>>Mantener
-                        peso</option>
-                    <option value="ganar_musculo" <%=paciente.objetivo==='ganar_musculo' ? 'selected' : '' %>>Ganar masa
-                        muscular</option>
-                </select>
-            </div>
-
-            <div>
-                <label for="comidas_dia" class="block text-sm font-medium text-gray-700">¿Cuántas comidas al día
-                    desea?</label>
-                <select name="comidas_dia" id="comidas_dia" required
-                    class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-emerald-500 focus:border-emerald-500">
-                    <option value="3" <%=paciente.comidas_dia==3 ? 'selected' : '' %>>3 (Desayuno, comida, cena)
-                    </option>
-                    <option value="4" <%=paciente.comidas_dia==4 ? 'selected' : '' %>>4 (Incluye snack)</option>
-                    <option value="5" <%=paciente.comidas_dia==5 ? 'selected' : '' %>>5 (Incluye dos snacks)</option>
-                    <option value="6" <%=paciente.comidas_dia==6 ? 'selected' : '' %>>6 (Frecuente en volumen)</option>
-                </select>
-            </div>
-        </div>
-
-        <div>
-            <label for="preferencias" class="block text-sm font-medium text-gray-700">Preferencias y alergias</label>
-            <textarea name="preferencias" id="preferencias" rows="3"
-                placeholder="Ej. No le gusta el pescado, es alérgico a nueces"
-                class="w-full border border-gray-300 rounded-md p-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none"><%= paciente.preferencias || '' %></textarea>
-        </div>
+      <div>
+        <label for="prioridad_objetivo" class="block text-sm font-medium text-gray-700">Nivel de prioridad del
+          objetivo</label>
+        <select name="prioridad_objetivo" id="prioridad_objetivo"
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500">
+          <option value="Bajo" <%= paciente.prioridad_objetivo==='Bajo' ? 'selected' : '' %>>Bajo</option>
+          <option value="Medio" <%= paciente.prioridad_objetivo==='Medio' ? 'selected' : '' %>>Medio</option>
+          <option value="Alto" <%= paciente.prioridad_objetivo==='Alto' ? 'selected' : '' %>>Alto</option>
+        </select>
+      </div>
     </div>
+  </div>
 
-    <!-- Contacto -->
-    <div class="bg-white shadow rounded-lg p-6 space-y-4">
-        <h2 class="text-lg font-semibold text-gray-700">Contacto</h2>
+  <!-- Información médica -->
+  <div class="bg-white shadow rounded-lg p-6 space-y-4">
+    <h2 class="text-lg font-semibold text-gray-700">Información Médica</h2>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-                <label for="telefono" class="block text-sm font-medium text-gray-700">Número de teléfono móvil</label>
-                <input type="text" name="telefono" id="telefono" value="<%= paciente.telefono %>"
-                    placeholder="Ej: 5512345678"
-                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500" />
-            </div>
-
-            <div>
-                <label for="email" class="block text-sm font-medium text-gray-700">Correo electrónico</label>
-                <input type="email" name="email" id="email" value="<%= paciente.email %>"
-                    placeholder="correo@ejemplo.com"
-                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500" />
-            </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <!-- Enfermedades diagnosticadas -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Enfermedades diagnosticadas</label>
+        <div class="mt-1 flex flex-wrap gap-4 text-sm">
+          <label><input type="checkbox" name="diabetes" class="mr-1"
+              <%= paciente.diabetes ? 'checked' : '' %>> Diabetes</label>
+          <label><input type="checkbox" name="hipertension" class="mr-1"
+              <%= paciente.hipertension ? 'checked' : '' %>> Hipertensión</label>
+          <label><input type="checkbox" name="higado_graso" class="mr-1"
+              <%= paciente.higado_graso ? 'checked' : '' %>> Hígado graso</label>
+          <label><input type="checkbox" name="gastritis" class="mr-1"
+              <%= paciente.gastritis ? 'checked' : '' %>> Gastritis</label>
         </div>
+        <textarea name="otras_enfermedades" rows="1" placeholder="Otras enfermedades"
+          class="mt-2 w-full border border-gray-300 rounded-md p-1.5 focus:ring-emerald-500 focus:border-emerald-500 resize-none text-sm"><%= paciente.otras_enfermedades || '' %></textarea>
+      </div>
 
-        <label class="inline-flex items-center mt-2">
-            <input type="checkbox" name="enviar_anamnesis" value="1" class="form-checkbox text-emerald-600" />
-            <span class="ml-2 text-sm text-gray-700">Enviar cuestionario de la anamnesis por mensaje y por correo</span>
-        </label>
+      <!-- Antecedentes familiares -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Antecedentes familiares relevantes</label>
+        <div class="mt-1 flex flex-wrap gap-4 text-sm">
+          <label><input type="checkbox" name="diabetes_familiar" class="mr-1"
+              <%= paciente.diabetes_familiar ? 'checked' : '' %>> Diabetes</label>
+          <label><input type="checkbox" name="hipertension_familiar" class="mr-1"
+              <%= paciente.hipertension_familiar ? 'checked' : '' %>> Hipertensión</label>
+          <label><input type="checkbox" name="obesidad_familiar" class="mr-1"
+              <%= paciente.obesidad_familiar ? 'checked' : '' %>> Obesidad</label>
+          <label><input type="checkbox" name="cancer_familiar" class="mr-1"
+              <%= paciente.cancer_familiar ? 'checked' : '' %>> Cáncer</label>
+        </div>
+        <textarea name="otros_antecedentes" rows="1" placeholder="Otros antecedentes"
+          class="mt-2 w-full border border-gray-300 rounded-md p-1.5 focus:ring-emerald-500 focus:border-emerald-500 resize-none text-sm"><%= paciente.otros_antecedentes || '' %></textarea>
+      </div>
+
+      <!-- Alergias -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Alergias</label>
+        <textarea name="alergias" rows="2" placeholder="Especificar alergias"
+          class="w-full border border-gray-300 rounded-md p-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none text-base"><%= paciente.alergias || '' %></textarea>
+      </div>
+
+      <!-- Medicaciones -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Tratamiento actuales</label>
+        <textarea name="medicacion_actual" rows="2" placeholder="Especificar medicación actual"
+          class="mt-1 w-full border border-gray-300 rounded-md p-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none text-base"><%= paciente.medicacion_actual || '' %></textarea>
+      </div>
+
+      <!-- Cirugías -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Cirugías previas</label>
+        <textarea name="cirugias_previas" rows="2" placeholder="Especificar cirugías previas"
+          class="mt-1 w-full border border-gray-300 rounded-md p-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none text-base"><%= paciente.cirugias_previas || '' %></textarea>
+      </div>
     </div>
+  </div>
+
+  <!-- Medición física -->
+  <div class="bg-white shadow rounded-lg p-6 space-y-4">
+    <h2 class="text-lg font-semibold text-gray-700">Medición Física</h2>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div>
+        <label for="peso" class="block text-sm font-medium text-gray-700">Peso actual (kg)</label>
+        <input type="number" name="peso" value="<%= paciente.peso || '' %>"
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500" />
+      </div>
+
+      <div>
+        <label for="estatura" class="block text-sm font-medium text-gray-700">Estatura (cm)</label>
+        <input type="number" name="estatura" value="<%= paciente.estatura || '' %>"
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500" />
+      </div>
+
+      <div>
+        <label for="porcentaje_grasa" class="block text-sm font-medium text-gray-700">% de grasa corporal</label>
+        <input type="number" name="porcentaje_grasa" value="<%= paciente.porcentaje_grasa || '' %>"
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500" />
+      </div>
+
+      <div>
+        <label for="circunferencia_cintura" class="block text-sm font-medium text-gray-700">Circunferencia cintura
+          (cm)</label>
+        <input type="number" name="circunferencia_cintura"
+          value="<%= paciente.circunferencia_cintura || '' %>"
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500" />
+      </div>
+
+      <div>
+        <label for="presion_arterial" class="block text-sm font-medium text-gray-700">Presión arterial
+          (opcional)</label>
+        <input type="text" name="presion_arterial" value="<%= paciente.presion_arterial || '' %>"
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Estilo de vida -->
+  <div class="bg-white shadow rounded-lg p-6 space-y-4">
+    <h2 class="text-lg font-semibold text-gray-700">Estilo de vida y actividad</h2>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div>
+        <label for="actividad" class="block text-sm font-medium text-gray-700">Nivel de actividad física</label>
+        <select name="actividad" id="actividad" required
+          class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-emerald-500 focus:border-emerald-500">
+          <option value="sedentario" <%= paciente.actividad==='sedentario' ? 'selected' : '' %>>Sedentario</option>
+          <option value="ligero" <%= paciente.actividad==='ligero' ? 'selected' : '' %>>Ligero (1-3 días/semana)
+          </option>
+          <option value="moderado" <%= paciente.actividad==='moderado' ? 'selected' : '' %>>Moderado (3-5
+            días/semana)</option>
+          <option value="intenso" <%= paciente.actividad==='intenso' ? 'selected' : '' %>>Intenso (6-7 días/semana)
+          </option>
+          <option value="muy_intenso" <%= paciente.actividad==='muy_intenso' ? 'selected' : '' %>>Muy intenso (2x por
+            día o entrenamientos pesados)</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="tipo_ejercicio" class="block text-sm font-medium text-gray-700">Tipo de ejercicio que
+          realiza</label>
+        <input type="text" name="tipo_ejercicio" id="tipo_ejercicio"
+          value="<%= paciente.tipo_ejercicio || '' %>" placeholder="Ej. caminata, gym, natación"
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500" />
+      </div>
+
+      <div>
+        <label for="horas_sueno" class="block text-sm font-medium text-gray-700">Horas de sueño por día</label>
+        <input type="number" name="horas_sueno" id="horas_sueno" min="0" max="24"
+          value="<%= paciente.horas_sueno || '' %>"
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500" />
+      </div>
+
+      <div>
+        <label for="calidad_sueno" class="block text-sm font-medium text-gray-700">Calidad del sueño</label>
+        <select name="calidad_sueno" id="calidad_sueno"
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500">
+          <option value="buena" <%= paciente.calidad_sueno==='buena' ? 'selected' : '' %>>Buena</option>
+          <option value="regular" <%= paciente.calidad_sueno==='regular' ? 'selected' : '' %>>Regular</option>
+          <option value="mala" <%= paciente.calidad_sueno==='mala' ? 'selected' : '' %>>Mala</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="estres" class="block text-sm font-medium text-gray-700">Estrés percibido</label>
+        <select name="estres" id="estres"
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500">
+          <option value="bajo" <%= paciente.estres==='bajo' ? 'selected' : '' %>>Bajo</option>
+          <option value="medio" <%= paciente.estres==='medio' ? 'selected' : '' %>>Medio</option>
+          <option value="alto" <%= paciente.estres==='alto' ? 'selected' : '' %>>Alto</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hábitos Alimenticios -->
+  <div class="bg-white shadow rounded-lg p-6 space-y-4">
+    <h2 class="text-lg font-semibold text-gray-700">Hábitos Alimenticios</h2>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div>
+        <label for="comidas_dia" class="block text-sm font-medium text-gray-700">¿Cuántas comidas al día
+          desea?</label>
+        <select name="comidas_dia" id="comidas_dia"
+          class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-emerald-500 focus:border-emerald-500">
+          <option value="3" <%= paciente.comidas_dia==3 ? 'selected' : '' %>>3 (Desayuno, comida, cena)</option>
+          <option value="4" <%= paciente.comidas_dia==4 ? 'selected' : '' %>>4 (Incluye snack)</option>
+          <option value="5" <%= paciente.comidas_dia==5 ? 'selected' : '' %>>5 (Incluye dos snacks)</option>
+          <option value="6" <%= paciente.comidas_dia==6 ? 'selected' : '' %>>6 (Frecuente en volumen)</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="preferencia_alimentaria" class="block text-sm font-medium text-gray-700">Preferencia
+          alimentaria</label>
+        <select name="preferencia_alimentaria" id="preferencia_alimentaria"
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500">
+          <option value="omnivoro" <%= paciente.preferencia_alimentaria==='omnivoro' ? 'selected' : '' %>>Omnívoro
+          </option>
+          <option value="vegetariano" <%= paciente.preferencia_alimentaria==='vegetariano' ? 'selected' : '' %>>
+            Vegetariano</option>
+          <option value="vegano" <%= paciente.preferencia_alimentaria==='vegano' ? 'selected' : '' %>>Vegano</option>
+          <option value="keto" <%= paciente.preferencia_alimentaria==='keto' ? 'selected' : '' %>>Keto</option>
+          <option value="libre_gluten" <%= paciente.preferencia_alimentaria==='libre_gluten' ? 'selected' : '' %>>
+            Libre de gluten</option>
+          <option value="libre_lacteos" <%= paciente.preferencia_alimentaria==='libre_lacteos' ? 'selected' : '' %>>
+            Libre de lácteos</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="consumo_agua" class="block text-sm font-medium text-gray-700">Consumo de agua (litros
+          diarios)</label>
+        <input type="number" name="consumo_agua" id="consumo_agua" value="<%= paciente.consumo_agua || '' %>"
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500" />
+      </div>
+
+      <div>
+        <label for="apetito" class="block text-sm font-medium text-gray-700">Apetito</label>
+        <select name="apetito" id="apetito"
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500">
+          <option value="bajo" <%= paciente.apetito==='bajo' ? 'selected' : '' %>>Bajo</option>
+          <option value="normal" <%= paciente.apetito==='normal' ? 'selected' : '' %>>Normal</option>
+          <option value="alto" <%= paciente.apetito==='alto' ? 'selected' : '' %>>Alto</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
 
     <!-- Historial Médico -->
     <div class="bg-white shadow rounded-lg p-6 space-y-4">
         <h2 class="text-lg font-semibold text-gray-700">Historial médico</h2>
-        <textarea name="historial" rows="4" placeholder="Alergias, condiciones crónicas, cirugías previas, etc."
+        <textarea name="historial" rows="3" placeholder="Alergias, condiciones crónicas, cirugías previas, etc."
             class="w-full border border-gray-300 rounded-md p-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none"><%= paciente.historial || '' %></textarea>
     </div>
 
-    <!-- Subida de archivos -->
-    <div class="bg-white shadow rounded-lg p-6 space-y-4">
-        <h2 class="text-lg font-semibold text-gray-700">Archivos del paciente</h2>
+  <!-- Subida de archivos -->
+  <div class="bg-white shadow rounded-lg p-6 space-y-4">
+    <h2 class="text-lg font-semibold text-gray-700">Archivos del paciente</h2>
 
-        <% if (paciente.foto) { %>
-            <div>
-                <p class="text-sm text-gray-600">Foto actual:</p>
-                <img src="/uploads/<%= paciente.foto %>" alt="Foto de perfil"
-                    class="w-24 h-24 rounded-full object-cover border border-gray-300" />
-            </div>
-            <% } %>
+    <% if (paciente.foto) { %>
+      <div>
+        <p class="text-sm text-gray-600">Foto actual:</p>
+        <img src="/uploads/pacientes/<%= paciente.foto %>" alt="Foto de perfil"
+          class="w-24 h-24 rounded-full object-cover border border-gray-300" />
+      </div>
+    <% } %>
 
-                <div>
-                    <label for="foto" class="block text-sm font-medium text-gray-700">Reemplazar foto</label>
-                    <input type="file" name="foto" id="foto" accept="image/*"
-                        class="mt-1 block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100" />
-                </div>
-
-                <% if (paciente.archivo) { %>
-                    <div>
-                        <p class="text-sm text-gray-600">Archivo actual:
-                            <a href="/uploads/<%= paciente.archivo %>" target="_blank"
-                                class="text-emerald-600 underline">Ver PDF</a>
-                        </p>
-                    </div>
-                    <% } %>
-
-                        <div>
-                            <label for="archivo" class="block text-sm font-medium text-gray-700">Reemplazar archivo
-                                PDF</label>
-                            <input type="file" name="archivo" id="archivo" accept=".pdf"
-                                class="mt-1 block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100" />
-                        </div>
+    <div>
+      <label for="foto" class="block text-sm font-medium text-gray-700">Reemplazar foto</label>
+      <input type="file" name="foto" id="foto" accept="image/*"
+        class="mt-1 block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100" />
     </div>
 
-    <!-- Botones -->
-    <div class="flex justify-end gap-4">
-        <a href="/pacientes" class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold">
-            Cancelar
-        </a>
-        <button type="submit"
-            class="px-6 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow">
-            Actualizar
-        </button>
+    <% if (paciente.archivo) { %>
+      <div>
+        <p class="text-sm text-gray-600">Archivo actual:
+          <a href="/uploads/pacientes/<%= paciente.archivo %>" target="_blank"
+            class="text-emerald-600 underline">Ver PDF</a>
+        </p>
+      </div>
+    <% } %>
+
+    <div>
+      <label for="archivo" class="block text-sm font-medium text-gray-700">Reemplazar archivo PDF</label>
+      <input type="file" name="archivo" id="archivo" accept=".pdf"
+        class="mt-1 block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100" />
     </div>
+
+    <!-- Checkbox enviar cuestionario (mantener lógica del controller) -->
+    <label class="inline-flex items-center mt-2">
+      <input type="checkbox" name="enviar_anamnesis" value="1" class="form-checkbox text-emerald-600"
+        <%= paciente.enviar_cuestionario ? 'checked' : '' %> />
+      <span class="ml-2 text-sm text-gray-700">
+        Enviar cuestionario de la anamnesis por mensaje y por correo
+      </span>
+    </label>
+  </div>
+
+  <!-- Botones -->
+  <div class="flex justify-end gap-4">
+    <a href="/pacientes" class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold">
+      Cancelar
+    </a>
+    <button type="submit"
+      class="px-6 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold shadow">
+      Actualizar
+    </button>
+  </div>
 </form>

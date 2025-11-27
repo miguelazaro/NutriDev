@@ -25,10 +25,11 @@
             <div>
                 <label for="fecha_nacimiento" class="block text-sm font-medium text-gray-700">Fecha de
                     nacimiento</label>
-                <input type="date" name="fecha_nacimiento" id="fecha_nacimiento"
+                <input type="date" name="fecha_nacimiento" id="fecha_nacimiento" required
                     class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500" />
             </div>
 
+            <!-- Dirección -->
             <div>
                 <label for="pais" class="block text-sm font-medium text-gray-700">País de residencia</label>
                 <select name="pais" id="pais"
@@ -37,29 +38,182 @@
                     <option>Otro</option>
                 </select>
             </div>
+
+            <!-- Ocupación -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label for="telefono" class="block text-sm font-medium text-gray-700">Número de teléfono
+                        móvil</label>
+                    <input type="text" name="telefono" id="telefono" placeholder="Ej: 5512345678"
+                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500" />
+                </div>
+
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700">Correo electrónico</label>
+                    <input type="email" name="email" id="email" placeholder="correo@ejemplo.com"
+                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500" />
+                </div>
+            </div>
+
+            <div>
+                <label for="ocupacion" class="block text-sm font-medium text-gray-700">Ocupación</label>
+                <input type="text" name="ocupacion" id="ocupacion"
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500" />
+            </div>
         </div>
     </div>
 
-    <!-- Información nutricional adicional -->
+    <!-- Objetivo principal -->
     <div class="bg-white shadow rounded-lg p-6 space-y-4">
-        <h2 class="text-lg font-semibold text-gray-700">Datos para plan alimenticio (IA)</h2>
+        <h2 class="text-lg font-semibold text-gray-700">Motivo de consulta</h2>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
             <div>
-                <label for="estatura" class="block text-sm font-medium text-gray-700">Estatura (en cm)</label>
-                <input type="number" name="estatura" id="estatura" min="50" max="250" step="1" required
-                    class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-emerald-500 focus:border-emerald-500" />
+                <label for="objetivo" class="block text-sm font-medium text-gray-700">Objetivo principal</label>
+                <select name="objetivo" id="objetivo" required
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500">
+                    <option value="bajar_peso">Bajar de peso</option>
+                    <option value="mantener_peso">Mantener peso</option>
+                    <option value="ganar_musculo">Ganar masa muscular</option>
+                    <option value="control_enfermedad">Control de enfermedad</option>
+                </select>
             </div>
 
             <div>
-                <label for="peso" class="block text-sm font-medium text-gray-700">Peso (kg)</label>
-                <input type="number" name="peso" id="peso" min="1" max="500" step="0.1" required
-                    placeholder="Ej: 70.5"
-                    class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-emerald-500 focus:border-emerald-500" />
+                <label for="meta_especifica" class="block text-sm font-medium text-gray-700">Meta específica</label>
+                <input type="text" name="meta_especifica" id="meta_especifica"
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500" />
             </div>
 
             <div>
-                <label for="actividad" class="block text-sm font-medium text-gray-700">Nivel de actividad física</label>
+                <label for="prioridad_objetivo" class="block text-sm font-medium text-gray-700">Nivel de prioridad del
+                    objetivo</label>
+                <select name="prioridad_objetivo" id="prioridad_objetivo"
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500">
+                    <option value="Bajo">Bajo</option>
+                    <option value="Medio">Medio</option>
+                    <option value="Alto">Alto</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información médica -->
+    <div class="bg-white shadow rounded-lg p-6 space-y-4">
+        <h2 class="text-lg font-semibold text-gray-700">Información Médica</h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+            <!-- Enfermedades diagnosticadas -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Enfermedades diagnosticadas</label>
+
+                <div class="mt-1 flex flex-wrap gap-4 text-sm">
+                    <label><input type="checkbox" name="diabetes" class="mr-1"> Diabetes</label>
+                    <label><input type="checkbox" name="hipertension" class="mr-1"> Hipertensión</label>
+                    <label><input type="checkbox" name="higado_graso" class="mr-1"> Hígado graso</label>
+                    <label><input type="checkbox" name="gastritis" class="mr-1"> Gastritis</label>
+                </div>
+
+
+                <textarea name="otras_enfermedades" rows="1" placeholder="Otras enfermedades"
+                    class="mt-2 w-full border border-gray-300 rounded-md p-1.5 focus:ring-emerald-500 focus:border-emerald-500 resize-none text-sm"></textarea>
+            </div>
+
+            <!-- Antecedentes familiares -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Antecedentes familiares relevantes</label>
+
+                <div class="mt-1 flex flex-wrap gap-4 text-sm">
+                    <label><input type="checkbox" name="diabetes_familiar" class="mr-1"> Diabetes</label>
+                    <label><input type="checkbox" name="hipertension_familiar" class="mr-1"> Hipertensión</label>
+                    <label><input type="checkbox" name="obesidad_familiar" class="mr-1"> Obesidad</label>
+                    <label><input type="checkbox" name="cancer_familiar" class="mr-1"> Cáncer</label>
+                </div>
+
+                <textarea name="otros_antecedentes" rows="1" placeholder="Otros antecedentes"
+                    class="mt-2 w-full border border-gray-300 rounded-md p-1.5 focus:ring-emerald-500 focus:border-emerald-500 resize-none text-sm"></textarea>
+            </div>
+
+
+            <!-- Alergias -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Alergias</label>
+                <textarea name="alergias" rows="2" placeholder="Especificar alergias"
+                    class="w-full border border-gray-300 rounded-md p-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none text-base"></textarea>
+            </div>
+
+            <!-- Medicaciones -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Tratamiento actuales</label>
+                <textarea name="medicacion_actual" rows="2" placeholder="Especificar medicación actual"
+                    class="mt-1 w-full border border-gray-300 rounded-md p-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none text-base"></textarea>
+            </div>
+
+            <!-- Cirugías -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Cirugías previas</label>
+                <textarea name="cirugias_previas" rows="2" placeholder="Especificar cirugías previas"
+                    class="mt-1 w-full border border-gray-300 rounded-md p-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none text-base"></textarea>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Medicion fisica -->
+    <div class="bg-white shadow rounded-lg p-6 space-y-4">
+        <h2 class="text-lg font-semibold text-gray-700">Medición Física</h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+            <div>
+                <label for="peso" class="block text-sm font-medium text-gray-700">Peso actual (kg)</label>
+                <input type="number" name="peso" required
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500" />
+            </div>
+
+            <div>
+                <label for="estatura" class="block text-sm font-medium text-gray-700">Estatura (cm)</label>
+                <input type="number" name="estatura" required
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500" />
+            </div>
+
+            <div>
+                <label for="porcentaje_grasa" class="block text-sm font-medium text-gray-700">% de grasa
+                    corporal</label>
+                <input type="number" name="porcentaje_grasa"
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500" />
+            </div>
+
+            <div>
+                <label for="circunferencia_cintura" class="block text-sm font-medium text-gray-700">Circunferencia
+                    cintura (cm)</label>
+                <input type="number" name="circunferencia_cintura"
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500" />
+            </div>
+
+            <div>
+                <label for="presion_arterial" class="block text-sm font-medium text-gray-700">Presión arterial
+                    (opcional)</label>
+                <input type="text" name="presion_arterial"
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500" />
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Estilo de vida  -->
+    <div class="bg-white shadow rounded-lg p-6 space-y-4">
+        <h2 class="text-lg font-semibold text-gray-700">Estilo de vida y actividad</h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+            <!-- Nivel de actividad física -->
+            <div>
+                <label for="actividad" class="block text-sm font-medium text-gray-700">
+                    Nivel de actividad física
+                </label>
                 <select name="actividad" id="actividad" required
                     class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-emerald-500 focus:border-emerald-500">
                     <option value="sedentario">Sedentario</option>
@@ -70,15 +224,59 @@
                 </select>
             </div>
 
+
+            <!-- Tipo de ejercicio -->
             <div>
-                <label for="objetivo" class="block text-sm font-medium text-gray-700">Objetivo principal</label>
-                <select name="objetivo" id="objetivo" required
-                    class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-emerald-500 focus:border-emerald-500">
-                    <option value="bajar_peso">Bajar de peso</option>
-                    <option value="mantener_peso">Mantener peso</option>
-                    <option value="ganar_musculo">Ganar masa muscular</option>
+                <label for="tipo_ejercicio" class="block text-sm font-medium text-gray-700">
+                    Tipo de ejercicio que realiza
+                </label>
+                <input type="text" name="tipo_ejercicio" id="tipo_ejercicio" placeholder="Ej. caminata, gym, natación"
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500" />
+            </div>
+
+            <!-- Horas de sueño -->
+            <div>
+                <label for="horas_sueno" class="block text-sm font-medium text-gray-700">
+                    Horas de sueño por día
+                </label>
+                <input type="number" name="horas_sueno" id="horas_sueno" min="0" max="24" required
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500" />
+            </div>
+
+            <!-- Calidad del sueño -->
+            <div>
+                <label for="calidad_sueno" class="block text-sm font-medium text-gray-700">
+                    Calidad del sueño
+                </label>
+                <select name="calidad_sueno" id="calidad_sueno"
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500">
+                    <option value="buena">Buena</option>
+                    <option value="regular">Regular</option>
+                    <option value="mala">Mala</option>
                 </select>
             </div>
+
+            <!-- Estrés percibido -->
+            <div>
+                <label for="estres" class="block text-sm font-medium text-gray-700">
+                    Estrés percibido
+                </label>
+                <select name="estres" id="estres"
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500">
+                    <option value="bajo">Bajo</option>
+                    <option value="medio">Medio</option>
+                    <option value="alto">Alto</option>
+                </select>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Habitos Alimenticios -->
+    <div class="bg-white shadow rounded-lg p-6 space-y-4">
+        <h2 class="text-lg font-semibold text-gray-700">Hábitos Alimenticios</h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
 
             <div>
                 <label for="comidas_dia" class="block text-sm font-medium text-gray-700">¿Cuántas comidas al día
@@ -91,44 +289,45 @@
                     <option value="6">6 (Frecuente en volumen)</option>
                 </select>
             </div>
-        </div>
 
-        <div>
-            <label for="preferencias" class="block text-sm font-medium text-gray-700">Preferencias y alergias</label>
-            <textarea name="preferencias" id="preferencias" rows="3"
-                placeholder="Ej. No le gusta el pescado, es alérgico a nueces"
-                class="w-full border border-gray-300 rounded-md p-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none"></textarea>
-        </div>
-    </div>
-
-    <!-- Contacto -->
-    <div class="bg-white shadow rounded-lg p-6 space-y-4">
-        <h2 class="text-lg font-semibold text-gray-700">Contacto</h2>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-                <label for="telefono" class="block text-sm font-medium text-gray-700">Número de teléfono móvil</label>
-                <input type="text" name="telefono" id="telefono" placeholder="Ej: 5512345678"
+                <label for="preferencia_alimentaria" class="block text-sm font-medium text-gray-700">Preferencia
+                    alimentaria</label>
+                <select name="preferencia_alimentaria"
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500">
+                    <option value="omnivoro">Omnívoro</option>
+                    <option value="vegetariano">Vegetariano</option>
+                    <option value="vegano">Vegano</option>
+                    <option value="keto">Keto</option>
+                    <option value="libre_gluten">Libre de gluten</option>
+                    <option value="libre_lacteos">Libre de lácteos</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="consumo_agua" class="block text-sm font-medium text-gray-700">Consumo de agua (litros
+                    diarios)</label>
+                <input type="number" name="consumo_agua"
                     class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500" />
             </div>
 
             <div>
-                <label for="email" class="block text-sm font-medium text-gray-700">Correo electrónico</label>
-                <input type="email" name="email" id="email" placeholder="correo@ejemplo.com"
-                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500" />
+                <label for="apetito" class="block text-sm font-medium text-gray-700">Apetito</label>
+                <select name="apetito"
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-emerald-500 focus:border-emerald-500">
+                    <option value="bajo">Bajo</option>
+                    <option value="normal">Normal</option>
+                    <option value="alto">Alto</option>
+                </select>
             </div>
-        </div>
 
-        <label class="inline-flex items-center mt-2">
-            <input type="checkbox" name="enviar_anamnesis" value="1" class="form-checkbox text-emerald-600" />
-            <span class="ml-2 text-sm text-gray-700">Enviar cuestionario de la anamnesis por mensaje y por correo</span>
-        </label>
+        </div>
     </div>
 
-    <!-- Historial Médico -->
+     <!-- Historial Médico -->
     <div class="bg-white shadow rounded-lg p-6 space-y-4">
         <h2 class="text-lg font-semibold text-gray-700">Historial médico</h2>
-        <textarea name="historial" rows="4" placeholder="Alergias, condiciones crónicas, cirugías previas, etc."
+        <textarea name="historial" rows="3" placeholder="Alergias, condiciones crónicas, cirugías previas, etc."
             class="w-full border border-gray-300 rounded-md p-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none"></textarea>
     </div>
 
