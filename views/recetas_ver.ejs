@@ -2,9 +2,13 @@
   <!-- Encabezado -->
   <div class="flex flex-col sm:flex-row justify-between items-start mb-4 border-b pb-4">
     <div>
-      <h2 class="text-2xl sm:text-3xl font-bold text-gray-800"><%= receta.titulo %></h2>
+      <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">
+        <%= receta.titulo %>
+      </h2>
       <p class="text-sm text-gray-500 capitalize mt-1">
-        Categoría: <span class="font-medium"><%= receta.categoria %></span>
+        Categoría: <span class="font-medium">
+          <%= receta.categoria %>
+        </span>
       </p>
     </div>
     <div class="mt-2 sm:mt-0">
@@ -18,15 +22,19 @@
   <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
     <% if (receta.imagen) { %>
       <div class="md:col-span-2">
-        <img src="<%= receta.imagen %>" alt="<%= receta.titulo %>" class="w-full h-auto object-cover rounded-lg shadow-sm">
+        <img src="<%= receta.imagen %>" alt="<%= receta.titulo %>"
+          class="w-full h-auto object-cover rounded-lg shadow-sm">
       </div>
-    <% } %>
-    <% if (receta.descripcion) { %>
-      <div class="p-4 bg-gray-50 rounded-lg <% if (receta.imagen) { %>md:col-span-3<% } else { %>md:col-span-5<% } %>">
-        <h3 class="font-semibold text-gray-700 mb-2">Descripción</h3>
-        <p class="text-gray-700 italic"><%= receta.descripcion %></p>
-      </div>
-    <% } %>
+      <% } %>
+        <% if (receta.descripcion) { %>
+          <div
+            class="p-4 bg-gray-50 rounded-lg <% if (receta.imagen) { %>md:col-span-3<% } else { %>md:col-span-5<% } %>">
+            <h3 class="font-semibold text-gray-700 mb-2">Descripción</h3>
+            <p class="text-gray-700 italic">
+              <%= receta.descripcion %>
+            </p>
+          </div>
+          <% } %>
   </div>
 
   <!-- Contenido principal: Ingredientes y Preparación -->
@@ -35,13 +43,15 @@
     <div>
       <h3 class="text-lg font-semibold mb-3 text-gray-700 border-b pb-2">Ingredientes</h3>
       <ul class="list-disc list-inside space-y-2 prose max-w-none">
-        <% if (receta.ingredientes && typeof receta.ingredientes === 'string' && receta.ingredientes.length > 0) { %>
-          <% receta.ingredientes.split('\n').forEach(item => { %>
-            <li><%= item %></li>
-          <% }) %>
-        <% } else { %>
-          <li class="text-gray-500">No se especificaron ingredientes.</li>
-        <% } %>
+        <% if (receta.ingredientes && typeof receta.ingredientes==='string' && receta.ingredientes.length> 0) { %>
+          <% receta.ingredientes.split('\n').forEach(item=> { %>
+            <li>
+              <%= item %>
+            </li>
+            <% }) %>
+              <% } else { %>
+                <li class="text-gray-500">No se especificaron ingredientes.</li>
+                <% } %>
       </ul>
     </div>
 
@@ -50,10 +60,10 @@
       <h3 class="text-lg font-semibold mb-3 text-gray-700 border-b pb-2">Preparación</h3>
       <div class="prose max-w-none">
         <% if (receta.preparacion) { %>
-          <%- receta.preparacion.replace(/\n/g, '<br>') %>
-        <% } else { %>
-          <p class="text-gray-500">No se especificaron los pasos de preparación.</p>
-        <% } %>
+          <%- receta.preparacion.replace(/\n/g, '<br>' ) %>
+            <% } else { %>
+              <p class="text-gray-500">No se especificaron los pasos de preparación.</p>
+              <% } %>
       </div>
     </div>
   </div>
@@ -64,42 +74,58 @@
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 text-center">
       <div class="bg-white p-3 rounded-lg shadow-sm">
         <p class="text-sm text-gray-500">Preparación</p>
-        <p class="font-bold text-lg"><%= receta.tiempo_preparacion || 'N/A' %></p>
+        <p class="font-bold text-lg">
+          <%= receta.tiempo_preparacion || 'N/A' %>
+        </p>
         <p class="text-xs text-gray-400">minutos</p>
       </div>
       <div class="bg-white p-3 rounded-lg shadow-sm">
         <p class="text-sm text-gray-500">Cocción</p>
-        <p class="font-bold text-lg"><%= receta.tiempo_coccion || 'N/A' %></p>
+        <p class="font-bold text-lg">
+          <%= receta.tiempo_coccion || 'N/A' %>
+        </p>
         <p class="text-xs text-gray-400">minutos</p>
       </div>
       <div class="bg-white p-3 rounded-lg shadow-sm">
         <p class="text-sm text-gray-500">Porciones</p>
-        <p class="font-bold text-lg"><%= receta.porciones || 'N/A' %></p>
+        <p class="font-bold text-lg">
+          <%= receta.porciones || 'N/A' %>
+        </p>
         <p class="text-xs text-gray-400">personas</p>
       </div>
       <div class="bg-white p-3 rounded-lg shadow-sm">
         <p class="text-sm text-gray-500">Dificultad</p>
-        <p class="font-bold text-lg capitalize"><%= receta.dificultad || 'N/A' %></p>
+        <p class="font-bold text-lg capitalize">
+          <%= receta.dificultad || 'N/A' %>
+        </p>
         <p class="text-xs text-gray-400 invisible">.</p>
       </div>
       <div class="bg-white p-3 rounded-lg shadow-sm">
         <p class="text-sm text-gray-500">Calorías</p>
-        <p class="font-bold text-lg"><%= receta.calorias || 'N/A' %></p>
+        <p class="font-bold text-lg">
+          <%= receta.calorias || 'N/A' %>
+        </p>
         <p class="text-xs text-gray-400">kcal</p>
       </div>
       <div class="bg-white p-3 rounded-lg shadow-sm">
         <p class="text-sm text-gray-500">Proteínas</p>
-        <p class="font-bold text-lg"><%= receta.proteinas || 'N/A' %></p>
+        <p class="font-bold text-lg">
+          <%= receta.proteinas || 'N/A' %>
+        </p>
         <p class="text-xs text-gray-400">gramos</p>
       </div>
       <div class="bg-white p-3 rounded-lg shadow-sm">
         <p class="text-sm text-gray-500">Carbs</p>
-        <p class="font-bold text-lg"><%= receta.carbohidratos || 'N/A' %></p>
+        <p class="font-bold text-lg">
+          <%= receta.carbohidratos || 'N/A' %>
+        </p>
         <p class="text-xs text-gray-400">gramos</p>
       </div>
       <div class="bg-white p-3 rounded-lg shadow-sm">
         <p class="text-sm text-gray-500">Grasas</p>
-        <p class="font-bold text-lg"><%= receta.grasas || 'N/A' %></p>
+        <p class="font-bold text-lg">
+          <%= receta.grasas || 'N/A' %>
+        </p>
         <p class="text-xs text-gray-400">gramos</p>
       </div>
     </div>
@@ -107,26 +133,32 @@
 
   <!-- Botones de Acción -->
   <div class="mt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-    <a href="/recetas" class="w-full sm:w-auto bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg inline-flex items-center justify-center">
+    <a href="<%= backTo ? backTo : '/recetas' %>"
+      class="w-full sm:w-auto bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-lg inline-flex items-center justify-center">
       <i class="fas fa-arrow-left mr-2"></i> Regresar
     </a>
+
     <div class="w-full sm:w-auto flex flex-col sm:flex-row gap-4">
-      <a href="/recetas/editar/<%= receta.id %>" class="w-full sm:w-auto bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg inline-flex items-center justify-center">
+      <a href="/recetas/editar/<%= receta.id %>"
+        class="w-full sm:w-auto bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg inline-flex items-center justify-center">
         <i class="fas fa-edit mr-2"></i> Editar
       </a>
 
       <!-- Nuevo botón Agregar a Plan -->
-      <% if (user && (user.rol === 'admin' || user.plan === 'premium')) { %>
-        <a href="/recetas/<%= receta.id %>/agregar-a-plan" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-4 rounded-lg inline-flex items-center justify-center">
+      <% if (user && (user.rol==='admin' || user.plan==='premium' )) { %>
+        <a href="/recetas/<%= receta.id %>/agregar-a-plan"
+          class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-4 rounded-lg inline-flex items-center justify-center">
           <i class="fas fa-plus mr-2"></i> Agregar a Plan
         </a>
-      <% } %>
+        <% } %>
 
-      <form action="/recetas/archivar/<%= receta.id %>?_method=PATCH" method="POST" class="w-full sm:w-auto" onsubmit="return confirm('¿Estás seguro de que quieres archivar esta receta?');">
-        <button type="submit" class="w-full bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg inline-flex items-center justify-center">
-          <i class="fas fa-trash-alt mr-2"></i> Archivar
-        </button>
-      </form>
+          <form action="/recetas/archivar/<%= receta.id %>?_method=PATCH" method="POST" class="w-full sm:w-auto"
+            onsubmit="return confirm('¿Estás seguro de que quieres archivar esta receta?');">
+            <button type="submit"
+              class="w-full bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg inline-flex items-center justify-center">
+              <i class="fas fa-trash-alt mr-2"></i> Archivar
+            </button>
+          </form>
     </div>
   </div>
 </div>

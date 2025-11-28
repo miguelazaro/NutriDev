@@ -1,64 +1,128 @@
 <%- include('partials/flash') %>
 
-  <div class="max-w-3xl mx-auto bg-white p-6 sm:p-8 shadow rounded-lg space-y-6">
+<div class="max-w-4xl mx-auto bg-white p-6 sm:p-8 shadow rounded-lg space-y-8">
 
-    <!-- HEADER -->
-    <div class="flex justify-between items-start gap-4">
-      <div>
-        <h1 class="text-2xl sm:text-3xl font-bold text-emerald-600">
-          <%= plan.titulo %>
-        </h1>
+  <!-- HEADER -->
+  <div class="flex justify-between items-start gap-4">
+    <div>
+      <h1 class="text-3xl font-bold text-emerald-600">
+        <%= plan.titulo %>
+      </h1>
 
-        <div class="mt-1 flex flex-wrap items-center gap-2 text-sm">
-          <span class="inline-flex items-center px-2 py-0.5 rounded-full
-          <%= plan.tipo === 'ia' ? 'bg-purple-100 text-purple-700' : 'bg-emerald-100 text-emerald-700' %>">
-            <i class="fas <%= plan.tipo==='ia' ? 'fa-robot' : 'fa-hands' %> mr-1"></i>
-            <%= plan.tipo==='ia' ? 'Generado por IA' : 'Manual' %>
+      <div class="mt-1 flex flex-wrap items-center gap-2 text-sm">
+        <span class="inline-flex items-center px-2 py-0.5 rounded-full
+        <%= plan.tipo === 'ia' ? 'bg-purple-100 text-purple-700' : 'bg-emerald-100 text-emerald-700' %>">
+          <i class="fas <%= plan.tipo==='ia' ? 'fa-robot' : 'fa-hands' %> mr-1"></i>
+          <%= plan.tipo==='ia' ? 'Generado por IA' : 'Manual' %>
+        </span>
+
+        <span class="text-gray-500">
+          • Paciente:
+          <span class="text-gray-700 font-medium">
+            <%= plan.paciente?.nombre || '—' %>
           </span>
-
-          <span class="text-gray-500">• Paciente:
-            <span class="text-gray-700 font-medium">
-              <%= plan.paciente ? plan.paciente.nombre : '—' %>
-            </span>
-          </span>
-        </div>
-
-        <p class="text-[11px] text-gray-400 mt-1">
-          Creado: <%= new Date(plan.createdAt).toLocaleString('es-MX') %>
-            · Actualizado: <%= new Date(plan.updatedAt).toLocaleString('es-MX') %>
-        </p>
+        </span>
       </div>
 
-      <div class="flex flex-col items-end space-y-2">
-        <a href="/planes-alimenticios"
-          class="inline-flex items-center text-sm font-medium text-emerald-600 hover:underline">
-          <i class="fas fa-arrow-left mr-2"></i> Volver a Planes Alimenticios
+      <p class="text-[11px] text-gray-400 mt-1">
+        Creado: <%= new Date(plan.createdAt).toLocaleString('es-MX') %> ·
+        Actualizado: <%= new Date(plan.updatedAt).toLocaleString('es-MX') %>
+      </p>
+    </div>
+
+    <!-- ACCIONES -->
+    <div class="flex flex-col items-end space-y-2">
+      <a href="/planes-alimenticios"
+        class="inline-flex items-center text-sm font-medium text-emerald-600 hover:underline">
+        <i class="fas fa-arrow-left mr-2"></i> Volver a Planes Alimenticios
+      </a>
+
+      <div class="flex flex-wrap gap-2">
+
+        <% if (plan.tipo==='manual') { %>
+          <a href="/recetas?addToPlan=<%= plan.id %>"
+            class="inline-flex items-center bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-4 py-2 rounded shadow text-sm">
+            <i class="fas fa-utensils mr-2"></i> Agregar receta
+          </a>
+        <% } %>
+
+        <a href="/planes-alimenticios/<%= plan.id %>/pdf"
+          class="inline-flex items-center bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded shadow text-sm">
+          <i class="fas fa-file-pdf mr-2"></i> PDF
         </a>
 
-        <div class="flex flex-wrap gap-2">
-          <% if (plan.tipo==='manual' ) { %>
-            <!-- 👇 ahora manda el ID del plan a /recetas -->
-            <a href="/recetas?addToPlan=<%= plan.id %>"
-              class="inline-flex items-center bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-4 py-2 rounded shadow text-sm">
-              <i class="fas fa-utensils mr-2"></i> Agregar receta (desde Recetas)
-            </a>
-            <% } %>
+        <a href="/planes-alimenticios/<%= plan.id %>/editar"
+          class="inline-flex items-center bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded shadow text-sm">
+          <i class="fas fa-edit mr-2"></i> Editar
+        </a>
 
-              <a href="/planes-alimenticios/<%= plan.id %>/pdf"
-                class="inline-flex items-center bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded shadow text-sm">
-                <i class="fas fa-file-pdf mr-2"></i> Descargar PDF
-              </a>
+        <!-- 🔥 NUEVO: BOTÓN DE QR -->
+        <a href="/qr_paciente/<%= plan.paciente_id %>"
+          class="inline-flex items-center bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded shadow text-sm">
+          <i class="fas fa-qrcode mr-2"></i> Ver QR del paciente
+        </a>
 
-              <a href="/planes-alimenticios/<%= plan.id %>/editar"
-                class="inline-flex items-center bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded shadow text-sm">
-                <i class="fas fa-edit mr-2"></i> Editar
-              </a>
-        </div>
       </div>
     </div>
-
-    <!-- CONTENIDO (ya viene como HTML seguro desde el controlador) -->
-    <div class="prose max-w-none">
-      <%- contenidoSeguro %>
-    </div>
   </div>
+
+  <!-- CONTENIDO DEL PLAN -->
+  <div class="prose max-w-none">
+    <%- contenidoSeguro %>
+  </div>
+
+  <!-- ================================ -->
+  <!-- 📌 SECCIÓN: RECETAS ASIGNADAS   -->
+  <!-- ================================ -->
+  <% if (recetas && recetas.length > 0) { %>
+    <div class="mt-10">
+      <h2 class="text-2xl font-bold text-emerald-600 mb-4 flex items-center">
+        <i class="fas fa-utensils mr-2"></i>
+        Recetas recomendadas esta semana
+      </h2>
+
+      <% 
+        const diasAgrupados = {};
+        recetas.forEach(r => {
+          const f = r.fecha;
+          if (!diasAgrupados[f]) diasAgrupados[f] = [];
+          diasAgrupados[f].push(r);
+        });
+      %>
+
+      <% Object.keys(diasAgrupados).forEach(fecha => { %>
+        <div class="mb-6 bg-gray-50 p-4 rounded-lg border">
+
+          <h3 class="font-semibold text-lg text-gray-800 mb-2">
+            <%= new Date(fecha).toLocaleDateString('es-MX', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %>
+          </h3>
+
+          <div class="space-y-3">
+            <% diasAgrupados[fecha].forEach(item => { %>
+              <div class="p-3 bg-white rounded shadow flex justify-between items-center border">
+
+                <div>
+                  <p class="font-medium text-gray-800"><%= item.receta.titulo %></p>
+                  <p class="text-xs text-gray-500">
+                    Momento: <strong><%= item.momento %></strong> • 
+                    Porciones: <%= item.porciones %>
+                  </p>
+                </div>
+
+                <!-- 🔥 LINK A RECETA CON RETORNO AL PLAN -->
+                <a href="/recetas/ver/<%= item.receta_id %>?fromPlan=<%= plan.id %>"
+                   class="text-emerald-600 text-sm hover:underline">
+                  Ver receta
+                </a>
+
+              </div>
+            <% }) %>
+          </div>
+
+        </div>
+      <% }) %>
+
+    </div>
+  <% } %>
+
+</div>

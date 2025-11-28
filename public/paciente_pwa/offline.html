@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sin Internet</title>
+    <link rel="stylesheet" href="/css/output.css?v=1" />
+</head>
+
+<body class="bg-gray-100 min-h-screen flex items-center justify-center px-6">
+
+    <div class="text-center max-w-xs bg-white p-6 rounded-xl shadow-lg">
+
+        <i class="fas fa-wifi-slash text-4xl text-emerald-600 mb-4"></i>
+
+        <h1 class="text-2xl font-bold text-gray-800 mb-2">No hay conexión a Internet</h1>
+
+        <p class="text-gray-600 text-sm mb-4">
+            Puedes seguir viendo el contenido que ya se cargó anteriormente.
+        </p>
+
+        <button onclick="volver()"
+            class="w-full bg-emerald-600 text-white py-2 rounded-lg shadow hover:bg-emerald-700 transition mb-3">
+            Ver último contenido disponible
+        </button>
+
+        <p class="text-xs text-gray-500 mt-2">
+            NutriDev — Modo Offline
+        </p>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
+
+    <script>
+        function volver() {
+            let id = localStorage.getItem("lastPaciente");
+
+            if (!id) {
+                // fallback seguro
+                window.location.href = "/paciente_pwa/";
+                return;
+            }
+
+            // ruta siempre cacheada
+            window.location.href = `/paciente_pwa/${id}`;
+        }
+    </script>
+
+</body>
+</html>

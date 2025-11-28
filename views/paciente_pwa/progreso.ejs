@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Progreso - <%= paciente.nombre %>
+    </title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/output.css?v=1">
+
+    <!-- PWA -->
+    <link rel="manifest" href="/paciente_pwa/manifest.json">
+    <script>
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("/paciente_pwa/service-worker.js");
+        }
+    </script>
+
+    <style>
+        body {
+            padding-bottom: 90px;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+
+    <!-- HEADER -->
+    <header class="bg-emerald-600 text-white py-4 px-4 shadow-md fixed top-0 left-0 right-0 z-20">
+        <h1 class="text-xl font-semibold">Progreso</h1>
+        <p class="text-sm opacity-80">Evolución del peso</p>
+    </header>
+
+    <!-- CONTENIDO -->
+    <main class="pt-24 px-4 pb-20 max-w-2xl mx-auto">
+
+        <!-- ================================
+             GRÁFICA
+        ================================= -->
+        <section class="bg-white p-4 rounded-lg shadow mb-4">
+            <h2 class="text-lg font-semibold text-emerald-600 mb-3">Evolución del Peso</h2>
+
+            <canvas id="pesoChart" data-fechas='<%- JSON.stringify(progresos.map(p => p.fecha)) %>'
+                data-pesos='<%- JSON.stringify(progresos.map(p => p.peso)) %>' height="180"></canvas>
+        </section>
+
+        <!-- ================================
+             LISTA DE REGISTROS
+        ================================= -->
+        <section class="bg-white p-4 rounded-lg shadow mb-4">
+            <h2 class="text-lg font-semibold text-emerald-600 mb-3">Historial</h2>
+
+            <% if (progresos.length===0) { %>
+                <p class="text-gray-500 text-sm">Aún no hay registros.</p>
+                <% } else { %>
+                    <ul class="space-y-3">
+                        <% progresos.forEach(p=> { %>
+                            <li class="p-3 bg-gray-50 rounded border">
+                                <p class="font-semibold text-gray-800">
+                                    <%= new Date(p.fecha).toLocaleDateString("es-MX") %>
+                                </p>
+
+                                <p class="text-sm text-gray-700">
+                                    Peso: <strong>
+                                        <%= p.peso %> kg
+                                    </strong>
+                                </p>
+
+                                <% if (p.observaciones) { %>
+                                    <p class="text-xs text-gray-500 mt-1">
+                                        <%= p.observaciones %>
+                                    </p>
+                                    <% } %>
+                            </li>
+                            <% }) %>
+                    </ul>
+                    <% } %>
+        </section>
+
+    </main>
+
+    <!-- MENÚ INFERIOR -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-30">
+        <div class="flex justify-around py-2">
+
+            <a href="/paciente_pwa/<%= paciente.id %>"
+                class="flex flex-col items-center text-gray-500 hover:text-emerald-600">
+                <i class="fas fa-list-alt text-xl"></i>
+                <span class="text-xs mt-1">Plan</span>
+            </a>
+
+            <a href="/paciente_pwa/<%= paciente.id %>/recetas"
+                class="flex flex-col items-center text-gray-500 hover:text-emerald-600">
+                <i class="fas fa-utensils text-xl"></i>
+                <span class="text-xs mt-1">Recetas</span>
+            </a>
+
+            <a href="/paciente_pwa/<%= paciente.id %>/progreso" class="flex flex-col items-center text-emerald-600">
+                <i class="fas fa-chart-line text-xl"></i>
+                <span class="text-xs mt-1 font-semibold">Progreso</span>
+            </a>
+
+        </div>
+    </nav>
+
+    <!-- Chart.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chart.js/4.4.0/chart.umd.min.js"></script>
+
+    <!-- Script externo encargado de generar la gráfica -->
+    <script src="/js/pesoChart.js"></script>
+
+    <!-- Icons -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
+
+    <script>
+    localStorage.setItem("lastPaciente", "<%= paciente.id %>");
+</script>
+</body>
+
+</html>
+
+

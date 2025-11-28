@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>
+        <%= receta.titulo %>
+    </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Tailwind -->
+    <link rel="stylesheet" href="/css/output.css?v=1">
+
+    <!-- PWA -->
+    <link rel="manifest" href="/paciente_pwa/manifest.json">
+    <script>
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("/paciente_pwa/service-worker.js");
+        }
+    </script>
+
+    <style>
+        body {
+            padding-bottom: 90px;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+
+    <!-- HEADER -->
+    <header class="bg-emerald-600 text-white py-4 px-4 shadow-md fixed top-0 left-0 right-0 z-20">
+        <h1 class="text-lg font-semibold leading-tight">
+            <%= receta.titulo %>
+        </h1>
+        <p class="text-xs opacity-80 capitalize">
+            <%= receta.categoria %>
+        </p>
+    </header>
+
+    <!-- CONTENIDO -->
+    <main class="pt-24 px-4 pb-10 max-w-2xl mx-auto">
+
+        <!-- IMAGEN -->
+        <% if (receta.imagen) { %>
+            <div class="rounded-lg overflow-hidden shadow mb-4">
+                <img src="<%= receta.imagen %>" alt="<%= receta.titulo %>" class="w-full object-cover max-h-64">
+            </div>
+            <% } %>
+
+                <!-- INGREDIENTES -->
+                <section class="bg-white p-4 rounded-lg shadow mb-4">
+                    <h2 class="text-lg font-semibold text-emerald-600 mb-2">Ingredientes</h2>
+
+                    <% if (receta.ingredientes) { %>
+                        <ul class="list-disc list-inside space-y-1 text-sm text-gray-700">
+                            <% receta.ingredientes.split('\n').forEach(i=> { %>
+                                <li>
+                                    <%= i %>
+                                </li>
+                                <% }) %>
+                        </ul>
+                        <% } else { %>
+                            <p class="text-sm text-gray-500">Sin ingredientes especificados.</p>
+                            <% } %>
+                </section>
+
+                <!-- PREPARACIÓN -->
+                <section class="bg-white p-4 rounded-lg shadow mb-6">
+                    <h2 class="text-lg font-semibold text-emerald-600 mb-2">Preparación</h2>
+
+                    <% if (receta.preparacion) { %>
+                        <p class="text-sm text-gray-700 whitespace-pre-line leading-relaxed">
+                            <%= receta.preparacion %>
+                        </p>
+                        <% } else { %>
+                            <p class="text-sm text-gray-500">Sin instrucciones disponibles.</p>
+                            <% } %>
+                </section>
+
+                <!-- BOTÓN REGRESAR -->
+                <a href="/paciente_pwa/<%= paciente.id %>/recetas"
+                    class="block w-full bg-gray-200 text-center text-gray-800 py-2 rounded-lg shadow hover:bg-gray-300 font-medium">
+                    ⬅️ Regresar
+                </a>
+
+    </main>
+
+    <!-- MENÚ INFERIOR -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-30">
+        <div class="flex justify-around py-2">
+
+            <!-- PLAN -->
+            <a href="/paciente_pwa/<%= paciente.id %>"
+                class="flex flex-col items-center text-gray-500 hover:text-emerald-600 transition">
+                <i class="fas fa-list-alt text-xl"></i>
+                <span class="text-xs mt-1">Plan</span>
+            </a>
+
+            <!-- RECETAS ACTIVO -->
+            <a href="/paciente_pwa/<%= paciente.id %>/recetas" class="flex flex-col items-center text-emerald-600">
+                <i class="fas fa-utensils text-xl"></i>
+                <span class="text-xs mt-1 font-semibold">Recetas</span>
+            </a>
+
+            <!-- PROGRESO -->
+            <a href="/paciente_pwa/<%= paciente.id %>/progreso"
+                class="flex flex-col items-center text-gray-500 hover:text-emerald-600 transition">
+                <i class="fas fa-chart-line text-xl"></i>
+                <span class="text-xs mt-1">Progreso</span>
+            </a>
+
+        </div>
+    </nav>
+
+    <!-- Icons -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
+
+</body>
+
+</html>
+
+<script>
+    localStorage.setItem("lastPaciente", "<%= paciente.id %>");
+</script>

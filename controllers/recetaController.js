@@ -154,6 +154,12 @@ const ver = async (req, res) => {
       }
     }
 
+    // 🔥 Detectar si viene desde un plan
+    const backTo =
+      req.query.fromPlan
+        ? `/planes-alimenticios/${req.query.fromPlan}`
+        : null;
+
     const recetaPlain = receta.get({ plain: true });
     recetaPlain.imagen = normalizeImagen(recetaPlain.imagen);
 
@@ -161,7 +167,8 @@ const ver = async (req, res) => {
       layout: 'layouts/sistema',
       receta: recetaPlain,
       user,
-      messages: req.flash()
+      messages: req.flash(),
+      backTo   // 🔥 Enviar la variable a la vista
     });
   } catch (error) {
     console.error('Error al ver receta:', error);
@@ -169,6 +176,8 @@ const ver = async (req, res) => {
     res.status(500).redirect('/recetas');
   }
 };
+
+
 
 const importarDesdeAPI = async (req, res) => {
   const user = req.session?.usuario || {};

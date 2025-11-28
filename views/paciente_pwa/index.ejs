@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>NutriDev Paciente</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- PWA -->
+    <!-- PWA -->
+    <link rel="manifest" href="/paciente_pwa/manifest.json">
+
+    <script>
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("/paciente_pwa/service-worker.js")
+                .then(() => console.log("SW registrado"))
+                .catch(err => console.error("SW error:", err));
+        }
+    </script>
+
+
+
+    <!-- Tailwind -->
+    <link rel="stylesheet" href="/css/output.css?v=1">
+
+    <style>
+        body {
+            padding-bottom: 90px;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 min-h-screen">
+
+    <!-- HEADER -->
+    <header class="bg-emerald-600 text-white py-4 px-4 shadow-md fixed top-0 left-0 right-0 z-20">
+        <h1 class="text-xl font-semibold">
+            👤 <%= paciente.nombre %>
+        </h1>
+        <p class="text-sm opacity-80">Plan alimenticio asignado</p>
+    </header>
+
+    <!-- CONTENIDO -->
+    <main class="pt-24 px-4 pb-10">
+
+        <!-- ============================
+             PLAN ALIMENTICIO
+        ============================ -->
+        <section class="bg-white shadow-lg rounded-xl p-4 mb-6">
+            <h2 class="text-lg font-bold text-emerald-700 mb-3">Tu Plan Alimenticio</h2>
+
+            <% if (plan) { %>
+                <p class="text-gray-700 whitespace-pre-line leading-relaxed text-sm">
+                    <%= plan.contenido %>
+                </p>
+                <% } else { %>
+                    <p class="text-gray-500 text-sm">Aún no tienes un plan asignado.</p>
+                    <% } %>
+        </section>
+
+
+        <!-- ============================
+             RECETAS ASIGNADAS
+        ============================ -->
+        <section class="bg-white shadow-lg rounded-xl p-4 mb-6">
+            <h2 class="text-lg font-bold text-emerald-700 mb-3">Recetas recomendadas</h2>
+
+            <% if (recetas.length===0) { %>
+                <p class="text-gray-500 text-sm">Aún no hay recetas asignadas a tu plan.</p>
+                <% } else { %>
+
+                    <div class="space-y-4">
+
+                        <% recetas.forEach(item=> { %>
+                            <div class="flex bg-gray-50 rounded-lg p-3 shadow-sm">
+
+                                <!-- Imagen -->
+                                <div class="w-20 h-20 flex-shrink-0 overflow-hidden rounded-lg border bg-white">
+                                    <% if (item.receta && item.receta.imagen) { %>
+                                        <img src="<%= item.receta.imagen %>" alt="<%= item.receta.titulo %>"
+                                            class="w-full h-full object-cover">
+                                        <% } else { %>
+                                            <div
+                                                class="w-full h-full flex items-center justify-center text-gray-400 text-xs">
+                                                Sin imagen
+                                            </div>
+                                            <% } %>
+                                </div>
+
+                                <!-- Info -->
+                                <div class="ml-3 flex flex-col justify-between flex-grow">
+                                    <div>
+                                        <p class="font-semibold text-sm text-gray-800">
+                                            <%= item.receta ? item.receta.titulo : "Receta no disponible" %>
+                                        </p>
+
+                                        <p class="text-xs text-gray-500 mt-1">
+                                            <i class="fas fa-calendar-day mr-1"></i>
+                                            <%= item.fecha %> •
+                                                <span class="capitalize">
+                                                    <%= item.momento %>
+                                                </span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <% }); %>
+
+                    </div>
+
+                    <% } %>
+        </section>
+
+        <footer class="text-center text-xs text-gray-400 mt-4 pb-5">
+            NutriDev — Vista del paciente
+        </footer>
+    </main>
+
+
+    <!-- MENÚ INFERIOR -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-30">
+        <div class="flex justify-around py-2">
+
+            <!-- PLAN -->
+            <a href="/paciente_pwa/<%= paciente.id %>" class="flex flex-col items-center text-emerald-600">
+                <i class="fas fa-list-alt text-xl"></i>
+                <span class="text-xs mt-1">Plan</span>
+            </a>
+
+            <!-- RECETAS -->
+            <a href="/paciente_pwa/<%= paciente.id %>/recetas"
+                class="flex flex-col items-center text-gray-500 hover:text-emerald-600 transition">
+                <i class="fas fa-utensils text-xl"></i>
+                <span class="text-xs mt-1">Recetas</span>
+            </a>
+
+            <!-- PROGRESO -->
+            <a href="/paciente_pwa/<%= paciente.id %>/progreso"
+                class="flex flex-col items-center text-gray-500 hover:text-emerald-600 transition">
+                <i class="fas fa-chart-line text-xl"></i>
+                <span class="text-xs mt-1">Progreso</span>
+            </a>
+
+        </div>
+    </nav>
+
+    <!-- FontAwesome -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
+
+    <script>
+    localStorage.setItem("lastPaciente", "<%= paciente.id %>");
+</script>
+
+</body>
+
+</html>
+
+

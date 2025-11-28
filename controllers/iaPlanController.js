@@ -1,6 +1,12 @@
 // controllers/iaPlanController.js
 const axios = require('axios');
 const { Paciente, Progreso, NotaNutriologo, PlanAlimenticio } = require('../models/associations');
+const parsePlanIA = require('../utils/parsePlanIA');
+const mapMealToCategory = require('../utils/mapMealToCategory');
+const getDatesForWeek = require('../utils/getDatesForWeek');
+const selectRecipe = require('../utils/selectRecipe');
+const PlanReceta = require('../models/PlanReceta');
+
 
 // Helper: id del usuario logueado
 const uid = (req) => req.session?.usuario?.id || null;
@@ -211,6 +217,35 @@ exports.generarPlan = async (req, res) => {
       paciente_id: paciente.id,
       usuario_id: userId,
     });
+    // ===========================
+    // 🚀 Asignación automática de recetas
+    // ===========================
+    const parsed = parsePlanIA(md);
+    const fechasSemana = getDatesForWeek();
+
+    for (let i = 0; i < parsed.length; i++) {
+      const dia = parsed[i];
+      const fecha = fechasSemana[i];
+
+      for (let meal of dia.comidas) {
+        const categoria = mapMealToCategory(meal.tipo);
+        const receta = await selectRecipe(categoria);
+
+        if (!receta) continue;
+
+        await PlanReceta.create({
+          plan_id: plan.id,
+          paciente_id: paciente.id,
+          receta_id: receta.id,
+          fecha,
+          momento: categoria,
+          porciones: 1,
+          notas: null
+        });
+      }
+    }
+
+    console.log("Recetas asignadas automáticamente ✔️");
 
     if (wantsJSON(req)) return res.json({ ok: true, planId: plan.id, contenido: md });
 

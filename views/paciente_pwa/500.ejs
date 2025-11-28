@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Error interno</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- PWA -->
+    <link rel="manifest" href="/paciente_pwa/manifest.json">
+    <script>
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("/paciente_pwa/service-worker.js")
+                .then(() => console.log("SW registrado"))
+                .catch(err => console.error("SW error:", err));
+        }
+    </script>
+
+    <!-- Tailwind -->
+    <link rel="stylesheet" href="/css/output.css?v=1">
+</head>
+
+<body class="bg-yellow-50 min-h-screen flex items-center justify-center px-6">
+
+    <div class="text-center bg-white shadow-lg p-6 rounded-xl max-w-sm w-full">
+        <h1 class="text-4xl font-bold text-yellow-600 mb-3">500</h1>
+
+        <p class="text-gray-700 text-sm mb-6">
+            Ocurrió un error interno en el servidor.
+        </p>
+
+        <a href="/"
+            class="bg-yellow-600 text-white px-4 py-2 rounded-lg shadow hover:bg-yellow-700 transition text-sm inline-flex items-center">
+            <i class="fas fa-arrow-left mr-2"></i>
+            Volver al inicio
+        </a>
+    </div>
+
+    <!-- FontAwesome -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
+
+    <script>
+    localStorage.setItem("lastPaciente", "<%= paciente.id %>");
+</script>
+
+</body>
+
+</html>
+
+

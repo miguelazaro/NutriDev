@@ -186,8 +186,16 @@ app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
 app.use('/css', express.static(path.join(__dirname, 'public/css')));
 
 app.get('/favicon.ico', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'favicon.ico'));
+  res.sendFile(path.join(__dirname, 'public/assets/img/logo_nutridev.png'));
 });
+
+
+// Service worker del PWA
+app.get('/paciente_pwa/service-worker.js', (req, res) => {
+  res.setHeader('Content-Type', 'application/javascript');
+  res.sendFile(path.join(__dirname, 'public/paciente_pwa/service-worker.js'));
+});
+
 
 /* -----------------------------
    Auth / User
@@ -253,6 +261,15 @@ app.use('/planes', requireAuth, (req, res, next) => { res.locals.active = 'plane
 // Cobros
 const cobrosRouter = require('./routes/cobros');
 app.use('/cobros', cobrosRouter);
+
+// PWA PACIENTE (sin autenticación)
+const pacientePwaRoutes = require('./routes/paciente_pwa');
+app.use('/paciente_pwa', pacientePwaRoutes);
+
+// QR del Paciente
+const qrPacienteRoutes = require("./routes/qr_paciente");
+app.use("/qr_paciente", qrPacienteRoutes);
+
 
 /* -----------------------------
    Recibo PDF de Cobro
