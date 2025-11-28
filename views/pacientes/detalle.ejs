@@ -201,46 +201,140 @@
     </p>
 </div>
 
-    
-
 </section>
 
+<section class="bg-white border rounded-xl p-6 shadow-md mt-8 w-full">
 
-     <!-- CALCULADORA DE GASTO CALÓRICO -->
-    <section class="bg-white border rounded-lg p-4 shadow mt-4">
-        <h2 class="text-lg font-semibold text-red-700 mb-3">🔥 Gasto Calórico del Paciente</h2>
+    <h2 class="text-xl font-semibold text-red-700 mb-4 flex items-center gap-2">
+         Calculadora de gasto calórico
+    </h2>
 
-        <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 text-sm">
+    <!-- CAMPOS OBLIGATORIOS -->
+    <h3 class="text-sm font-semibold text-gray-700 mb-2">Campos obligatorios</h3>
 
-            <div class="bg-red-50 p-4 rounded-lg shadow">
-                <p class="text-gray-500">Peso actual</p>
-                <p class="font-semibold text-red-700 text-lg">
-                    <%= paciente.peso ? paciente.peso + ' kg' : 'No registrado' %>
-                </p>
-            </div>
+    <!-- FORMULARIO ANCHO COMPLETO -->
+    <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
 
-            <div class="bg-red-50 p-4 rounded-lg shadow">
-                <p class="text-gray-500">TMB (Metabolismo Basal)</p>
-                <p class="font-semibold text-red-700 text-lg">
-                    <%= TMB ? TMB + ' kcal/día' : 'No disponible' %>
-                </p>
-            </div>
-
-            <div class="bg-red-50 p-4 rounded-lg shadow">
-                <p class="text-gray-500">TDEE (Gasto total)</p>
-                <p class="font-semibold text-red-700 text-lg">
-                    <%= TDEE ? TDEE + ' kcal/día' : 'No disponible' %>
-                </p>
-            </div>
+        <!-- SEXO -->
+        <div>
+            <label class="text-gray-600 font-medium text-sm">Sexo</label>
+            <select id="calc-genero" class="w-full border rounded-lg p-2">
+                <option value="Masculino" <%= paciente.genero === 'Masculino' ? 'selected':'' %>>Masculino</option>
+                <option value="Femenino" <%= paciente.genero === 'Femenino' ? 'selected':'' %>>Femenino</option>
+            </select>
         </div>
 
-        <% if (!paciente.peso || !paciente.estatura || !edad) { %>
-            <p class="text-gray-500 text-xs mt-3 italic">
-                * Para calcular correctamente el gasto calórico debes registrar: peso, estatura y fecha de nacimiento.
-            </p>
-        <% } %>
-    </section>
+        <!-- PESO -->
+        <div>
+            <label class="text-gray-600 font-medium text-sm">Peso (kg)</label>
+            <input id="calc-peso" type="number" class="w-full border rounded-lg p-2"
+                value="<%= paciente.peso || '' %>">
+        </div>
 
+        <!-- ESTATURA -->
+        <div>
+            <label class="text-gray-600 font-medium text-sm">Estatura (cm)</label>
+            <input id="calc-estatura" type="number" class="w-full border rounded-lg p-2"
+                value="<%= paciente.estatura || '' %>">
+        </div>
+
+        <!-- EDAD -->
+        <div>
+            <label class="text-gray-600 font-medium text-sm">Edad (años)</label>
+            <input id="calc-edad" type="number" class="w-full border rounded-lg p-2"
+                value="<%= edad || '' %>">
+        </div>
+
+        <!-- ACTIVIDAD -->
+        <div>
+            <label class="text-gray-600 font-medium text-sm">Actividad física</label>
+            <select id="calc-actividad" class="w-full border rounded-lg p-2">
+                <option value="sedentario" <%= paciente.actividad==='sedentario'?'selected':'' %>>Sedentario</option>
+                <option value="ligero" <%= paciente.actividad==='ligero'?'selected':'' %>>Ligero</option>
+                <option value="moderado" <%= paciente.actividad==='moderado'?'selected':'' %>>Moderado</option>
+                <option value="intenso" <%= paciente.actividad==='intenso'?'selected':'' %>>Intenso</option>
+                <option value="muy_intenso" <%= paciente.actividad==='muy_intenso'?'selected':'' %>>Muy intenso</option>
+            </select>
+        </div>
+
+        <!-- OBJETIVO -->
+        <div>
+            <label class="text-gray-600 font-medium text-sm">Objetivo</label>
+            <select id="calc-objetivo" class="w-full border rounded-lg p-2">
+                <option value="mantener_peso" <%= paciente.objetivo === 'mantener_peso'?'selected':'' %>>Mantener peso</option>
+                <option value="bajar_peso" <%= paciente.objetivo === 'bajar_peso'?'selected':'' %>>Bajar peso</option>
+                <option value="ganar_musculo" <%= paciente.objetivo === 'ganar_musculo'?'selected':'' %>>Ganar músculo</option>
+            </select>
+        </div>
+
+    </div>
+
+    <!-- OPCIONALES -->
+    <h3 class="text-sm font-semibold text-gray-700 mt-6 mb-2">Opcionales (no afectan el cálculo)</h3>
+
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+
+        <div>
+            <label class="text-gray-600 font-medium text-sm">Cintura (cm)</label>
+            <input disabled class="w-full border rounded-lg p-2 bg-gray-100"
+                value="<%= paciente.circunferencia_cintura || '' %>">
+        </div>
+
+        <div>
+            <label class="text-gray-600 font-medium text-sm">% grasa</label>
+            <input disabled class="w-full border rounded-lg p-2 bg-gray-100"
+                value="<%= paciente.porcentaje_grasa || '' %>">
+        </div>
+
+        <div>
+            <label class="text-gray-600 font-medium text-sm">Enfermedades</label>
+            <input disabled class="w-full border rounded-lg p-2 bg-gray-100"
+                value="<%= paciente.otras_enfermedades || 'Ninguna' %>">
+        </div>
+
+        <div>
+            <label class="text-gray-600 font-medium text-sm">Sueño (hrs)</label>
+            <input disabled class="w-full border rounded-lg p-2 bg-gray-100"
+                value="<%= paciente.horas_sueno || '' %>">
+        </div>
+
+        <div>
+            <label class="text-gray-600 font-medium text-sm">Estrés</label>
+            <input disabled class="w-full border rounded-lg p-2 bg-gray-100"
+                value="<%= paciente.estres || '' %>">
+        </div>
+
+    </div>
+
+    <!-- RESULTADOS -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
+
+        <div class="p-4 border rounded-xl bg-red-50 text-center shadow-sm">
+            <p class="text-gray-600 text-sm">TMB (Metabolismo basal)</p>
+            <h3 id="calc-tmb" class="text-2xl font-bold text-red-700">—</h3>
+        </div>
+
+        <div class="p-4 border rounded-xl bg-red-50 text-center shadow-sm">
+            <p class="text-gray-600 text-sm">TDEE (Gasto total)</p>
+            <h3 id="calc-tdee" class="text-2xl font-bold text-red-700">—</h3>
+        </div>
+
+        <div class="p-4 border rounded-xl bg-red-50 text-center shadow-sm">
+            <p class="text-gray-600 text-sm">Calorías según objetivo</p>
+            <h3 id="calc-objetivo-res" class="text-2xl font-bold text-red-700">—</h3>
+        </div>
+
+    </div>
+
+    <!-- BOTÓN -->
+    <div class="text-center mt-6">
+        <button onclick="calcular()"
+            class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold shadow">
+            CALCULAR
+        </button>
+    </div>
+
+</section>
     <!-- HISTORIAL Y NOTAS -->
     <section class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div class="bg-white border rounded-lg p-4">
@@ -436,6 +530,47 @@
 </div>
 
 <script>
+function calcular() {
+    const peso = parseFloat(document.getElementById("calc-peso").value);
+    const estatura = parseFloat(document.getElementById("calc-estatura").value);
+    const edad = parseInt(document.getElementById("calc-edad").value);
+    const actividad = document.getElementById("calc-actividad").value;
+    const genero = document.getElementById("calc-genero").value;
+    const objetivo = document.getElementById("calc-objetivo").value;
+
+    if (!peso || !estatura || !edad) return;
+
+    let TMB = 0;
+
+    if (genero === "Masculino") {
+        TMB = 88.362 + (13.397 * peso) + (4.799 * estatura) - (5.677 * edad);
+    } else {
+        TMB = 447.593 + (9.247 * peso) + (3.098 * estatura) - (4.330 * edad);
+    }
+
+    const factores = {
+        sedentario: 1.2,
+        ligero: 1.375,
+        moderado: 1.55,
+        intenso: 1.725,
+        muy_intenso: 1.9
+    };
+
+    const TDEE = TMB * (factores[actividad] || 1.2);
+
+    let caloriasObjetivo = TDEE;
+    if (objetivo === "bajar_peso") caloriasObjetivo -= 450;
+    if (objetivo === "ganar_musculo") caloriasObjetivo += 300;
+
+    document.getElementById("calc-tmb").textContent = Math.round(TMB) + " kcal/día";
+    document.getElementById("calc-tdee").textContent = Math.round(TDEE) + " kcal/día";
+    document.getElementById("calc-objetivo-res").textContent = Math.round(caloriasObjetivo) + " kcal/día";
+}
+
+document.addEventListener("DOMContentLoaded", calcular);
+</script>
+
+<script>
   window.pacienteMeta = JSON.parse(
     `<%- JSON.stringify({
       TMB: TMB || 0,
@@ -480,7 +615,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     function renderGraficaProgreso() {
-        const progresos = <% - JSON.stringify(paciente.Progresos || []) %>;
+const progresos = <%- JSON.stringify(paciente.Progresos || []) %>;
         const ctx = document.getElementById('graficaProgreso')?.getContext('2d');
 
         if (!ctx || !progresos || progresos.length === 0) return;
