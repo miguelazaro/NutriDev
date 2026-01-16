@@ -1,20 +1,20 @@
-// controllers/dashboardController.js
 const { Cobro } = require('../models/associations_cobros');
-const Paciente = require('../models/Paciente'); // si usas associations, cámbialo a require('../models/associations').Paciente
+const Paciente = require('../models/Paciente');
+const Cita = require('../models/Cita'); // Modelo de citas
 
 exports.renderDashboard = async (req, res) => {
   const user = req.session?.usuario;
   const uid = user?.id;
 
   try {
-    // Pacientes del dueño
+    // Pacientes activos del usuario
     const pacientesActivos = await Paciente.count({ where: { usuario_id: uid } });
 
-    // Ingresos del dueño
+    // Cobros pagados
     const whereCobros = { usuario_id: uid, estado: 'pagado' };
     const totalIngresosCents = (await Cobro.sum('monto_centavos', { where: whereCobros })) || 0;
 
-    // Último cobro pagado
+    // Último cobro
     const ultimoCobro = await Cobro.findOne({
       where: whereCobros,
       order: [
@@ -24,16 +24,20 @@ exports.renderDashboard = async (req, res) => {
     });
     const ultimoIngreso = ultimoCobro ? (ultimoCobro.monto_centavos || 0) / 100 : 0;
 
-    // Placeholders 
+    // Placeholders
     const menusCreados = 0;
     const progresosRegistrados = 0;
+
+    // Total de citas
+    const totalCitasDashboard = await Cita.count({ where: { usuario_id: uid } });
 
     res.render('dashboard', {
       pacientesActivos,
       menusCreados,
       progresosRegistrados,
       ultimoIngreso,
-      totalIngresos: totalIngresosCents / 100
+      totalIngresos: totalIngresosCents / 100,
+      totalCitasDashboard
     });
   } catch (err) {
     console.error('Error al cargar dashboard:', err);
@@ -42,7 +46,8 @@ exports.renderDashboard = async (req, res) => {
       menusCreados: 0,
       progresosRegistrados: 0,
       ultimoIngreso: 0,
-      totalIngresos: 0
+      totalIngresos: 0,
+      totalCitasDashboard: 0
     });
   }
 };

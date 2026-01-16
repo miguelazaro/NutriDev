@@ -1,4 +1,3 @@
-// models/Paciente.js
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 
@@ -37,6 +36,13 @@ const Paciente = sequelize.define('Paciente', {
         allowNull: true,
         validate: { min: 50, max: 250 }
     },
+
+    peso: {
+        type: DataTypes.FLOAT,
+        allowNull: true,
+        validate: { min: 20, max: 400 }
+    },
+
     actividad: { type: DataTypes.STRING, allowNull: true },
     objetivo: { type: DataTypes.STRING, allowNull: true },
     comidas_dia: {
@@ -44,6 +50,7 @@ const Paciente = sequelize.define('Paciente', {
         allowNull: true,
         validate: { min: 1, max: 10 }
     },
+    // antes se llamaba "preferencias" en el modelo
     preferencias: { type: DataTypes.TEXT, allowNull: true },
 <<<<<<< Updated upstream
 =======
@@ -99,6 +106,58 @@ const Paciente = sequelize.define('Paciente', {
     },
 >>>>>>> Stashed changes
 
+    // 🔹 Medición física detallada
+    porcentaje_grasa: {
+        type: DataTypes.FLOAT,
+        allowNull: true
+    },
+    circunferencia_cintura: {
+        type: DataTypes.FLOAT,
+        allowNull: true
+    },
+    presion_arterial: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+
+    // 🔹 Estilo de vida
+    tipo_ejercicio: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    horas_sueno: {
+        type: DataTypes.INTEGER,
+        allowNull: true
+    },
+    calidad_sueno: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    estres: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+
+    // 🔹 Hábitos alimenticios
+    preferencia_alimentaria: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    consumo_agua: {
+        type: DataTypes.FLOAT,
+        allowNull: true
+    },
+    apetito: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+
+    // 🔹 Enfermedades adicionales
+    otras_enfermedades: {
+        type: DataTypes.TEXT,
+        allowNull: true
+    },
+
     // Contacto
     telefono: {
         type: DataTypes.STRING,
@@ -135,10 +194,5 @@ const Paciente = sequelize.define('Paciente', {
         }
     }
 });
-
-const Cita = require('./Cita');
-Paciente.hasMany(Cita, { foreignKey: 'paciente_id', as: 'citas' });
-Cita.belongsTo(Paciente, { foreignKey: 'paciente_id', as: 'paciente' });
-
 
 module.exports = Paciente;

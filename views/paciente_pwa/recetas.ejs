@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Recetas recomendadas — <%= paciente.nombre %>
+    </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- PWA -->
+    <link rel="manifest" href="/paciente_pwa/manifest.json">
+    <script>
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("/paciente_pwa/service-worker.js")
+                .then(() => console.log("SW registrado"))
+                .catch(err => console.error("SW error:", err));
+        }
+    </script>
+
+    <!-- Tailwind compilado -->
+    <link rel="stylesheet" href="/css/output.css?v=1">
+
+    <style>
+        body {
+            padding-bottom: 80px;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+
+    <!-- HEADER -->
+    <header class="bg-emerald-600 text-white py-4 px-4 shadow-md fixed top-0 left-0 right-0 z-20">
+        <h1 class="text-xl font-semibold">
+            <%= paciente.nombre %>
+        </h1>
+        <p class="text-sm opacity-80">Recetas recomendadas esta semana</p>
+    </header>
+
+    <!-- CONTENIDO -->
+    <main class="pt-24 px-4 pb-6 max-w-2xl mx-auto">
+
+        <% if (recetas && recetas.length> 0) { %>
+
+            <% const diasAgrupados={}; recetas.forEach(r=> {
+                const key = (r.fecha instanceof Date)
+                ? r.fecha.toISOString().slice(0,10)
+                : String(r.fecha || '');
+                if (!diasAgrupados[key]) diasAgrupados[key] = [];
+                diasAgrupados[key].push(r);
+                });
+
+                const fechasOrdenadas = Object.keys(diasAgrupados).sort();
+                %>
+
+                <% fechasOrdenadas.forEach(fecha=> { %>
+                    <section class="mb-6 bg-white rounded-xl shadow-sm border border-gray-100">
+
+                        <!-- Fecha -->
+                        <div class="px-4 pt-4 pb-2 border-b">
+                            <h2 class="text-base font-semibold text-gray-800 capitalize">
+                                <% const d=new Date(fecha); const esValida=!isNaN(d.getTime()); %>
+
+                                    <% if (esValida) { %>
+                                        <%= d.toLocaleDateString('es-MX', { weekday: 'long' , year: 'numeric' ,
+                                            month: 'long' , day: 'numeric' }) %>
+                                            <% } else { %>
+                                                <%= fecha || 'Sin fecha' %>
+                                                    <% } %>
+                            </h2>
+                        </div>
+
+                        <!-- Recetas del día -->
+                        <div class="divide-y divide-gray-100">
+
+                            <% diasAgrupados[fecha].forEach(item=> { %>
+                                <article class="px-4 py-3 flex items-center justify-between">
+
+                                    <div class="mr-3">
+                                        <p class="font-medium text-gray-900 text-sm">
+                                            <%= item.receta?.titulo || 'Receta sin nombre' %>
+                                        </p>
+
+                                        <p class="text-xs text-gray-500 mt-0.5">
+                                            Momento:
+                                            <span class="font-semibold capitalize">
+                                                <%= item.momento %>
+                                            </span>
+                                            • Porciones: <%= item.porciones || 1 %>
+                                        </p>
+
+                                        <% if (item.notas) { %>
+                                            <p class="text-[11px] text-gray-400 mt-0.5">
+                                                Nota: <%= item.notas %>
+                                            </p>
+                                            <% } %>
+                                    </div>
+
+                                    <!-- Botón ver receta -->
+                                    <a href="/paciente_pwa/<%= paciente.id %>/recetas/<%= item.receta_id %>"
+                                        class="text-emerald-600 text-xs font-semibold px-3 py-1 rounded-full border border-emerald-200 hover:bg-emerald-50 transition">
+                                        Ver receta
+                                    </a>
+
+                                </article>
+                                <% }) %>
+
+                        </div>
+                    </section>
+                    <% }) %>
+
+                        <% } else { %>
+                            <!-- Cuando no hay recetas -->
+                            <section class="bg-white rounded-xl shadow p-4 text-center text-sm text-gray-500">
+                                Aún no tienes recetas recomendadas vinculadas a tu plan.
+                            </section>
+                            <% } %>
+
+                                <footer class="text-center text-[11px] text-gray-400 mt-4">
+                                    NutriDev — Vista del paciente
+                                </footer>
+
+    </main>
+
+    <!-- MENÚ INFERIOR -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-30">
+        <div class="flex justify-around py-2">
+
+            <a href="/paciente_pwa/<%= paciente.id %>"
+                class="flex flex-col items-center text-gray-500 hover:text-emerald-600 transition">
+                <i class="fas fa-list-alt text-xl"></i>
+                <span class="text-xs mt-1">Plan</span>
+            </a>
+
+            <a href="/paciente_pwa/<%= paciente.id %>/recetas" class="flex flex-col items-center text-emerald-600">
+                <i class="fas fa-utensils text-xl"></i>
+                <span class="text-xs mt-1 font-semibold">Recetas</span>
+            </a>
+
+            <a href="/paciente_pwa/<%= paciente.id %>/progreso"
+                class="flex flex-col items-center text-gray-500 hover:text-emerald-600 transition">
+                <i class="fas fa-chart-line text-xl"></i>
+                <span class="text-xs mt-1">Progreso</span>
+            </a>
+
+        </div>
+    </nav>
+
+    <!-- Icons -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
+
+</body>
+
+</html>
+
+<script>
+    localStorage.setItem("lastPaciente", "<%= paciente.id %>");
+</script>

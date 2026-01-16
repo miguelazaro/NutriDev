@@ -1,6 +1,6 @@
 const Receta = require('../models/Receta');
 const { Op } = require('sequelize');
-const PUBLIC_OWNER_ID = 2; // tu catálogo
+const PUBLIC_OWNER_ID = 2; 
 
 module.exports = async function selectRecipe(categoria) {
     const recetas = await Receta.findAll({

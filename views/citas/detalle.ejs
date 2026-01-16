@@ -1,0 +1,82 @@
+<div class="max-w-3xl mx-auto px-4 py-6">
+  <!-- TÍTULO -->
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-emerald-700">Detalle de la cita</h1>
+
+    <a href="/citas"
+      class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg shadow transition">
+      Volver
+    </a>
+  </div>
+
+  <!-- TARJETA PRINCIPAL -->
+  <div class="bg-white rounded-lg shadow p-6 space-y-6">
+
+    <!-- PACIENTE -->
+    <div>
+      <h2 class="text-lg font-semibold text-gray-700 mb-1">Paciente</h2>
+      <p class="text-gray-800 text-lg">
+        <i class="fas fa-user text-emerald-600 mr-1"></i>
+        <%= cita.paciente.nombre %>
+      </p>
+    </div>
+
+    <!-- FECHA Y HORA -->
+    <div>
+      <h2 class="text-lg font-semibold text-gray-700 mb-1">Fecha y hora</h2>
+
+      <p class="text-gray-800">
+        <i class="fas fa-calendar-alt text-blue-600 mr-1"></i>
+        <%= new Date(cita.fecha).toLocaleDateString('es-MX') %>
+      </p>
+
+      <p class="text-gray-800">
+        <i class="fas fa-clock text-yellow-600 mr-1"></i>
+        <%= cita.hora %>
+      </p>
+    </div>
+
+    <!-- MOTIVO -->
+    <div>
+      <h2 class="text-lg font-semibold text-gray-700 mb-1">Motivo</h2>
+      <p class="text-gray-800"><%= cita.motivo || "Sin especificar" %></p>
+    </div>
+
+    <!-- ESTADO -->
+    <div>
+      <h2 class="text-lg font-semibold text-gray-700 mb-1">Estado</h2>
+      <p class="text-lg font-bold
+        <%= cita.estado === 'Pendiente' ? 'text-yellow-600' :
+            cita.estado === 'Completada' ? 'text-green-600' :
+            cita.estado === 'Cancelada' ? 'text-red-600' :
+            'text-blue-600' %>">
+        <%= cita.estado %>
+      </p>
+    </div>
+
+    <!-- OBSERVACIONES -->
+    <div>
+      <h2 class="text-lg font-semibold text-gray-700 mb-1">Observaciones</h2>
+      <p class="text-gray-800 whitespace-pre-line">
+        <%= cita.observaciones || "Sin observaciones" %>
+      </p>
+    </div>
+
+    <!-- BOTONES -->
+    <div class="flex gap-3 pt-4">
+      <a href="/citas/editar/<%= cita.id %>"
+        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg shadow transition">
+        Editar
+      </a>
+
+      <form action="/citas/eliminar/<%= cita.id %>" method="POST"
+        onsubmit="return confirm('¿Eliminar esta cita?')">
+        <button type="submit"
+          class="bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded-lg shadow transition">
+          Eliminar
+        </button>
+      </form>
+    </div>
+
+  </div>
+</div>

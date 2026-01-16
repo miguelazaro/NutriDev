@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>QR del Paciente</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="/css/output.css">
+</head>
+
+<body class="bg-gray-100 min-h-screen flex items-center justify-center px-4">
+
+    <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm text-center">
+
+        <h1 class="text-xl font-bold text-emerald-600 mb-4">
+            QR del Paciente
+        </h1>
+
+        <p class="text-gray-600 mb-4">
+            Comparte este código al paciente para que pueda acceder a su PWA.
+        </p>
+
+        <!-- QR generado -->
+        <img src="<%= qr %>" alt="QR del paciente" class="mx-auto mb-4 w-48 h-48 shadow-md rounded">
+
+        <p class="text-sm text-gray-500 mb-6">
+            ID del paciente: <strong>
+                <%= pacienteId %>
+            </strong>
+        </p>
+
+        <!-- 🔵 Botón para DESCARGAR PNG -->
+        <a href="<%= qr %>" download="qr_paciente_<%= pacienteId %>.png"
+            class="mb-4 inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow text-sm">
+            <i class="fas fa-download mr-2"></i> Descargar PNG
+        </a>
+
+        <br>
+
+        <!-- Botón para volver -->
+        <a href="/planes-alimenticios"
+            class="mt-4 inline-block bg-emerald-600 text-white px-4 py-2 rounded hover:bg-emerald-700">
+            Volver
+        </a>
+
+    </div>
+
+    <!-- FontAwesome para ícono de descarga -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
+
+</body>
+
+</html>

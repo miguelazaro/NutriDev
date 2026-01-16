@@ -1,6 +1,8 @@
 const sanitizeHtml = require('sanitize-html');
 const PlanAlimenticio = require('../models/PlanAlimenticio');
 const Paciente = require('../models/Paciente');
+const PlanReceta = require('../models/PlanReceta');
+const Receta = require('../models/Receta');
 
 const fs = require('fs');
 const path = require('path');
@@ -13,6 +15,7 @@ const MEALS = ['Desayuno', 'Snack 1', 'Snack 2', 'Snack', 'Comida', 'Almuerzo', 
 let _marked;
 const uid  = (req) => req.session?.usuario?.id;
 const urol = (req) => req.session?.usuario?.rol || 'nutriologo';
+
 
 /* ---------------- helpers markdown ---------------- */
 function limpiarMarkdownMeta(md) {
@@ -408,23 +411,44 @@ exports.verVista = async (req, res) => {
       ? { id: req.params.id }
       : { id: req.params.id, usuario_id: uid(req) };
 
+    // 1) Buscar plan
     const plan = await PlanAlimenticio.findOne({
       where,
       include: [{ model: Paciente, as: 'paciente' }]
     });
+
     if (!plan) {
       req.flash('error', 'Plan no encontrado');
       return res.redirect('/planes-alimenticios');
     }
 
+    // 2) Convertir contenido Markdown → HTML seguro
     const contenidoSeguro = await toSafeHtmlFromMarkdown(plan.contenido);
-    res.render('ver-plan', { plan, contenidoSeguro });
+
+    // 3) Buscar recetas asignadas automáticamente
+    const recetasAsignadas = await PlanReceta.findAll({
+      where: { plan_id: plan.id },
+      include: [{ model: Receta, as: "receta" }],
+      order: [
+        ["fecha", "ASC"],
+        ["momento", "ASC"]
+      ]
+    });
+
+    // 4) Renderizar vista
+    res.render("ver-plan", {
+      plan,
+      contenidoSeguro,
+      recetas: recetasAsignadas
+    });
+
   } catch (e) {
     console.error('Error verVista:', e);
     req.flash('error', 'No se pudo cargar el plan.');
     res.redirect('/planes-alimenticios');
   }
 };
+
 
 exports.verImprimible = async (req, res) => {
   try {

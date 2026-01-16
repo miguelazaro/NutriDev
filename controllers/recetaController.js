@@ -154,6 +154,12 @@ const ver = async (req, res) => {
       }
     }
 
+    // 🔥 Detectar si viene desde un plan
+    const backTo =
+      req.query.fromPlan
+        ? `/planes-alimenticios/${req.query.fromPlan}`
+        : null;
+
     const recetaPlain = receta.get({ plain: true });
     recetaPlain.imagen = normalizeImagen(recetaPlain.imagen);
 
@@ -161,19 +167,18 @@ const ver = async (req, res) => {
       layout: 'layouts/sistema',
       receta: recetaPlain,
       user,
-<<<<<<< Updated upstream
-      messages: req.flash()
-=======
       messages: req.flash(),
-      backTo   
->>>>>>> Stashed changes
+      backTo
     });
+
   } catch (error) {
     console.error('Error al ver receta:', error);
     req.flash('error', 'Error al cargar la receta');
     res.status(500).redirect('/recetas');
   }
 };
+
+
 
 const importarDesdeAPI = async (req, res) => {
   const user = req.session?.usuario || {};
@@ -336,15 +341,15 @@ const guardar = async (req, res) => {
       categoria: (req.body.categoria || 'general').toLowerCase(),
       etiquetas: req.body.etiquetas || '',
       tiempo_preparacion: toInt(req.body.tiempo_preparacion),
-      tiempo_coccion:     toInt(req.body.tiempo_coccion),
-      porciones:          toInt(req.body.porciones),
-      dificultad:         normEnumDificultad(req.body.dificultad),
-      calorias:           toInt(req.body.calorias),
-      proteinas:          toFloat(req.body.proteinas),
-      carbohidratos:      toFloat(req.body.carbohidratos),
-      grasas:             toFloat(req.body.grasas),
-      usuario_id:         user.id,
-      archivada:          false
+      tiempo_coccion: toInt(req.body.tiempo_coccion),
+      porciones: toInt(req.body.porciones),
+      dificultad: normEnumDificultad(req.body.dificultad),
+      calorias: toInt(req.body.calorias),
+      proteinas: toFloat(req.body.proteinas),
+      carbohidratos: toFloat(req.body.carbohidratos),
+      grasas: toFloat(req.body.grasas),
+      usuario_id: user.id,
+      archivada: false
     };
 
     if (req.file) {
@@ -392,13 +397,13 @@ const actualizar = async (req, res) => {
       categoria: (req.body.categoria || 'general').toLowerCase(),
       etiquetas: req.body.etiquetas || '',
       tiempo_preparacion: toInt(req.body.tiempo_preparacion),
-      tiempo_coccion:     toInt(req.body.tiempo_coccion),
-      porciones:          toInt(req.body.porciones),
-      dificultad:         normEnumDificultad(req.body.dificultad),
-      calorias:           toInt(req.body.calorias),
-      proteinas:          toFloat(req.body.proteinas),
-      carbohidratos:      toFloat(req.body.carbohidratos),
-      grasas:             toFloat(req.body.grasas)
+      tiempo_coccion: toInt(req.body.tiempo_coccion),
+      porciones: toInt(req.body.porciones),
+      dificultad: normEnumDificultad(req.body.dificultad),
+      calorias: toInt(req.body.calorias),
+      proteinas: toFloat(req.body.proteinas),
+      carbohidratos: toFloat(req.body.carbohidratos),
+      grasas: toFloat(req.body.grasas)
     };
 
     if (req.file) {
@@ -453,7 +458,7 @@ const restaurar = async (req, res) => {
 /* =========================
   Helpers para agregar a Plan
 ========================= */
-const DIAS_ES = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+const DIAS_ES = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
 const MEAL_MAP = {
   'desayuno': 'Desayuno',
   'comida': 'Comida',
@@ -491,7 +496,7 @@ const appendUnder = (md, dayHdr, mealHdr, bullet) => {
     }
     const before = lines.slice(0, start).join('\n');
     const block = lines.slice(start, end).join('\n');
-    const after  = lines.slice(end).join('\n');
+    const after = lines.slice(end).join('\n');
 
     const hasMeal = new RegExp(`^\\s*${mealHdr}\\s*$`, 'mi').test(block);
     let newBlock = block;
@@ -583,9 +588,9 @@ const agregarAPlan = async (req, res) => {
     }
 
     // Normaliza / mapea el momento
-    const mealHdr = (MEAL_MAP[String(momento).toLowerCase()] || 'Comida') + ':'; 
-    const dayHdr  = dayHeader(fecha);                                           
-    const bullet  = buildBullet(receta, toInt(porciones) || 1, (notas || '').trim());
+    const mealHdr = (MEAL_MAP[String(momento).toLowerCase()] || 'Comida') + ':';
+    const dayHdr = dayHeader(fecha);
+    const bullet = buildBullet(receta, toInt(porciones) || 1, (notas || '').trim());
 
     let planDestino = null;
 
@@ -608,7 +613,7 @@ const agregarAPlan = async (req, res) => {
 
     // Construye/actualiza el markdown
     const mdActual = planDestino.contenido || '';
-    const mdNuevo  = appendUnder(mdActual, dayHdr, mealHdr, bullet);
+    const mdNuevo = appendUnder(mdActual, dayHdr, mealHdr, bullet);
 
     await planDestino.update({ contenido: mdNuevo, tipo: 'manual' }, { transaction: t });
 

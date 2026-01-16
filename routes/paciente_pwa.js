@@ -9,7 +9,7 @@ const Receta = require("../models/Receta");
 
 
 // ======================================================
-// 0) MODO OFFLINE (PRIMERO!!! OBLIGATORIO)
+// 0) MODO OFFLINE 
 // ======================================================
 router.get("/offline", (req, res) => {
     res.sendFile(path.join(__dirname, "..", "public", "paciente_pwa", "offline.html"));
@@ -62,7 +62,7 @@ router.get("/:idPaciente", async (req, res) => {
 
 
 // ======================================================
-// 2) LISTA DE RECETAS 
+// 2) LISTA DE RECETAS
 // ======================================================
 router.get("/:idPaciente/recetas", async (req, res) => {
     const { idPaciente } = req.params;
@@ -97,7 +97,7 @@ router.get("/:idPaciente/recetas", async (req, res) => {
 
 
 // ======================================================
-// 3) RECETA INDIVIDUAL  
+// 3) RECETA INDIVIDUAL
 // ======================================================
 router.get("/:idPaciente/recetas/:idReceta", async (req, res) => {
     try {

@@ -1,8 +1,8 @@
-const CACHE = "nutridev-v6"; // Actualizado a v6 para refrescar cambios
+const CACHE = "nutridev-v6"; 
 
 const STATIC_FILES = [
   "/paciente_pwa/offline.html",
-  "/css/output.css?v=1",       
+  "/css/output.css?v=1",
   "/paciente_pwa/manifest.json",
   "/paciente_pwa/icons/icon-192.png",
   "/paciente_pwa/icons/icon-512.png"
@@ -48,20 +48,13 @@ self.addEventListener("activate", event => {
 self.addEventListener("fetch", event => {
   const req = event.request;
   const url = new URL(req.url);
-
-  // 1. DEFINICIÓN DE RUTAS A INTERCEPTAR
   const isPwaPath = url.pathname.startsWith("/paciente_pwa/");
   const isGlobalAsset = url.pathname.startsWith("/css/") || url.pathname.startsWith("/assets/");
-  
-  // NUEVO: Detectar si es una imagen (por destino o extensión de archivo)
   const isImage = req.destination === "image" || url.pathname.match(/\.(jpg|jpeg|png|webp|svg|gif)$/i);
-
-  // 2. FILTRO: Si NO es PWA, ni CSS/Assets, ni Imagen, lo ignoramos.
   if (!isPwaPath && !isGlobalAsset && !isImage) {
-    return; 
+    return;
   }
 
-  // 3. ESTRATEGIA: Network First (Internet primero, luego Cache)
   event.respondWith(
     fetch(req)
       .then(res => {
@@ -74,18 +67,15 @@ self.addEventListener("fetch", event => {
       .catch(() => {
         console.warn("[SW] Offline → buscando en cache:", req.url);
 
-        // 4. BUSCAR EN CACHÉ
         return caches.match(req, { ignoreSearch: false }).then(match => {
           if (match) {
             return match;
           }
 
-          // 5. FALLBACK (PLAN B)
           if (req.mode === 'navigate') {
             console.log("[SW] Navegación fallida → mostrando OFFLINE page");
             return caches.match("/paciente_pwa/offline.html");
           }
-          // Si falló una imagen y no está en caché, simplemente no devolvemos nada (o podrías devolver una imagen placeholder aquí)
           return null;
         });
       })

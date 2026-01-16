@@ -28,46 +28,313 @@
         </div>
     </div>
 
-    <!-- INFO GENERAL -->
+        <!-- INFO GENERAL + RESUMEN CLÍNICO -->
     <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-sm">
         <div class="bg-gray-50 p-4 rounded-lg shadow">
             <p class="text-gray-500">Edad</p>
             <p class="font-semibold">
-                <% if (paciente.fecha_nacimiento) { const nacimiento=new Date(paciente.fecha_nacimiento); const hoy=new
-                    Date(); let edad=hoy.getFullYear() - nacimiento.getFullYear(); const m=hoy.getMonth() -
-                    nacimiento.getMonth(); if (m < 0 || (m===0 && hoy.getDate() < nacimiento.getDate())) edad--; %>
+                <% if (paciente.fecha_nacimiento) { 
+                    const nacimiento = new Date(paciente.fecha_nacimiento); 
+                    const hoy = new Date(); 
+                    let edad = hoy.getFullYear() - nacimiento.getFullYear(); 
+                    const m = hoy.getMonth() - nacimiento.getMonth(); 
+                    if (m < 0 || (m === 0 && hoy.getDate() < nacimiento.getDate())) edad--; 
+                %>
                     <%= edad %> años
-                        <% } else { %>
-                            No especificada
-                            <% } %>
+                <% } else { %>
+                    No especificada
+                <% } %>
             </p>
         </div>
+
         <div class="bg-gray-50 p-4 rounded-lg shadow">
             <p class="text-gray-500">Sexo</p>
             <p class="font-semibold">
                 <%= paciente.genero || 'No especificado' %>
             </p>
         </div>
+
         <div class="bg-gray-50 p-4 rounded-lg shadow">
             <p class="text-gray-500">Estatura</p>
             <p class="font-semibold">
-                <%= paciente.estatura || 'No especificado' %>
+                <%= paciente.estatura ? paciente.estatura + ' cm' : 'No especificada' %>
             </p>
         </div>
+
         <div class="bg-gray-50 p-4 rounded-lg shadow">
             <p class="text-gray-500">Correo</p>
             <p class="font-semibold">
                 <%= paciente.email || 'No especificado' %>
             </p>
         </div>
+
         <div class="bg-gray-50 p-4 rounded-lg shadow">
             <p class="text-gray-500">Teléfono</p>
             <p class="font-semibold">
-                <%= paciente.telefono %>
+                <%= paciente.telefono || 'No especificado' %>
+            </p>
+        </div>
+
+        <div class="bg-gray-50 p-4 rounded-lg shadow">
+            <p class="text-gray-500">País</p>
+            <p class="font-semibold">
+                <%= paciente.pais_residencia || 'No especificado' %>
+            </p>
+        </div>
+
+          <div class="bg-gray-50 p-4 rounded-lg shadow">
+            <p class="text-gray-500">Ocupación</p>
+            <p class="font-semibold">
+                <%= paciente.ocupacion || 'No especificada' %>
             </p>
         </div>
     </section>
 
+    <!-- RESUMEN CLÍNICO COMPLETO -->
+   <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+    <!-- Motivo de consulta -->
+    <div class="bg-white border border-gray-200 rounded-xl shadow p-6">
+        <h2 class="text-lg font-semibold text-emerald-700 mb-2">📝 Motivo de consulta</h2>
+        <p><span class="font-semibold">Objetivo:</span> <%= paciente.objetivo || 'Sin objetivo definido' %></p>
+        <p><span class="font-semibold">Meta específica:</span> <%= paciente.meta_especifica || 'No registrada' %></p>
+        <p><span class="font-semibold">Prioridad:</span> <%= paciente.prioridad_objetivo || 'No indicada' %></p>
+    </div>
+
+    <!-- Medición física -->
+    <div class="bg-white border border-gray-200 rounded-xl shadow p-6">
+        <h2 class="text-lg font-semibold text-emerald-700 mb-2">⚖️ Medición física</h2>
+        <p><span class="font-semibold">Peso:</span> <%= paciente.peso ? paciente.peso + ' kg' : 'Sin registrar' %> ·
+           <span class="font-semibold">Estatura:</span> <%= paciente.estatura ? paciente.estatura + ' cm' : 'Sin registrar' %></p>
+
+        <p><span class="font-semibold">% grasa:</span> <%= paciente.porcentaje_grasa || 'Sin registrar' %> ·
+           <span class="font-semibold">Cintura:</span> <%= paciente.circunferencia_cintura ? paciente.circunferencia_cintura + ' cm' : 'Sin registrar' %></p>
+
+        <p><span class="font-semibold">Presión arterial:</span> <%= paciente.presion_arterial || 'Sin registrar' %></p>
+    </div>
+
+    <!-- Estilo de vida -->
+    <div class="bg-white border border-gray-200 rounded-xl shadow p-6">
+        <h2 class="text-lg font-semibold text-emerald-700 mb-2">🏃 Estilo de vida</h2>
+
+        <p><span class="font-semibold">Actividad física:</span> <%= paciente.actividad || 'Sin especificar' %></p>
+
+        <p><span class="font-semibold">Tipo de ejercicio:</span> <%= paciente.tipo_ejercicio || 'Sin registrar' %></p>
+
+        <p>
+            <span class="font-semibold">Horas de sueño:</span> <%= paciente.horas_sueno || 'Sin registrar' %> ·
+            <span class="font-semibold">Calidad:</span> <%= paciente.calidad_sueno || 'Sin registrar' %> ·
+            <span class="font-semibold">Estrés:</span> <%= paciente.estres || 'Sin registrar' %>
+        </p>
+    </div>
+
+    <!-- Hábitos alimenticios -->
+    <div class="bg-white border border-gray-200 rounded-xl shadow p-6">
+        <h2 class="text-lg font-semibold text-emerald-700 mb-2">🍽️ Hábitos alimenticios</h2>
+
+        <p><span class="font-semibold">Comidas al día:</span> <%= paciente.comidas_dia || 'Sin registrar' %> ·
+           <span class="font-semibold">Preferencia:</span> <%= paciente.preferencia_alimentaria || 'Sin registrar' %></p>
+
+        <p><span class="font-semibold">Consumo de agua:</span> <%= paciente.consumo_agua ? paciente.consumo_agua + ' L' : 'Sin registrar' %></p>
+
+        <p><span class="font-semibold">Apetito:</span> <%= paciente.apetito || 'Sin registrar' %></p>
+    </div>
+
+    <!-- Enfermedades y antecedentes -->
+<div class="bg-white border rounded-lg p-4 shadow-sm space-y-1 md:col-span-2">
+    <h2 class="text-base font-semibold text-emerald-700 mb-1">🩺 Enfermedades y antecedentes</h2>
+
+    <!-- Enfermedades diagnosticadas -->
+    <p class="mb-1">
+        <span class="font-semibold">Enfermedades diagnosticadas:</span>
+        <% 
+            const enf = [];
+            if (paciente.diabetes) enf.push('Diabetes');
+            if (paciente.hipertension) enf.push('Hipertensión');
+            if (paciente.higado_graso) enf.push('Hígado graso');
+            if (paciente.gastritis) enf.push('Gastritis');
+        %>
+        <%= enf.length ? enf.join(', ') : 'Ninguna registrada' %>
+    </p>
+
+    <!-- Otras enfermedades -->
+    <p class="mb-1">
+        <span class="font-semibold">Otras enfermedades:</span>
+        <%= paciente.otras_enfermedades || 'No registradas' %>
+    </p>
+
+    <!-- Antecedentes familiares -->
+    <p class="mb-1">
+        <span class="font-semibold">Antecedentes familiares:</span>
+        <% 
+            const ant = [];
+            if (paciente.diabetes_familiar) ant.push('Diabetes');
+            if (paciente.hipertension_familiar) ant.push('Hipertensión');
+            if (paciente.obesidad_familiar) ant.push('Obesidad');
+            if (paciente.cancer_familiar) ant.push('Cáncer');
+        %>
+        <%= ant.length ? ant.join(', ') : 'No registrados' %>
+    </p>
+
+    <!-- Otros antecedentes -->
+    <p class="mb-1">
+        <span class="font-semibold">Otros antecedentes:</span>
+        <%= paciente.otros_antecedentes || 'No registrados' %>
+    </p>
+
+    <!-- Alergias -->
+    <p class="mb-1">
+        <span class="font-semibold">Alergias:</span>
+        <%= paciente.alergias || 'No registradas' %>
+    </p>
+
+    <!-- Medicación actual -->
+    <p class="mb-1">
+        <span class="font-semibold">Medicación actual:</span>
+        <%= paciente.medicacion_actual || 'No registrada' %>
+    </p>
+
+    <!-- Cirugías previas -->
+    <p>
+        <span class="font-semibold">Cirugías previas:</span>
+        <%= paciente.cirugias_previas || 'No registradas' %>
+    </p>
+</div>
+
+</section>
+
+<section class="bg-white border rounded-xl p-6 shadow-md mt-8 w-full">
+
+    <h2 class="text-xl font-semibold text-red-700 mb-4 flex items-center gap-2">
+         Calculadora de gasto calórico
+    </h2>
+
+    <!-- CAMPOS OBLIGATORIOS -->
+    <h3 class="text-sm font-semibold text-gray-700 mb-2">Campos obligatorios</h3>
+
+    <!-- FORMULARIO ANCHO COMPLETO -->
+    <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
+
+        <!-- SEXO -->
+        <div>
+            <label class="text-gray-600 font-medium text-sm">Sexo</label>
+            <select id="calc-genero" class="w-full border rounded-lg p-2">
+                <option value="Masculino" <%= paciente.genero === 'Masculino' ? 'selected':'' %>>Masculino</option>
+                <option value="Femenino" <%= paciente.genero === 'Femenino' ? 'selected':'' %>>Femenino</option>
+            </select>
+        </div>
+
+        <!-- PESO -->
+        <div>
+            <label class="text-gray-600 font-medium text-sm">Peso (kg)</label>
+            <input id="calc-peso" type="number" class="w-full border rounded-lg p-2"
+                value="<%= paciente.peso || '' %>">
+        </div>
+
+        <!-- ESTATURA -->
+        <div>
+            <label class="text-gray-600 font-medium text-sm">Estatura (cm)</label>
+            <input id="calc-estatura" type="number" class="w-full border rounded-lg p-2"
+                value="<%= paciente.estatura || '' %>">
+        </div>
+
+        <!-- EDAD -->
+        <div>
+            <label class="text-gray-600 font-medium text-sm">Edad (años)</label>
+            <input id="calc-edad" type="number" class="w-full border rounded-lg p-2"
+                value="<%= edad || '' %>">
+        </div>
+
+        <!-- ACTIVIDAD -->
+        <div>
+            <label class="text-gray-600 font-medium text-sm">Actividad física</label>
+            <select id="calc-actividad" class="w-full border rounded-lg p-2">
+                <option value="sedentario" <%= paciente.actividad==='sedentario'?'selected':'' %>>Sedentario</option>
+                <option value="ligero" <%= paciente.actividad==='ligero'?'selected':'' %>>Ligero</option>
+                <option value="moderado" <%= paciente.actividad==='moderado'?'selected':'' %>>Moderado</option>
+                <option value="intenso" <%= paciente.actividad==='intenso'?'selected':'' %>>Intenso</option>
+                <option value="muy_intenso" <%= paciente.actividad==='muy_intenso'?'selected':'' %>>Muy intenso</option>
+            </select>
+        </div>
+
+        <!-- OBJETIVO -->
+        <div>
+            <label class="text-gray-600 font-medium text-sm">Objetivo</label>
+            <select id="calc-objetivo" class="w-full border rounded-lg p-2">
+                <option value="mantener_peso" <%= paciente.objetivo === 'mantener_peso'?'selected':'' %>>Mantener peso</option>
+                <option value="bajar_peso" <%= paciente.objetivo === 'bajar_peso'?'selected':'' %>>Bajar peso</option>
+                <option value="ganar_musculo" <%= paciente.objetivo === 'ganar_musculo'?'selected':'' %>>Ganar músculo</option>
+            </select>
+        </div>
+
+    </div>
+
+    <!-- OPCIONALES -->
+    <h3 class="text-sm font-semibold text-gray-700 mt-6 mb-2">Opcionales (no afectan el cálculo)</h3>
+
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+
+        <div>
+            <label class="text-gray-600 font-medium text-sm">Cintura (cm)</label>
+            <input disabled class="w-full border rounded-lg p-2 bg-gray-100"
+                value="<%= paciente.circunferencia_cintura || '' %>">
+        </div>
+
+        <div>
+            <label class="text-gray-600 font-medium text-sm">% grasa</label>
+            <input disabled class="w-full border rounded-lg p-2 bg-gray-100"
+                value="<%= paciente.porcentaje_grasa || '' %>">
+        </div>
+
+        <div>
+            <label class="text-gray-600 font-medium text-sm">Enfermedades</label>
+            <input disabled class="w-full border rounded-lg p-2 bg-gray-100"
+                value="<%= paciente.otras_enfermedades || 'Ninguna' %>">
+        </div>
+
+        <div>
+            <label class="text-gray-600 font-medium text-sm">Sueño (hrs)</label>
+            <input disabled class="w-full border rounded-lg p-2 bg-gray-100"
+                value="<%= paciente.horas_sueno || '' %>">
+        </div>
+
+        <div>
+            <label class="text-gray-600 font-medium text-sm">Estrés</label>
+            <input disabled class="w-full border rounded-lg p-2 bg-gray-100"
+                value="<%= paciente.estres || '' %>">
+        </div>
+
+    </div>
+
+    <!-- RESULTADOS -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
+
+        <div class="p-4 border rounded-xl bg-red-50 text-center shadow-sm">
+            <p class="text-gray-600 text-sm">TMB (Metabolismo basal)</p>
+            <h3 id="calc-tmb" class="text-2xl font-bold text-red-700">—</h3>
+        </div>
+
+        <div class="p-4 border rounded-xl bg-red-50 text-center shadow-sm">
+            <p class="text-gray-600 text-sm">TDEE (Gasto total)</p>
+            <h3 id="calc-tdee" class="text-2xl font-bold text-red-700">—</h3>
+        </div>
+
+        <div class="p-4 border rounded-xl bg-red-50 text-center shadow-sm">
+            <p class="text-gray-600 text-sm">Calorías según objetivo</p>
+            <h3 id="calc-objetivo-res" class="text-2xl font-bold text-red-700">—</h3>
+        </div>
+
+    </div>
+
+    <!-- BOTÓN -->
+    <div class="text-center mt-6">
+        <button onclick="calcular()"
+            class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold shadow">
+            CALCULAR
+        </button>
+    </div>
+
+</section>
     <!-- HISTORIAL Y NOTAS -->
     <section class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div class="bg-white border rounded-lg p-4">
@@ -128,7 +395,7 @@
                     🤖 Plan Alimenticio (IA) <span class="ml-1 text-xs">Premium</span>
                 </a>
                 <% } %>
-</div>
+   </div>
 
 
     <!-- TAB: PROGRESO -->
@@ -262,6 +529,57 @@
     </section>
 </div>
 
+<script>
+function calcular() {
+    const peso = parseFloat(document.getElementById("calc-peso").value);
+    const estatura = parseFloat(document.getElementById("calc-estatura").value);
+    const edad = parseInt(document.getElementById("calc-edad").value);
+    const actividad = document.getElementById("calc-actividad").value;
+    const genero = document.getElementById("calc-genero").value;
+    const objetivo = document.getElementById("calc-objetivo").value;
+
+    if (!peso || !estatura || !edad) return;
+
+    let TMB = 0;
+
+    if (genero === "Masculino") {
+        TMB = 88.362 + (13.397 * peso) + (4.799 * estatura) - (5.677 * edad);
+    } else {
+        TMB = 447.593 + (9.247 * peso) + (3.098 * estatura) - (4.330 * edad);
+    }
+
+    const factores = {
+        sedentario: 1.2,
+        ligero: 1.375,
+        moderado: 1.55,
+        intenso: 1.725,
+        muy_intenso: 1.9
+    };
+
+    const TDEE = TMB * (factores[actividad] || 1.2);
+
+    let caloriasObjetivo = TDEE;
+    if (objetivo === "bajar_peso") caloriasObjetivo -= 450;
+    if (objetivo === "ganar_musculo") caloriasObjetivo += 300;
+
+    document.getElementById("calc-tmb").textContent = Math.round(TMB) + " kcal/día";
+    document.getElementById("calc-tdee").textContent = Math.round(TDEE) + " kcal/día";
+    document.getElementById("calc-objetivo-res").textContent = Math.round(caloriasObjetivo) + " kcal/día";
+}
+
+document.addEventListener("DOMContentLoaded", calcular);
+</script>
+
+<script>
+  window.pacienteMeta = JSON.parse(
+    `<%- JSON.stringify({
+      TMB: TMB || 0,
+      TDEE: TDEE || 0,
+      objetivo: paciente.objetivo || ""
+    }) %>`
+  );
+</script>
+
 <!-- IA Plan Alimenticio -->
 <script src="/js/iaPlan.js"></script>
 
@@ -297,7 +615,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     function renderGraficaProgreso() {
-        const progresos = <% - JSON.stringify(paciente.Progresos || []) %>;
+const progresos = <%- JSON.stringify(paciente.Progresos || []) %>;
         const ctx = document.getElementById('graficaProgreso')?.getContext('2d');
 
         if (!ctx || !progresos || progresos.length === 0) return;

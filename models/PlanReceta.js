@@ -1,6 +1,11 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 
+// Importar modelos para asociar
+const PlanAlimenticio = require('./PlanAlimenticio');
+const Receta = require('./Receta');
+const Paciente = require('./Paciente');
+
 const PlanReceta = sequelize.define('PlanReceta', {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     plan_id: { type: DataTypes.INTEGER, allowNull: false },
@@ -15,9 +20,6 @@ const PlanReceta = sequelize.define('PlanReceta', {
     notas: { type: DataTypes.STRING, allowNull: true }
 }, {
     tableName: 'plan_recetas',
-<<<<<<< Updated upstream
-    underscored: true
-=======
     underscored: true,
     timestamps: true,
     createdAt: 'created_at',
@@ -40,7 +42,6 @@ PlanReceta.belongsTo(Receta, {
 PlanReceta.belongsTo(Paciente, {
     foreignKey: 'paciente_id',
     as: 'paciente'
->>>>>>> Stashed changes
 });
 
 module.exports = PlanReceta;

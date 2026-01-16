@@ -1,5 +1,11 @@
 const axios = require('axios');
 const { Paciente, Progreso, NotaNutriologo, PlanAlimenticio } = require('../models/associations');
+const parsePlanIA = require('../utils/parsePlanIA');
+const mapMealToCategory = require('../utils/mapMealToCategory');
+const getDatesForWeek = require('../utils/getDatesForWeek');
+const selectRecipe = require('../utils/selectRecipe');
+const PlanReceta = require('../models/PlanReceta');
+
 
 // Helper: id del usuario logueado
 const uid = (req) => req.session?.usuario?.id || null;
@@ -13,6 +19,45 @@ function calcularEdad(fechaNacimiento) {
   const m = hoy.getMonth() - n.getMonth();
   if (m < 0 || (m === 0 && hoy.getDate() < n.getDate())) edad--;
   return `${edad} años`;
+}
+
+// ==================== Cálculo REAL: Edad numérica, TMB, TDEE y calorías objetivo ====================
+function calcularEdadNum(fechaNacimiento) {
+  if (!fechaNacimiento) return null;
+  const nac = new Date(fechaNacimiento);
+  const hoy = new Date();
+  let edad = hoy.getFullYear() - nac.getFullYear();
+  const m = hoy.getMonth() - nac.getMonth();
+  if (m < 0 || (m === 0 && hoy.getDate() < nac.getDate())) edad--;
+  return edad;
+}
+
+function calcularTMB(paciente, edad) {
+  if (!paciente.peso || !paciente.estatura || !edad) return null;
+
+  if (paciente.genero === "Masculino") {
+    return 88.362 + (13.397 * paciente.peso) + (4.799 * paciente.estatura) - (5.677 * edad);
+  } else {
+    return 447.593 + (9.247 * paciente.peso) + (3.098 * paciente.estatura) - (4.330 * edad);
+  }
+}
+
+function calcularTDEE(TMB, actividad) {
+  const factores = {
+    sedentario: 1.2,
+    ligero: 1.375,
+    moderado: 1.55,
+    intenso: 1.725,
+    muy_intenso: 1.9
+  };
+  return TMB ? TMB * (factores[actividad] || 1.2) : null;
+}
+
+function calcularCaloriasObjetivo(TDEE, objetivo) {
+  if (!TDEE) return null;
+  if (objetivo === "bajar_peso") return TDEE - 350;
+  if (objetivo === "ganar_musculo") return TDEE + 300;
+  return TDEE;
 }
 
 // Prompt en español con formato Markdown compatible con nuestro parser
@@ -29,6 +74,11 @@ function buildPrompt(paciente, progresos = [], notas = []) {
       .join('\n') || 'Sin registros';
 
   const notasTxt = (notas || []).map((n) => `- ${n.nota}`).join('\n') || 'Sin notas';
+
+  const edadNum = calcularEdadNum(paciente.fecha_nacimiento);
+  const TMB = calcularTMB(paciente, edadNum);
+  const TDEE = calcularTDEE(TMB, paciente.actividad);
+  const caloriasObjetivo = calcularCaloriasObjetivo(TDEE, paciente.objetivo);
 
   return `
 Eres un nutriólogo. Genera un plan alimenticio **semanal** en **español** y en **Markdown** para este paciente.
@@ -48,6 +98,11 @@ Paciente:
 - País de residencia: ${paciente.pais_residencia || 'N/A'}
 - Preferencias / Restricciones: ${paciente.preferencias || 'N/A'}
 - Historial médico relevante: ${paciente.historial || 'N/A'}
+
+Cálculo energético (basado en registro del paciente):
+- TMB: ${TMB ? Math.round(TMB) : 'N/A'} kcal
+- TDEE: ${TDEE ? Math.round(TDEE) : 'N/A'} kcal
+- Calorías objetivo diarias: ${caloriasObjetivo ? Math.round(caloriasObjetivo) : 'N/A'} kcal
 
 Progresos (fecha • peso • observaciones):
 ${progTxt}
@@ -161,10 +216,12 @@ exports.generarPlan = async (req, res) => {
       paciente_id: paciente.id,
       usuario_id: userId,
     });
-<<<<<<< Updated upstream
-=======
+
     // ===========================
     // Asignación automática de recetas
+
+    // ===========================
+    // 🚀 Asignación automática de recetas
     // ===========================
     const parsed = parsePlanIA(md);
     const fechasSemana = getDatesForWeek();
@@ -192,7 +249,7 @@ exports.generarPlan = async (req, res) => {
     }
 
     console.log("Recetas asignadas automáticamente ✔️");
->>>>>>> Stashed changes
+
 
     if (wantsJSON(req)) return res.json({ ok: true, planId: plan.id, contenido: md });
 
