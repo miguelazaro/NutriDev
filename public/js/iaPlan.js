@@ -58,8 +58,6 @@
                 }
 
                 const data = await resp.json();
-
-                // Soporta NUEVO { ok, planId, contenido } y VIEJO { plan }
                 const okNew = data && data.ok && data.contenido;
                 const okOld = data && data.plan;
 
@@ -72,13 +70,11 @@
                 if (inputContenido) inputContenido.value = md;
 
                 if (okNew && data.planId) {
-                    // Ya quedó guardado en el backend
                     showFlash(
                         `<a href="/planes-alimenticios/${data.planId}" class="inline-block mt-3 px-4 py-2 rounded bg-emerald-600 text-white hover:bg-emerald-700">Ver plan guardado</a>`,
                         'success'
                     );
                 } else {
-                    // Flujo antiguo: mostrar botón para guardar manualmente
                     formGuardar?.classList.remove('hidden');
                     showFlash('Plan generado. Puedes guardarlo con el botón verde.', 'success');
                 }

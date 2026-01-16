@@ -37,7 +37,7 @@ router.get('/exito', requireAuth, async (req, res) => {
 
   const hoy = new Date();
   const fin = new Date();
-  fin.setMonth(hoy.getMonth() + 1); // válido por 30 días
+  fin.setMonth(hoy.getMonth() + 1); 
 
   await Suscripcion.create({
     usuario_id,
@@ -47,6 +47,6 @@ router.get('/exito', requireAuth, async (req, res) => {
     estado: 'activa'
   });
 
-  res.redirect('/dashboard'); // o donde quieras redirigir tras pagar
+  res.redirect('/dashboard'); 
 });
 

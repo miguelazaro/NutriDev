@@ -17,10 +17,8 @@ router.post('/guardar', requireAuth, uploadRecetas.single('imagen'), recetasCont
 router.get('/ver/:id', requireAuth, recetasController.ver);
 router.post('/importar-api', requireAuth, recetasController.importarDesdeAPI);
 
-// --- RUTAS PREMIUM (o admin, según tu requirePlan) ---
 router.get('/papelera', requireAuth, requirePlan(['premium']), recetasController.papelera);
 
-// el form en la vista usa ?_method=PATCH, así que soportamos PATCH;
 // si además quieres aceptar POST puro, deja ambas rutas.
 router.patch('/archivar/:id', requireAuth, requirePlan(['premium']), recetasController.archivar);
 router.post('/archivar/:id', requireAuth, requirePlan(['premium']), recetasController.archivar);

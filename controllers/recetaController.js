@@ -161,7 +161,12 @@ const ver = async (req, res) => {
       layout: 'layouts/sistema',
       receta: recetaPlain,
       user,
+<<<<<<< Updated upstream
       messages: req.flash()
+=======
+      messages: req.flash(),
+      backTo   
+>>>>>>> Stashed changes
     });
   } catch (error) {
     console.error('Error al ver receta:', error);
@@ -578,8 +583,8 @@ const agregarAPlan = async (req, res) => {
     }
 
     // Normaliza / mapea el momento
-    const mealHdr = (MEAL_MAP[String(momento).toLowerCase()] || 'Comida') + ':'; // "Desayuno:" / "Comida:" ...
-    const dayHdr  = dayHeader(fecha);                                            // "Lunes:"
+    const mealHdr = (MEAL_MAP[String(momento).toLowerCase()] || 'Comida') + ':'; 
+    const dayHdr  = dayHeader(fecha);                                           
     const bullet  = buildBullet(receta, toInt(porciones) || 1, (notas || '').trim());
 
     let planDestino = null;
@@ -591,9 +596,7 @@ const agregarAPlan = async (req, res) => {
         req.flash('error', 'El plan seleccionado no existe.');
         return backToFormWithPlan(plan_id);
       }
-      // (opcional) validar paciente del plan si quieres
     } else {
-      // Crea plan manual vacío si no enviaron plan_id
       planDestino = await PlanAlimenticio.create({
         titulo: `Plan manual • ${fecha}`,
         tipo: 'manual',

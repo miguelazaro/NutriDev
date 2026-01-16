@@ -184,8 +184,8 @@ exports.crearCobroCheckout = async (req, res) => {
       monto_centavos: amount,
       moneda: 'MXN',
       estado: 'pendiente',
-      stripe_checkout_session_id: session.id, // compat
-      stripe_session_id: session.id,         // preferido
+      stripe_checkout_session_id: session.id,
+      stripe_session_id: session.id,      
       stripe_account_id: stripeCuenta.connected_account_id,
       url_cobro: session.url
     });

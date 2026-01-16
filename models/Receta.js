@@ -14,7 +14,6 @@ const Receta = sequelize.define('Receta', {
         type: DataTypes.TEXT,
         defaultValue: ''
     },
-    // --- ESTA ES LA VERSIÓN SIMPLIFICADA Y CORRECTA ---
     // Sequelize ahora solo leerá y escribirá el texto plano.
     ingredientes: {
         type: DataTypes.TEXT,

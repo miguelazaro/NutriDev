@@ -22,9 +22,6 @@ const Cobro = sequelize.define(
 
     // Texto corto visible en Checkout / recibos
     concepto: { type: DataTypes.STRING, allowNull: false },
-
-    // Guardamos en centavos para precisión. Al crear el cobro puede ir 0 y
-    // al confirmar el pago se actualiza con el webhook.
     monto_centavos: {
       type: DataTypes.INTEGER,
       allowNull: false,
@@ -58,41 +55,35 @@ const Cobro = sequelize.define(
       comment: 'Si usas Payment Links (opcional)',
     },
 
-    // Recomendado: usar stripe_session_id.
-    // Si ya tenías este campo, puedes mantenerlo por compatibilidad:
     stripe_checkout_session_id: {
       type: DataTypes.STRING,
       allowNull: true,
       comment: 'Legacy: preferir stripe_session_id',
     },
 
-    // Checkout Session id (cuando creas la sesión de pago)
     stripe_session_id: {
       type: DataTypes.STRING,
       allowNull: true,
       comment: 'Checkout Session ID asociado al cobro',
     },
 
-    // PaymentIntent id (confirmado desde el webhook)
     stripe_payment_intent_id: {
       type: DataTypes.STRING,
       allowNull: true,
     },
 
-    // ID de la cuenta conectada de Stripe (acct_xxx)
     stripe_account_id: {
       type: DataTypes.STRING,
       allowNull: true,
       comment: 'Cuenta conectada (Connect) donde se cobró',
     },
 
-    // URL de pago/checkout (por si quieres guardar el link)
     url_cobro: { type: DataTypes.TEXT, allowNull: true },
   },
   {
     tableName: 'cobros',
     underscored: true,
-    timestamps: true, // created_at, updated_at
+    timestamps: true, 
 
     indexes: [
       { fields: ['usuario_id'] },
@@ -103,9 +94,7 @@ const Cobro = sequelize.define(
       { fields: ['stripe_account_id'] },
     ],
 
-    // "Virtual" helper para leer el monto en pesos ya convertido
     getterMethods: {
-      // Nota: en Sequelize v6 puedes usar get() { ... } dentro de field
       monto() {
         const cents = this.getDataValue('monto_centavos') || 0;
         return cents / 100;

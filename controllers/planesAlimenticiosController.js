@@ -1,4 +1,3 @@
-// controllers/planesAlimenticiosController.js
 const sanitizeHtml = require('sanitize-html');
 const PlanAlimenticio = require('../models/PlanAlimenticio');
 const Paciente = require('../models/Paciente');

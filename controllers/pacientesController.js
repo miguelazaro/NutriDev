@@ -1,4 +1,3 @@
-// controllers/pacientesController.js
 const { Paciente, Progreso, NotaNutriologo, ArchivoPaciente } = require('../models/associations');
 
 // Helper: id del usuario logueado
@@ -61,7 +60,6 @@ exports.index = async (req, res) => {
   try {
     const pacientes = await Paciente.findAll({
       where: { usuario_id: userId },
-      // IMPORTANTE: tu modelo usa createdAt: 'fecha_registro'
       order: [['fecha_registro', 'DESC']]
     });
 
@@ -107,11 +105,15 @@ exports.guardar = async (req, res) => {
       historial,
       foto,
       archivo,
+<<<<<<< Updated upstream
       estatura: estatura ? parseInt(estatura) : null,
       actividad,
       objetivo,
       comidas_dia: comidas_dia ? parseInt(comidas_dia) : null,
       preferencias,
+=======
+      enviar_cuestionario: 0,  
+>>>>>>> Stashed changes
       usuario_id: userId
     });
 

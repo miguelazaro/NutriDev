@@ -3,11 +3,8 @@ const express = require('express');
 const router = express.Router();
 
 const pacientesController = require('../controllers/pacientesController');
-const upload = require('../middlewares/multerPacientes'); // incluye .single y .fields
+const upload = require('../middlewares/multerPacientes'); 
 
-// Si NO montas este router con requireAuth en app.js, puedes descomentar:
-// const { requireAuth } = require('../middlewares/auth');
-// router.use(requireAuth);
 
 // ---------- Listado & creación ----------
 router.get('/', pacientesController.index);

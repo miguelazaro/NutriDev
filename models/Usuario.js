@@ -19,18 +19,16 @@ const Usuario = sequelize.define('Usuario', {
     type: DataTypes.ENUM('nutriologo', 'admin'),
     defaultValue: 'nutriologo'
   },
-  // --- AÑADE ESTA SECCIÓN ---
   plan: {
     type: DataTypes.ENUM('basico', 'premium'),
     allowNull: false,
     defaultValue: 'basico'
   }
-  // -------------------------
 }, {
   tableName: 'usuarios',
   timestamps: true,
   createdAt: 'created_at',
-  updatedAt: false // sequelize no manejará la columna updatedAt
+  updatedAt: false 
 });
 
 module.exports = Usuario;

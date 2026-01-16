@@ -1,4 +1,3 @@
-// controllers/authController.js
 const bcrypt = require('bcryptjs');
 const Usuario = require('../models/Usuario');
 
@@ -104,8 +103,6 @@ exports.loginUser = async (req, res) => {
         rol: user.rol,
         plan: user.plan || 'basico'
       };
-
-      // Si guardaste una ruta antes de forzar login, respétala
       const redirectTo = req.session.returnTo || '/dashboard';
       delete req.session.returnTo;
 
@@ -119,10 +116,8 @@ exports.loginUser = async (req, res) => {
 };
 
 exports.logout = (req, res) => {
-  // Opcional: limpiar datos sensibles antes
   req.session.usuario = null;
   req.session.destroy(() => {
-    // si definiste cookie de sesión personalizada, podrías limpiar aquí con res.clearCookie('sid')
     return res.redirect('/login');
   });
 };

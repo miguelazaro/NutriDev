@@ -3,7 +3,6 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 
 const Paciente = sequelize.define('Paciente', {
-    // 👇 DUEÑO del registro (multi-usuario)
     usuario_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
@@ -14,7 +13,6 @@ const Paciente = sequelize.define('Paciente', {
         comment: 'ID del usuario (nutriólogo) dueño del paciente',
     },
 
-    // Información básica
     nombre: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -34,8 +32,6 @@ const Paciente = sequelize.define('Paciente', {
         defaultValue: 'México',
         allowNull: true
     },
-
-    // Datos para plan alimenticio (IA)
     estatura: {
         type: DataTypes.INTEGER,
         allowNull: true,
@@ -49,6 +45,59 @@ const Paciente = sequelize.define('Paciente', {
         validate: { min: 1, max: 10 }
     },
     preferencias: { type: DataTypes.TEXT, allowNull: true },
+<<<<<<< Updated upstream
+=======
+    porcentaje_grasa: {
+        type: DataTypes.FLOAT,
+        allowNull: true
+    },
+    circunferencia_cintura: {
+        type: DataTypes.FLOAT,
+        allowNull: true
+    },
+    presion_arterial: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+
+    // 🔹 Estilo de vida
+    tipo_ejercicio: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    horas_sueno: {
+        type: DataTypes.INTEGER,
+        allowNull: true
+    },
+    calidad_sueno: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    estres: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+
+    // Hábitos alimenticios
+    preferencia_alimentaria: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    consumo_agua: {
+        type: DataTypes.FLOAT,
+        allowNull: true
+    },
+    apetito: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+
+    // Enfermedades adicionales
+    otras_enfermedades: {
+        type: DataTypes.TEXT,
+        allowNull: true
+    },
+>>>>>>> Stashed changes
 
     // Contacto
     telefono: {

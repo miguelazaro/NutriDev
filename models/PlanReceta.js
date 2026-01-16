@@ -1,4 +1,3 @@
-// models/PlanReceta.js
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 
@@ -16,7 +15,32 @@ const PlanReceta = sequelize.define('PlanReceta', {
     notas: { type: DataTypes.STRING, allowNull: true }
 }, {
     tableName: 'plan_recetas',
+<<<<<<< Updated upstream
     underscored: true
+=======
+    underscored: true,
+    timestamps: true,
+    createdAt: 'created_at',
+    updatedAt: 'updated_at'
+});
+
+// ================================
+// ASOCIACIONES NECESARIAS
+// ================================
+PlanReceta.belongsTo(PlanAlimenticio, {
+    foreignKey: 'plan_id',
+    as: 'plan'
+});
+
+PlanReceta.belongsTo(Receta, {
+    foreignKey: 'receta_id',
+    as: 'receta'
+});
+
+PlanReceta.belongsTo(Paciente, {
+    foreignKey: 'paciente_id',
+    as: 'paciente'
+>>>>>>> Stashed changes
 });
 
 module.exports = PlanReceta;

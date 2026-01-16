@@ -6,7 +6,6 @@ exports.requireAuth = (req, res, next) => {
     return res.redirect('/login');
   }
 
-  // Hacerlo disponible en todas las vistas
   res.locals.user = usuario;
 
   next();
@@ -19,7 +18,6 @@ exports.redirectIfAuthenticated = (req, res, next) => {
   next();
 };
 
-// Middleware para verificar rol de usuario
 exports.checkRol = (rolesPermitidos = []) => {
   return (req, res, next) => {
     const usuario = req.session.usuario;
