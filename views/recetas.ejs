@@ -1,7 +1,9 @@
-<% const isPremium=user && (user.rol==='admin' || user.plan==='premium' ); const isAdmin=user && user.rol==='admin' ; //
-  cuando vienes desde un plan con ?addToPlan=ID const currentPlanId=typeof addToPlanId !=='undefined' && addToPlanId ?
-  String(addToPlanId) : null; const backToPlanURL_=typeof backToPlanURL !=='undefined' && backToPlanURL ? backToPlanURL
-  : (currentPlanId ? `/planes-alimenticios/${currentPlanId}` : null); %>
+<%
+  const isPremium = user && (user.rol === 'admin' || user.plan === 'premium');
+  const isAdmin = user && user.rol === 'admin';
+  const currentPlanId = typeof addToPlanId !== 'undefined' && addToPlanId ? String(addToPlanId) : null;
+  const backToPlanURL_ = typeof backToPlanURL !== 'undefined' && backToPlanURL ? backToPlanURL : (currentPlanId ? `/planes-alimenticios/${currentPlanId}` : null);
+%>
 
   <div
     class="flex flex-col sm:flex-row justify-between items-start sm:items-center px-4 sm:px-6 py-4 bg-white shadow-sm">
